@@ -1,5 +1,6 @@
 package lib;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -466,57 +467,76 @@ public class Compute {
 		
 	}
 	
+	/**
+	 * Method that given a matrix, compares the sum of the elements of each of its columns and rows separately,
+	 * it will return the row / column whose sum is greater.
+	 * 
+	 * 
+	 * @param m Given matrix
+	 * @return maxArray Row/Col whose sum is the greater.
+	 */
 	public static int[] maxArray(int[][] m) {
+		
 		// Declarations
-		int[] diagonalP = new int[m.length];
-		int[] diagonalS = new int[m.length];
-		int[] maxArray = new int[m.length];
+		int[] diagonalP = new int[m.length]; // Primary diagonal
+		int[] diagonalS = new int[m.length]; // Secondary diagonal
+		int sumAux = 0;
 		
-		int maxSumAux = 0; // not set to 0
-		int matrixSumAux = 0;
+		int maxSumAux = 0; // Store sumAux of each row/col
+		int[] maxArray = null;
 		
+		// Get maxArray from rows
 		for (int i = 0; i < m.length; i++) {
+			int[] oneRow = Compute.getFila(m, i);
 			for (int j = 0; j < m[0].length; j++) {
-				matrixSumAux += m[i][j];
+				sumAux += oneRow[j];
 			}
-			
-			if(matrixSumAux > maxSumAux) maxSumAux = matrixSumAux;
-			matrixSumAux = 0;
+			if(sumAux > maxSumAux) {
+				maxArray = new int[oneRow.length];
+				maxArray = oneRow;
+				maxSumAux = sumAux;
+			}
+			sumAux = 0; // Set to 0 for a new row
 		}
 		
-		for (int i = 0; i < m.length; i++) {
-			for (int j = 0; j < m[0].length; j++) {
-				matrixSumAux += m[i][j];
+		// Get maxArray from cols		
+		for (int i = 0; i < m[0].length; i++) {
+			int[] oneCol = Compute.getColumna(m, i);
+			for (int j = 0; j < m.length; j++) {
+				sumAux += oneCol[j];
+			}			
+			if (sumAux > maxSumAux) {
+				maxArray = new int[oneCol.length];
+				maxArray = oneCol;
+				maxSumAux = sumAux;
 			}
-			
-			if (matrixSumAux == maxSumAux) {
-				for (int j = 0; j < m.length; j++) {
-					maxArray[i] = m[i][j];
-				}
-			}
+			sumAux = 0; // Set to 0 for a new col
 		}
 		
-		if(m.length == m[0].length) { // get max sum between diagonals (if exist)
+		// Get max array from diagonals
+		if(m.length == m[0].length) { // Only square matrix have diagonals
 			diagonalP = diagonal(m);
 			diagonalS = diagonal(m, true);
-			int sumDP = 0;
-			int sumDS = 0;
-			for (int i = 0; i < m.length; i++) { // get main diagonal sum
-				
-				sumDP += diagonalP[i];
-				
+			int sumP = 0;
+			int sumS = 0;
+			
+			for (int i = 0; i < m.length; i++) { // get main diagonal sum				
+				sumP += diagonalP[i];				
 			}
 			
 			for (int i = 0; i < diagonalS.length; i++) { // get secondary diagonal sum
-				sumDS += diagonalS[i];
+				sumS += diagonalS[i];
 			}
 			
-			if(sumDP > sumDS && sumDP > maxSumAux) maxSumAux = sumDP;			
-			else if(sumDS > sumDP && sumDS > maxSumAux) maxSumAux = sumDS;
-			
-			
-		}
-		
+			if(sumP > sumS && sumP > maxSumAux) {
+				maxArray = new int[diagonalP.length];
+				maxArray = diagonalP;			
+			}
+			else if(sumS > sumP && sumS > maxSumAux) {
+				maxArray = new int[diagonalS.length];
+				maxArray = diagonalS;
+			}			
+		}		
 		return maxArray;
 	}
 }
