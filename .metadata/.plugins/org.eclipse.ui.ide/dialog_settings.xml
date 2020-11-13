@@ -12,6 +12,7 @@
 		<item key="WizardProjectsImportPage.STORE_CLOSE_CREATED_PROJECTS_ID" value="false"/>
 		<item key="WizardProjectsImportPage.STORE_HIDE_CONFLICTING_PROJECTS_ID" value="false"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
+			<item value="C:\Users\alumnado.DESKTOP-AMVVTGC\Desktop\Eclipse\Repositorios\Zackysh\Programacion\Java POO"/>
 			<item value="C:\Users\adrig\Desktop\Eclipse\Repositorios\Git_Zackysh\Programacion\Practica"/>
 		</list>
 		<list key="WizardProjectsImportPage.STORE_ARCHIVES">
