@@ -1,4 +1,4 @@
-package model;
+ package model;
 
 public class Persona {
 
@@ -14,29 +14,26 @@ public class Persona {
 		this.dni = dni;
 		this.sueldo = sueldo;
 		this.cuenta = cuenta;
-	}	
-	
-	// Construir persona sin asignarle una cuenta
-	public Persona(String nombre, String apellidos, String dni, double sueldo) {
-		this.nombre = nombre;
-		this.apellidos = apellidos;
-		this.dni = dni;
-		this.sueldo = sueldo;				
 	}
 	
 	public void cobrarSueldo() {
-		this.cuenta.sumarCantidad(this.getSueldo());
+		this.cuenta.sumarCantidad(this.sueldo);
 	}
 	
 	public void sacarPasta(double cantidad) {
-		if(cantidad < this.cuenta.getSaldo())
+		try {
 			this.cuenta.restarCantidad(cantidad);
-		else
-			System.out.println("¡No tienes suficiente saldo!");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public CuentaCorriente getCuentaCorriente() {
 		return cuenta;
+	}	
+	
+	public void cambiarSueldo(double nuevoSueldo) {
+		this.sueldo = nuevoSueldo;
 	}
 	
 	public void setCuentaCorriente(CuentaCorriente cuenta) {
@@ -69,10 +66,6 @@ public class Persona {
 
 	public double getSueldo() {
 		return sueldo;
-	}
-
-	public void cambiarSueldo(double nuevoSueldo) {
-		this.sueldo = nuevoSueldo;
 	}
 
 	@Override
