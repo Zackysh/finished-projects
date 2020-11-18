@@ -1,5 +1,0 @@
-INDEX VERSION 1.131+C:\Users\adrig\Desktop\Eclipse\Repositorios\Git_Zackysh\Programacion\.metadata\.plugins\org.eclipse.jdt.core
-2551671262.index
-3856919588.index
-3285582300.index
-4021261718.index
