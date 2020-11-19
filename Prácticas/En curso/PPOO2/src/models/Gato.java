@@ -2,12 +2,12 @@ package models;
 
 import java.util.Date;
 
-public class Perro extends Animal {
+public class Gato extends Animal {
 	
-	public enum RazaPerro {PASTOR_ALEMAN("Pastor alemán"), HUSKY("Husky"), FOXT("FoxTerrier"), DALMATA("Dalmata"), SANB("San Bernardo");
+	public enum RazaGato {COMUN("Pastor alemán"), SIAMES("Siamés"), PERSA("Persa"), ANGORA("Angora"), SCOTTISH("ScottishFold");
 		private String raza;
 	
-		RazaPerro(String raza) {
+		RazaGato(String raza) {
 			this.raza = raza;
 		}
 		
@@ -16,10 +16,10 @@ public class Perro extends Animal {
 		}
 	}
 	
-	private RazaPerro raza;
 	private String chip;
-	
-	public Perro(String nombre, Date fechaNacimiento, double peso, RazaPerro raza, String chip) {
+	private RazaGato raza;
+
+	public Gato(String nombre, Date fechaNacimiento, double peso, RazaGato raza, String chip) {
 		super(nombre, fechaNacimiento, peso);
 		this.raza = raza;
 		this.chip = chip;
@@ -27,7 +27,7 @@ public class Perro extends Animal {
 
 	@Override
 	public String toString() {
-		return "Ficha Perro\n"
+		return "Ficha Gato\n"
 			 + "Nombre: " + this.nombre
 			 + "\nRaza: " + this.raza.dameRaza()
 			 + "\nFecha de nacimiento: " + this.fechaNacimiento
@@ -35,5 +35,4 @@ public class Perro extends Animal {
 			 + "\nMicrochip: " + this.chip
 			 + "\nComentarios: " + this.comentarios;
 	}
-	
 }
