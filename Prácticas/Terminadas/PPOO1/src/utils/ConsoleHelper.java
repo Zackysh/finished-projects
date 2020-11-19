@@ -137,7 +137,8 @@ public class ConsoleHelper {
 		System.out.print("ID: ");
 		String dni = sc.nextLine();
 		double sueldo = 0;
-		boolean isValid = false;		
+		boolean isValid = false;	
+		
 		do {	
 			System.out.print("Salary: ");
 			try {
@@ -149,8 +150,7 @@ public class ConsoleHelper {
 			}			
 		} while (isValid != true);
 		
-		CuentaCorriente cuenta = new CuentaCorriente(lista.size() + 1, 0);
-		Persona persona = new Persona(nombre, apellidos, dni, sueldo, cuenta);
+		Persona persona = new Persona(nombre, apellidos, dni, sueldo, new CuentaCorriente(lista.size() + 1, 0));
 		lista.add(persona);
 		System.out.println("Person added: " + lista.get(lista.size()-1));
 	}
@@ -171,6 +171,7 @@ public class ConsoleHelper {
 				}
 			} while(option < 1 || option > lista.size());
 			option--;
+			System.out.println();
 			doOverPerson(lista.get(option));
 		} else System.out.println("\nThere's no people registered.");
 	}
@@ -184,21 +185,26 @@ public class ConsoleHelper {
 	}
 
 	public boolean menuDeletePerson(ArrayList<Persona> lista) {
-		boolean isValid = false;
 		boolean exit = false;
 		
 		showPersonList(lista);
-		
+		int option = -1;
 		do {
-			System.out.print("Option (number): ");
+			System.out.print("Person (numer): ");
 			try {
-				int option = Integer.parseInt(sc.nextLine());	
+				option = Integer.parseInt(sc.nextLine());
+				if(option < 1 || option > lista.size())
+					System.out.println("This is not a valid index.");
+					showPersonList(lista);
 			} catch (Exception e) {
 				e.fillInStackTrace();
-				System.out.println("You must input a number!");
+				System.out.println("This is not a number BRO.");
+				showPersonList(lista);
 			}
-		} while(isValid == false);
-		System.out.println();
+		} while(option < 1 || option > lista.size());
+		option--;
+		System.out.println("Persona eliminada: " + lista.get(option));
+		lista.remove(option);
 		
 		return exit;		
 	}

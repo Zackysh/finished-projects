@@ -2,14 +2,12 @@ package model;
 
 public class CuentaCorriente {
 
-	private String numeroCuenta;
+	private int numeroCuenta;
 	private double saldo;
-	private Persona titular;
 	
-	public CuentaCorriente(String numeroCuenta, double saldo, Persona titular) {
+	public CuentaCorriente(int numeroCuenta, double saldo) {
 		this.numeroCuenta = numeroCuenta;
 		this.saldo = saldo;
-		this.titular = titular;
 	}
 	
 	public void sumarCantidad(double cantidad) {
@@ -24,11 +22,8 @@ public class CuentaCorriente {
 		else System.out.println("Solo valores mayores a cero.");
 	}
 	
-	public String getNumeroCuenta() {
+	public int getNumeroCuenta() {
 		return numeroCuenta;
-	}
-	public void setNumeroCuenta(String numeroCuenta) {
-		this.numeroCuenta = numeroCuenta;
 	}
 	public double getSaldo() {
 		return saldo;
@@ -36,16 +31,6 @@ public class CuentaCorriente {
 	public void setSaldo(double saldo) {
 		this.saldo = saldo;
 	}
-	public Persona getTitular() {
-		return titular;
-	}
-	public void setTitular(Persona titular) {
-		this.titular = titular;
-	}
 	
-	@Override
-	public String toString() {
-		return "CuentaCorriente [numeroCuenta=" + numeroCuenta + ", saldo=" + saldo + ", titular=" + titular + "]";
-	}
 	
 }
