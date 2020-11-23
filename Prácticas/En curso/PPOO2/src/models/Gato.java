@@ -1,25 +1,16 @@
 package models;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-public class Gato extends Animal {
-	
-	public enum RazaGato {COMUN("Pastor alemán"), SIAMES("Siamés"), PERSA("Persa"), ANGORA("Angora"), SCOTTISH("ScottishFold");
-		private String raza;
-	
-		RazaGato(String raza) {
-			this.raza = raza;
-		}
-		
-		public String dameRaza() {
-			return raza;
-		}
-	}
+import Enums.Enums.RazaGato;
+import utils.DateHelper;
+
+public class Gato extends Animal {	
 	
 	private String chip;
 	private RazaGato raza;
 
-	public Gato(String nombre, Date fechaNacimiento, double peso, RazaGato raza, String chip) {
+	public Gato(String nombre, LocalDate fechaNacimiento, double peso, RazaGato raza, String chip) {
 		super(nombre, fechaNacimiento, peso);
 		this.raza = raza;
 		this.chip = chip;

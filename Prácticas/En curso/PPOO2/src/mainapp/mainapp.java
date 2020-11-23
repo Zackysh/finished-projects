@@ -1,32 +1,33 @@
 package mainapp;
 
-import java.util.Date;
+import java.time.LocalDate;
 
+import Enums.Enums.EspeciePajaro;
+import Enums.Enums.EspecieReptil;
+import Enums.Enums.RazaGato;
+import Enums.Enums.RazaPerro;
 import models.Animal;
 import models.ClinicaVeterinaria;
 import models.Gato;
-import models.Gato.RazaGato;
 import models.Pajaro;
-import models.Pajaro.EspeciEPajaro;
 import models.Perro;
-import models.Perro.RazaPerro;
-import models.Reptil.EspecieReptil;
 import models.Reptil;
-import utils.DateCreator;
+import utils.ConsoleHelper;
+import utils.DateHelper;
 
 public class mainapp {
 	
 	public static void main(String[] argd) {
 		
-		DateCreator dc = new DateCreator();
 		ClinicaVeterinaria cv = new ClinicaVeterinaria();
+		ConsoleHelper ch = new ConsoleHelper();
 		
-		Date fechaNacimiento = dc.createDate("2000-12-06");
+		LocalDate fechaNacimiento = DateHelper.generarFecha();
 		Animal perro = new Perro("Pepper", fechaNacimiento, 7, RazaPerro.DALMATA, "3232132312412321");
 		perro.setComentarios("Con puntitos negros.");
 		Animal gato = new Gato("Garfield", fechaNacimiento, 23, RazaGato.SCOTTISH, "111432321444122");
 		gato.setComentarios("Odia los lunes");
-		Animal pajaro = new Pajaro("Snoopy", fechaNacimiento, 1.3, EspeciEPajaro.CANARIO, true);
+		Animal pajaro = new Pajaro("Snoopy", fechaNacimiento, 1.3, EspeciePajaro.CANARIO, true);
 		pajaro.setComentarios("Es amarillo.");
 		Animal reptil = new Reptil("Donatello", fechaNacimiento, 12, EspecieReptil.TORTUGA, false);
 		reptil.setComentarios("Este bicho muerde.");
@@ -36,7 +37,7 @@ public class mainapp {
 		cv.insertaAnimal(pajaro);
 		cv.insertaAnimal(reptil);
 		
-		System.out.println(cv);
+		ch.mainMenu(cv);
+		
 	}
-
 }

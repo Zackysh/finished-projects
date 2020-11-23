@@ -1,15 +1,17 @@
 package models;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public abstract class Animal {
 
 	protected String nombre;
-	protected Date fechaNacimiento;
+	protected LocalDate fechaNacimiento;
 	protected double peso;
 	protected String comentarios;
+	protected String chip;
 
-	public Animal(String nombre, Date fechaNacimiento, double peso) {
+	public Animal(String nombre, LocalDate fechaNacimiento, double peso) {
 		this.nombre = nombre;
 		this.fechaNacimiento = fechaNacimiento;
 		this.peso = peso;
@@ -35,13 +37,13 @@ public abstract class Animal {
 		return nombre;
 	}
 
-	public Date getFechaNacimiento() {
+	public LocalDate getFechaNacimiento() {
 		return fechaNacimiento;
 	}
 
 	@Override
 	public String toString() {
-		return "nombre=" + nombre + ", fechaNacimiento=" + fechaNacimiento + ", peso=" + peso + ", comentarios="
+		return "nombre=" + nombre + ", fechaNacimiento=" + this.fechaNacimiento + ", peso=" + peso + ", comentarios="
 				+ comentarios + ", ";
 	}
 

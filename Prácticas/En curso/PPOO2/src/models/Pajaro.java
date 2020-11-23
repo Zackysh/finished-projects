@@ -1,25 +1,16 @@
 package models;
 
-import java.util.Date;
+import java.time.LocalDate;
+
+import Enums.Enums.EspeciePajaro;
+import utils.DateHelper;
 
 public class Pajaro extends Animal {
 	
-	public enum EspeciEPajaro {CANARIO("Canario"), PERIQUITO("Periquito"), AGAP("Agapornis");
-		private String especie;
-	
-		EspeciEPajaro(String especie) {
-			this.especie = especie;
-		}
-		
-		public String dameEspecie() {
-			return especie;
-		}
-	}
-	
 	private boolean cantor;
-	private EspeciEPajaro especie;
+	private EspeciePajaro especie;
 
-	public Pajaro(String nombre, Date fechaNacimiento, double peso, EspeciEPajaro especie, boolean cantor) {
+	public Pajaro(String nombre, LocalDate fechaNacimiento, double peso, EspeciePajaro especie, boolean cantor) {
 		super(nombre, fechaNacimiento, peso);
 		this.especie = especie;
 		this.cantor = cantor;
