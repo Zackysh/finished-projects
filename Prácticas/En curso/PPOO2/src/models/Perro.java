@@ -24,7 +24,8 @@ public class Perro extends Animal {
 			 + "\nFecha de nacimiento: " + this.fechaNacimiento
 			 + "\nPeso: " + this.peso + "Kg"
 			 + "\nMicrochip: " + this.chip
-			 + "\nComentarios: " + this.comentarios;
+			 + "\nComentarios: " + this.comentarios
+			 + "\n";
 	}
 	
 }

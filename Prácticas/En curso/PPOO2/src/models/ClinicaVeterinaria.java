@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ClinicaVeterinaria {
 
-	private List<Animal> lista;
+	public List<Animal> lista;
 	private static List<String> chips;
 
 	public ClinicaVeterinaria() {
@@ -54,14 +54,14 @@ public class ClinicaVeterinaria {
 		return chip;
 	}
 
-	@Override
-	public String toString() {
-		String lista = "Lista de animales registrados:\n";
-		for (Animal animal : this.lista) {
-			lista += animal + "\n\n";
-		}
-		return lista;
-	}
+//	@Override
+//	public String toString() {
+//		String lista = "Lista de animales registrados:\n";
+//		for (Animal animal : this.lista) {
+//			lista += animal + "\n\n";
+//		}
+//		return lista;
+//	}
 	
 	
 }

@@ -36,8 +36,8 @@ public class mainapp {
 		cv.insertaAnimal(gato);
 		cv.insertaAnimal(pajaro);
 		cv.insertaAnimal(reptil);
-		
-		ch.mainMenu(cv);
+		System.out.println(cv.lista);
+//		ch.mainMenu(cv);
 		
 	}
 }
