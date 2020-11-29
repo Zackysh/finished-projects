@@ -9,7 +9,6 @@ public abstract class Animal {
 	protected LocalDate fechaNacimiento;
 	protected double peso;
 	protected String comentarios;
-	protected String chip;
 
 	public Animal(String nombre, LocalDate fechaNacimiento, double peso) {
 		this.nombre = nombre;
