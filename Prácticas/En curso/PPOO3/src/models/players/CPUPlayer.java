@@ -2,17 +2,34 @@ package models.players;
 
 import enums.EnumGame.Juegos;
 import models.Mano;
-import models.Mesa;
+import models.games.Game;
+import utils.StringUtils;
 
-public class CPUPlayer extends Player{
+public class CPUPlayer extends Player {
 
-	public CPUPlayer(String nombre, int puntos, Mano mano, Mesa mesa) {
-		super(nombre, puntos, mano, mesa);
+	public CPUPlayer(String nombre, Game game) {
+		super(nombre, 0, new Mano(game.getMesa()), game);
 	}
 
 	@Override
 	public void jugarTurno(Juegos juego) {
-		// TODO Auto-generated method stub
+		System.out.print(
+				    "Jugador: " + this.getNombre() + "\n"
+				  + "Puntuación actual: " + this.puntos + "\n");
+		StringUtils.br();
+		if(this.puntos < 6) {
+			System.out.println("Ha decidido robar");
+			this.robar();
+			this.puntos += this.mano.ultimaCartaInsertada().getValor7yMedia();
+			System.out.println(
+					  "Carta robada: " + this.mano.ultimaCartaInsertada() + "\n"
+					+ "Valor que suma: " + this.mano.ultimaCartaInsertada().getValor7yMedia() + "\n"
+					+ "Nueva puntuación: " + this.puntos);
+		} else {
+			System.out.println("Ha decidido plantarse con " + this.puntos);
+			this.plantarse();
+		}
 		
-	}	
+		StringUtils.br();
+	}
 }

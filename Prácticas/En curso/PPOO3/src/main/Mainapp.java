@@ -3,6 +3,7 @@ package main;
 import java.util.Scanner;
 
 import enums.EnumGame.Juegos;
+import models.Mesa;
 import models.games.Game;
 import models.games.SieteYMedio;
 import utils.StringUtils;

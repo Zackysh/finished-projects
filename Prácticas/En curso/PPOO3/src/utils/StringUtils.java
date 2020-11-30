@@ -28,6 +28,10 @@ public class StringUtils {
 		}
 		return temp;
 	}
+	
+	public static void br() {
+		System.out.println();
+	}
 
 	public static String nombreAleatorio() {
 		String[] nombres = { "Pipo", "Bowser", "GLaDOS", "The Joker", "Ganon", "Gary Oak", "Sephiroth", "Inky" };

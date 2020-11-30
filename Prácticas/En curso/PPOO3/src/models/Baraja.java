@@ -7,18 +7,22 @@ import java.util.List;
 public class Baraja extends Mazo {
 	
 	/**
-	 * Constructor que genera una baraja vacía.
+	 * Constructor de la baraja. Genera una baraja vacía.
+	 * Puede contener varias cartas.
 	 */
 	public Baraja() {
 		lista = new ArrayList<Carta>();
 	};
 	
 	/**
-	 * Constructor Genera un tipo de baraja según el entero que reciba, si recibe un entero
+	 * Constructor de la baraja.
+	 * Contendrá una baraja española entera o doble.
+	 * Genera un tipo de baraja según el entero que reciba, si recibe un entero
 	 * inesperado creará una baraja de la opción válida más cercana:
 	 *  - 1: Baraja normal de 40 cartas.
-	 *  - 2: Baraja doble de 80 cartas.	 * 
-	 * @param tipoBaraja
+	 *  - 2: Baraja doble de 80 cartas.
+	 *  
+	 * @param tipoBaraja Entero que definirá el tipo de baraja.
 	 */
 	public Baraja(int tipoBaraja) {
 		if (tipoBaraja <= 1) {
@@ -36,11 +40,19 @@ public class Baraja extends Mazo {
 		}
 	}
 	
-	// Modificar orden de la baraja
+	/**
+	 * Método que reordenará de forma aleatoria el contenido de la lista de cartas.
+	 */
 	public void barajar() {
 		Collections.shuffle(this.lista);
 	}
 	
+	/**
+	 * Método que recibirá un entero, este señalará una posición en la baraja y la
+	 * cortará por ese punto.
+	 * 
+	 * @param interseccion Punto por el que cortar.
+	 */
 	public void cortar(int interseccion) {
 		List<Carta> mitadUno = this.lista.subList(0, interseccion);
 		List<Carta> mitadDos = this.lista.subList(interseccion, this.lista.size());
@@ -49,23 +61,43 @@ public class Baraja extends Mazo {
 		System.out.println(mitadUno);
 	}
 	
-	// Extraer
+	/**
+	 * Método que extraerá
+	 * 
+	 * @return
+	 */
 	public Carta robar() {
-		Carta temp = this.lista.get(1);
-		this.lista.remove(1);
+		Carta temp = this.lista.get(0);
+		this.lista.remove(0);
 		return temp;
 	}
 	
-	// Insertar
-	public void insertarCartarFinal(int id_carta) {
+	// Métodos para INSERTAR CARTAS
+	
+	/**
+	 * Método que inserta una carta al final de la baraja (arriba).
+	 * 
+	 * @param id_carta Recibe la carta en forma de id.
+	 */
+	public void insertarCartaArriba(int id_carta) {
 		lista.add(new Carta(id_carta));
 	}
 	
-	public void insertarCartaFinal(Carta carta) {
+	/**
+	 * Método que inserta una carta al final de la baraja (arriba).
+	 * 
+	 * @param id_carta Recibe la carta en forma de objeto.
+	 */
+	public void insertarCartaArriba(Carta carta) {
 		lista.add(carta);
 	}
 	
-	public void insertarCartaPrincipio(int id_carta) {
+	/**
+	 * Método que inserta una carta al principio de la baraja (abajo).
+	 * 
+	 * @param id_carta Recibe la carta en forma de id.
+	 */
+	public void insertarCartaAbajo(int id_carta) {
 		ArrayList<Carta> copia = new ArrayList<Carta>(this.lista);
 		this.lista.clear();
 		this.lista.add(new Carta(id_carta));
@@ -74,7 +106,12 @@ public class Baraja extends Mazo {
 		}
 	}
 	
-	public void insertarCartaPrincipio(Carta carta) {
+	/**
+	 * Método que inserta una carta al principio de la baraja (abajo).
+	 * 
+	 * @param id_carta Recibe la carta en forma de objeto.
+	 */
+	public void insertarCartaAbajo(Carta carta) {
 		ArrayList<Carta> copia = new ArrayList<Carta>(this.lista);
 		this.lista.clear();
 		this.lista.add(carta);
@@ -83,7 +120,19 @@ public class Baraja extends Mazo {
 		}
 	}
 	
+	/**
+	 * Metodo que devuelve el número de cartas que contiene la baraja.
+	 * 
+	 * @return number Número de cartas que contiene la baraja.
+	 */
 	public int getNumeroCartas() {return this.lista.size();}
+	
+	/**
+	 * Método que comprueba si la baraja está vacía.
+	 * 
+	 * @returns true Si la baraja está vacía.
+	 * @returns false Si la baraja no está vacía.
+	 */
 	public boolean isVacia() {
 		if(this.lista.isEmpty()) return true;
 		else return false;

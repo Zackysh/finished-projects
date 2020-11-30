@@ -2,7 +2,6 @@ package models.games;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Scanner;
 
 import enums.EnumGame.Juegos;
@@ -19,12 +18,42 @@ public class SieteYMedio extends Game {
 	
 	private static Scanner sc = new Scanner(System.in);
 	
-	public SieteYMedio(Mesa mesa) {
-		super(mesa);
-		super.modo = Juegos.SIETEYMEDIO;
-		super.finished = false;
+	/**
+	 * Parámetros de configuración de SieteYMedio. La configuración está implicita
+	 * en el propio juego. Sin embargo, para facilitar la lectura se extraen sus
+	 * valores en estas variables en el constructor.
+	 */
+	private double valorAlcanzar;
+	private int tipoBaraja;
+
+	
+	/**
+	 * Constructor.
+	 */
+	public SieteYMedio() {
+		this.jugadores = new ArrayList<Player>();
+		this.modo = Juegos.SIETEYMEDIO;
+		this.finished = false;
+		this.mesa = new Mesa(new Baraja(1));
+		this.config = new double[2];
+		// Establezco una configuración por defecto al crear el juego.
+		this.config[0] = 1;
+		this.config[1] = 7.5;
+		// Le asigno estos valores a las variables que facilitarán su implementación.
+		this.tipoBaraja = (int) config[0];
+		this.valorAlcanzar = config[1];
+	}
+	
+	public void cambiarConfig(double[] nuevaConfig) {
+		config = nuevaConfig;
+		tipoBaraja = (int) config[0];
+		valorAlcanzar = config[1];		
 	}
 
+	public double[] obtenerConfigActual() {
+		return this.config;
+	}
+	
 	public void mostrarListaJugadores() {
 		int cont = 1;
 		for (Player player : jugadores) {
@@ -37,6 +66,7 @@ public class SieteYMedio extends Game {
 		Collections.shuffle(jugadores);
 	}
 	
+	// LÓGICA DEL JUEGO
 	@Override
 	public void bienvenida() {
 		System.out.println(
@@ -52,26 +82,31 @@ public class SieteYMedio extends Game {
 	 */
 	@Override
 	public void menuPrincipal() {
-		double[] config = {1, 7.5};
+		
+		// Variable de control.
 		boolean salir = false;
 		do {
-			String strOpcion = "";
 			System.out.println("===== Menu principal =====\n"
 					+ "1. Comenzar el juego.\n"
 					+ "2. Configurar reglas de juego.\n"
 					+ "3. Añadir/Quitar jugadores.\n"
 					+ "4. Cómo se juega.\n"
-					+ "5. Salir.");
+					+ "5. Simular partidas (testing)"
+					+ "6. Salir.");
 			
+			// Variables de control/validación.
+			String strOpcion = "";
 			boolean esValida = false;
 			do {
 				System.out.print("Opción: ");
 				strOpcion = sc.nextLine().trim();
+				
 				if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4") || strOpcion.equals("5"))
 					esValida = true;
 				else
 					System.out.println("Opción no válida, vuelve a intentarlo.");
-			} while (!esValida);
+				
+			} while (!esValida); // La opción debe ser válida.
 
 			switch (strOpcion) {
 			case "1":
@@ -86,7 +121,7 @@ public class SieteYMedio extends Game {
 				break;
 			case "2":
 				br();
-				config = mostrarMenuConfiguracion(config);
+				mostrarMenuConfiguracion();				
 				br();
 				break;
 			case "3":
@@ -100,22 +135,52 @@ public class SieteYMedio extends Game {
 				br();
 				break;
 			case "5":
+				System.out.println(
+						  "1. Forzar empate.\n"
+						+ "2. Forzar ganador con pleno.\n"
+						+ "3. Forzar ganador sin pleno.\n"
+						+ "4. Atrás.");
+				// Variables de control/validación (las reutilizo, no causa conflicto).
+				strOpcion = "";
+				esValida = false;
+				do {
+					System.out.print("Opción: ");
+					strOpcion = sc.nextLine().trim();
+					
+					if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4"))
+						esValida = true;
+					else
+						System.out.println("Opción no válida, vuelve a intentarlo.");
+					
+				} while (!esValida); // La opción debe ser válida.
+				
+				switch(strOpcion) {
+				case "1":
+					System.out.println(
+							  "Todos los jugadores existentes han sido borrados para lograr una simulación exitosa.\n"
+							 + "También se ha restablecido la configuración (1, 7.5)\n"
+							 + "Se añadirán dos jugadores. La baraja solo contendrá cuatro cartas cartas que causarán un empate.");
+//					this.mesa = new Mesa
+					Player simu1 = new HumanPlayer("Simu Uno", this);
+					
+				}
+				break;
+			case "6":
 				salir = true;
 				System.out.print("\n" 
 						+ "================================\n"
 						+ "|     ¡Hasta la próxima!       |\n"
 						+ "================================\n");
 			}
-		} while (!salir);
+		} while (!salir); // Mostrará el menú hasta que el usuario pulse "5" (salir).
 		
-		this.finished = true;		
+		this.finished = true; // El juego habrá terminado.
 	}
 	
 	private void mostrarMenuJugadores() {
 		
 		boolean salir = false;
 		do {
-			String strOpcion = "";
 			System.out.println("===== Jugadores =====");
 			System.out.println(
 					  "1. Añadir nuevo.\n"
@@ -123,80 +188,110 @@ public class SieteYMedio extends Game {
 					+ "3. Mostrar lista.\n"
 					+ "4. Atrás.");
 			
+			// Variables de control/validación.
+			String strOpcion = "";
 			boolean esValida = false;
 			do {
 				System.out.print("Opción: ");
 				strOpcion = sc.nextLine().trim();
+				
 				if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4"))
 					esValida = true;
 				else
 					System.out.println("Opción no válida, vuelve a intentarlo.");
+				
 			} while (!esValida);
 
 			switch (strOpcion) {
 			case "1":
+				
 				br();
 				System.out.println(
 						    "Nuevo Jugador:\n"
 						  + "1. Añadir CPU Player.\n"
-						  + "2. Añadir jugador humano.\n"
+						  + "2. Añadir Human Player.\n"
 						  + "3. Atrás.");
-				String strOpcionTipoPlayer;
-
+				// Variables de control/validación.
+				strOpcion = ""; // Reutilizamos esta variable (no causa conflicto.
 				boolean esTipo = false;
 				do {
 					System.out.print("Opción: ");
-					strOpcionTipoPlayer = sc.nextLine().trim();
-					if (strOpcionTipoPlayer.equals("1") || strOpcionTipoPlayer.equals("2")
-							|| strOpcionTipoPlayer.equals("3"))
+					strOpcion = sc.nextLine().trim();
+					
+					if (strOpcion.equals("1") || strOpcion.equals("2")
+							|| strOpcion.equals("3"))
 						esTipo = true;
 					else
 						System.out.println("Opción no válida, vuelve a intentarlo.");
+					
 				} while (!esTipo);
+				
+				// Declaramos esta variable fuera del switch pues se utiliza más de un caso.
+				// Creo que queda más limpio
 				String nombre;
-				switch (strOpcionTipoPlayer) {
+				switch (strOpcion) {
 				case "1":
+					// Asignación de nombre (CPU Player).
 					System.out.print("Nuevo jugador (CPU):\n"
-							+ "Introduce un nombre para este jugador (dejar en blanco para usar un nombre aleatorio): ");
+							+ "Introduce un nombre para este jugador\n"
+							+ "(dejar en blanco para usar un nombre aleatorio): ");
+					
 					nombre = sc.nextLine();
 					if (nombre.isBlank())
 						nombre = StringUtils.nombreAleatorio();
-					addPlayer(new CPUPlayer(nombre, 0, new Mano(mesa), mesa));
+					
+					// Añadir CPU a este juego con dicho nombre.
+					addPlayer(new CPUPlayer(nombre, this));
+					
 					System.out.println("¡CPU Player añadido con exito! :)");
 					break;
+					
 				case "2":
+					// Asignación de nombre (Human Player).
 					System.out.print("Nuevo jugador (humano):\n"
-							+ "Introduce un nombre para este jugador (dejar en blanco para usar un nombre aleatorio): ");
+							+ "Introduce un nombre para este jugador\n"
+							+ "(dejar en blanco para usar un nombre aleatorio): ");
 					nombre = sc.nextLine();
 					if (nombre.isBlank())
 						nombre = StringUtils.nombreAleatorio();
-					addPlayer(new HumanPlayer(nombre, 0, new Mano(mesa), mesa));
+					
+					// Añadir jugador a este juego con dicho nombre.
+					addPlayer(new HumanPlayer(nombre, this));
 					System.out.println("¡Human Player añadido con exito! :)");
 					break;
+					
 				case "3":
 					salir = true;
 				}
 				br();
 				break;
+				
 			case "2":
+				
 				br();
 				int indiceJugador;
 
 				boolean esIndice = false;
-				do { // Se muestra una lista con los jugadores. Se debe seleccionar uno para poder continuar.
-					String strIndiceJugador = "";
 
+				do {
+					// Variable que utiliza el usuario para seleccionar un jugador antes de editarlo.
+					String strIndiceJugador = "";
+					
+					// Se muestra una lista con los jugadores. Se debe seleccionar uno para poder continuar.
 					System.out.println("Jugadores:");
 					this.mostrarListaJugadores();
 
-					boolean esInt = false;
+					boolean esInt = false; // Debe ser int, pues hará referencia a un índice de una lista.
 					do {
 						System.out.print("Opción: ");
 						strIndiceJugador = sc.nextLine().trim();
+						
 						esInt = Validator.validateInt(strIndiceJugador);
+						
 						if (!esInt)
 							System.out.println("Debes introducir un número.");
-					} while (!esInt);
+						
+					} while (!esInt); // No pasará hasta que sea un entero.
 
 					indiceJugador = Integer.parseInt(strIndiceJugador) - 1;
 
@@ -205,53 +300,68 @@ public class SieteYMedio extends Game {
 					else
 						System.out.println("Opción no válida.");
 
-				} while (!esIndice);
-				System.out.println("BIEEEEEEEEEEEEEEN");
+				} while (!esIndice); // No pasa hasta que se haya introducido un índice válido.
 				
+				// El jugador ya está seleccionado, hora de editarlo / eliminarlo.
 				System.out.println(
 					    "Nuevo Jugador:\n"
 					  + "1. Cambiar nombre.\n"
 					  + "2. Eliminar.\n"
 					  + "3. Atrás.");
-
-				String strOpcion2;
-				boolean esValida2 = false;
+				
+				// Reutilizamos las variables de control del anterior menú (no genera conflicto).
+				strOpcion = "";
+				esValida = false;
 				do {
 					System.out.print("Opción: ");
-					strOpcion2 = sc.nextLine().trim();
-					if (strOpcion2.equals("1") || strOpcion2.equals("2") || strOpcion2.equals("3"))
-						esValida2 = true;
+					strOpcion = sc.nextLine().trim();
+					if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3"))
+						esValida = true;
 					else
 						System.out.println("Opción no válida, vuelve a intentarlo.");
-				} while (!esValida2);
-				switch (strOpcion2) {
-				case "1": // Al cambiar el nombre sí es posible dejarlo vacío.
+				} while (!esValida);
+				
+				switch (strOpcion) {
+				case "1":
+					// Obtenemos la referencia del jugador deseado.
 					Player temp = jugadores.get(indiceJugador);
-					System.out.print("Nuevo nombre: ");
+					
+					// Le asignamos un nuevo nombre...
+					System.out.print(
+							  "Nuevo nombre\n"
+							+ "(dejar en blanco para usar un nombre aleatorio):");
+					
 					nombre = sc.nextLine();
 					if (nombre.isBlank())
 						nombre = StringUtils.nombreAleatorio();
-					temp.setNombre(nombre);
+					
+					temp.setNombre(nombre); //  ...a través de su referencia.
 					break;
+					
 				case "2":
+					
 					System.out.println("Jugador eliminado: "
 							+ StringUtils.normalizarString(jugadores.get(indiceJugador).getNombre()));
+					// Eliminamos el jugador al que hace referencia el índice.
 					jugadores.remove(indiceJugador);
 					break;
 				}
 				br();
 				break;
+				
 			case "3":
+				// Mostramos la lista de jugadores.
 				br();
 				System.out.println("Jugadores:");
 				this.mostrarListaJugadores();
 				br();
 				break;
+				
 			case "4":
 				salir = true;
 				break;
 			}
-		} while (!salir);
+		} while (!salir); // No saldrá hasta que el usuario pulse salir.
 	}
 
 	/**
@@ -266,13 +376,16 @@ public class SieteYMedio extends Game {
 	 */
 	@Override
 	public void start(double[] config) {
-		// La mesa se genera después de haber elegido la configuración en el menú
-		// principal. Gracias a esto, es posible utilizar distintos tipos de barjas en
-		// cada ejecución.
-		int tipoBaraja = (int) config[0]; // Primer parámetro de la configuración.
+		
+		/*
+		 * La mesa se genera después de haber elegido la configuración en el menú
+		 * principal. Gracias a esto, es posible utilizar distintos tipos de barjas en
+		 * cada ejecución.
+		 */
+		tipoBaraja = (int) config[0]; // Primer parámetro de la configuración.
 		this.mesa 	   = new Mesa(new Baraja(tipoBaraja));
 		
-		double valorAlcanzar = config[1]; // Segundo parámetro de la configuración.
+		valorAlcanzar = config[1]; // Segundo parámetro de la configuración.
 		
 		this.barajar(); // BARAJA la baraja que está en la mesa.
 		
@@ -280,25 +393,144 @@ public class SieteYMedio extends Game {
 		System.out.println(
 				  "Valor a alcanzar: " + valorAlcanzar + "\n"
 				+ "Tipo de baraja: " + tipoBaraja);
+		br();
+		do {
+			for (Player player : jugadores) {
+				
+				if(!player.isPlantado())
+					player.jugarTurno(Juegos.SIETEYMEDIO);
+				
+				if(player.getPuntos() >= valorAlcanzar)
+					player.plantarse();
+				
+			}
+		} while(!checkPlantados());
 		
+		/**
+		 * He opdato por esta forma de obtener al ganador/ganadores, me ha resultado intuitiva.
+		 * No tengo tiempo para implementar otra más eficiente. Pero aquí dejo la que creo que es más eficiente:
+		 * 
+		 * Crear un ArryList de enteros, almacenar todos los puntos de los jugadores (con un for), ya tenemos el máximo.
+		 * Añadir a otra lista todos los jugadores que tengan esa puntuación (que previamente habrá sido filtrada para
+		 * no se mayor que el valor a alcanzar).
+		 * Y ya tendrías los ganadores.
+		 * Es similar.
+		 */
+		// RESULTADOS
+		boolean empate = false; // Si hay empate, los ganadores podrán jugar una revancha.
+		Player ganador = null;
+		ArrayList<Player> ganadores = null;
+		
+		// En caso de pleno.
+		
+		// Variable auxiliar.
+		int numeroGanadores = 0;
 		for (Player player : jugadores) {
-			if(player)
-			player.jugarTurno(Juegos.SIETEYMEDIO);
+			if(player.getPuntos() == valorAlcanzar)
+				numeroGanadores++;
 		}
 		
+		if (numeroGanadores > 1) {
+			ganadores = new ArrayList<Player>(); // Se reserva memoria si hay más de 1 ganador.
+			for (Player player : jugadores) {
+				ganadores.add(player);
+			}
+		} else if (numeroGanadores == 1) {			
+			for (Player player : jugadores) {				
+					ganador = player;
+			}
+		}
 		
-//		System.out.println("Tu puntuación final es " + valor);
-//		if(valor == valorAlcanzar)
-//			System.out.print("\n"
-//					+ "================================\n"
-//					+ "|         ¡Has GANADO!         |\n"
-//					+ "================================\n");
-//		else
-//			System.out.print("\n"
-//					+ "================================\n"
-//					+ "|         ¡Has PERDIDO!        |\n"
-//					+ "================================\n");
+		// En caso de que nadie haya logrado un pleno.
+		if(numeroGanadores == 0) {
+			
+			// Variable auxiliares.
+			int mayorPuntuacion = 0;
+			for (Player player : jugadores) { // Primero vemos cuál es la mayor puntuación válida.			
+				if(player.getPuntos() > mayorPuntuacion && player.getPuntos() < valorAlcanzar) {
+					mayorPuntuacion = player.getPuntos();
+				}
+			}
+			for (Player player : jugadores) { // Contamos los jugadores que la han sacado.
+				if(player.getPuntos() == mayorPuntuacion)
+					numeroGanadores++;
+			}
+			
+			// Con este if, evito comprobar si el número de ganadores es mayor a uno
+			// por cada jugador. Escribo dos veces el for, pero ahorro tiempo de ejecución.
+			if(numeroGanadores == 1)
+			for (Player player : jugadores) {
+				if(player.getPuntos() == mayorPuntuacion)
+					ganador = player;
+			} else if(numeroGanadores != 0) {
+				ganadores = new ArrayList<Player>(); // Se reserva espacio solo si hay más de 1 ganador.
+				for (Player player : jugadores) {
+					if(player.getPuntos() == mayorPuntuacion)
+						ganadores.add(player);					
+				}
+			}
+		} // Ganadores obtenidos.
 		
+		System.out.println(
+				  "==================================\n"
+				+ "|           RESULTADOS           |\n"
+				+ "==================================\n");
+		if(numeroGanadores == 0)
+			System.out.println("¡¡¡HAN PERDIDO TODOS!!! Esto se parece un poco al lol.");
+			
+		else if(numeroGanadores == 1)
+			System.out.println("EL GANADOR ES...." + "¡¡¡" + ganador.getNombre() + "!!!");
+		
+		else {
+			empate = true;
+			System.out.print("LOS GANADORES SON... ¡¡¡");
+			for (Player player : ganadores) {
+				if(numeroGanadores > 2) {
+					if (ganadores.get(jugadores.size() - 2) != player && ganadores.get(jugadores.size() - 1) != player)
+						System.out.print(player.getNombre() + ", ");
+					else if (ganadores.get(jugadores.size() - 2) == player)
+						System.out.print(player.getNombre() + " y ");
+				} else {
+					if(ganadores.get(0) == player)
+						System.out.println(player.getNombre() + " y ");
+					else
+						System.out.println(player.getNombre());
+				}
+			}
+			System.out.print("!!!");
+			br();
+		}
+		
+		if(empate) {
+			System.out.println("Como hay más de un ganador, puedes empezar la revancha con los ganadores.\n"
+					+ "¿Deseas la revancha?\n"
+					+ "1. Sí.\n"
+					+ "2. No.");
+			
+			// Variables de control/validación.
+			String strOpcion = "";
+			boolean esValida = false;
+			do {
+				System.out.print("Opción: ");
+				strOpcion = sc.nextLine().trim();
+				if (strOpcion.equals("1") || strOpcion.equals("2"))
+					esValida = true;
+				else
+					System.out.println("Opción no válida, vuelve a intentarlo.");
+			} while (!esValida);
+			
+			switch(strOpcion) {
+			case "1":
+				this.jugadores = ganadores; // Los jugadores ahora serán los ganadores.
+				this.start(config); // Empezaremos la partida directamente con la misma configuración.
+				break;
+			case "2":
+				System.out.println("\nMejor si ganan todos :)");
+			}
+		}
+		
+		// Volverá al menú del propio juego, no se borrarán los jugadores, pero sí se resetearán los valores necesarios.
+		this.finish();
 	}
 
 	@Override
@@ -307,11 +539,20 @@ public class SieteYMedio extends Game {
 		return null;
 	}
 	
+	public boolean checkPlantados() {
+		for (Player player : jugadores) {
+			if(player.isPlantado() != true) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	/**
 	 * <h3>Reglas del juego<h3>
 	 * Menú que muestra las reglas del juego.
 	 */
-	private static void mostrarReglas() {
+	private void mostrarReglas() {
 		System.out.println("===== Reglas =====\n");
 		System.out.println(""
 				+ "El juego es muy simple:\n"
@@ -336,10 +577,10 @@ public class SieteYMedio extends Game {
 	 * Devolverá la configuración en su forma correspondiente para este juego,
 	 * un arreglo de tipo double.</p>
 	 */
-	private static double[] mostrarMenuConfiguracion(double[] eConfig) {
+	private void mostrarMenuConfiguracion() {
 
-		double tipoBaraja 	 = eConfig[0];
-		double valorAlcanzar = eConfig[1];
+		double nuevoTipoBaraja 	 = config[0];
+		double nuevoValorAlcanzar = config[1];
 		String strOpcion 	 = "";
 		String strOpcion2 	 = "";
 
@@ -431,8 +672,9 @@ public class SieteYMedio extends Game {
 				+ "Tipo de baraja: " + tipoBaraja + "\n"
 				+ "Valor a alcanzar: " + valorAlcanzar);
 		
-		double[] config = { tipoBaraja, valorAlcanzar };
-		return config;
+		double[] nuevaConfig = {nuevoTipoBaraja, nuevoValorAlcanzar};
+		
+		cambiarConfig(nuevaConfig);
 	}
 	
 	/**
@@ -442,133 +684,4 @@ public class SieteYMedio extends Game {
 	private static void br() {
 		System.out.println();		
 	}
-	
-//	public boolean lanzarJuego(double eConfig[]) {
-//		boolean salir = false;
-//		double[] config = eConfig;
-//		do {
-//
-//			System.out.println(
-//					  "==================================\n"
-//					+ "|          7 y MEDIO             |\n"
-//					+ "==================================\n");
-//			String strOpcion = "";
-//			System.out.println("===== Menu principal =====\n"
-//					+ "1. Comenzar el juego.\n"
-//					+ "2. Configurar reglas de juego.\n"
-//					+ "3. Cómo se juega.\n"
-//					+ "4. Salir.");
-//			boolean esValida = false;
-//			do {
-//				System.out.print("Opción: ");
-//				strOpcion = sc.nextLine().trim();
-//				if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4"))
-//					esValida = true;
-//				else
-//					System.out.println("Opción no válida, vuelve a intentarlo.");
-//			} while (!esValida);
-//
-//			switch (strOpcion) {
-//			case "1":
-//				br();
-//				start(config);
-//				br();
-//				break;
-//			case "2":
-//				br();
-//				config = mostrarMenuConfiguracion(config);
-//				br();
-//				break;
-//			case "3":
-//				br();
-//				mostrarReglas();
-//				br();
-//				break;
-//			case "4":
-//				salir = true;
-//				System.out.print("\n" 
-//						+ "================================\n"
-//						+ "|     ¡Hasta la próxima!       |\n"
-//						+ "================================\n");
-//			}
-//		} while (!salir);
-//		return salir;	
-//	}
-	
-//	private static void comenzarJuego(double[] config) {
-//		
-//		int tipoBaraja 		 = (int) config[1];
-//		double valorAlcanzar = config[2];
-//		
-//		Baraja baraja 	 = new Baraja((int) tipoBaraja);
-//		Mano   mano   	 = new Mano();
-//		double valor  	 = 0;
-//		String strOpcion = "";
-//		
-//		baraja.barajar();
-//		
-//		System.out.println("         Comienza el juego\n");
-//		System.out.println(
-//				  "Valor a alcanzar: " + valorAlcanzar + "\n"
-//				+ "Tipo de baraja: " + tipoBaraja);
-//		System.out.print("Escribe algo para robar: ");
-//		sc.nextLine();
-//		mano.robar(baraja.robar());
-//		valor += mano.ultimaCartaInsertada().getValor7yMedia();
-//		
-//		br();
-//		System.out.println(
-//				  "Carta robada:   " + mano.ultimaCartaInsertada() + "\n"
-//				+ "Valor que suma: " + mano.ultimaCartaInsertada().getValor7yMedia() + "\n"
-//				+ "Puntuación actual: " + valor);
-//		br();
-//		do {
-//			System.out.print(
-//					  "¿Qué deseas?:\n"
-//					+ "1. Robar.\n"
-//					+ "2. Plantarte.\n"
-//					+ "Opción: ");
-//			boolean esValida = false;
-//			do {
-//				strOpcion = sc.nextLine().trim();
-//				if(strOpcion.equals("1") || strOpcion.equals("2"))
-//					esValida = true;
-//				else
-//					System.out.println("Opcion no válida, vuelve a intentarlo.");
-//			} while(!esValida);
-//			
-//			switch(strOpcion) {
-//			case "1":
-//				mano.robar(baraja.robar());
-//				valor += mano.ultimaCartaInsertada().getValor7yMedia();
-//				System.out.println(
-//						  "Carta robada:   " + mano.ultimaCartaInsertada() + "\n"
-//						+ "Valor que suma: " + mano.ultimaCartaInsertada().getValor7yMedia() + "\n"
-//						+ "Puntuación actual: " + valor);
-//				br();
-//				break;
-//			case "2":
-//			}
-//		} while(strOpcion.equals("1") && valor < valorAlcanzar);
-//		System.out.println("Tu puntuación final es " + valor);
-//		if(valor == valorAlcanzar)
-//			System.out.print("\n"
-//					+ "================================\n"
-//					+ "|         ¡Has GANADO!         |\n"
-//					+ "================================\n");
-//		else
-//			System.out.print("\n"
-//					+ "================================\n"
-//					+ "|         ¡Has PERDIDO!        |\n"
-//					+ "================================\n");	
-//	}
-		
-//	public static void main(String[] args) {
-//		boolean seguir = true;
-//		double[] config = {1, 7.5};
-//		do {
-//			seguir = lanzarJuego(config);
-//		} while(seguir);
-//		
-//	}
 }
