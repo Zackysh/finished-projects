@@ -15,6 +15,7 @@ public abstract  class Player {
 	protected Game game;
 	protected Mesa mesa;
 	protected boolean plantado;
+	protected boolean eliminado;
 	
 	public Player(String nombre, int puntos, Mano mano, Game game) {
 		super();
@@ -29,6 +30,7 @@ public abstract  class Player {
 	public void resetPlayerState() {
 		this.puntos = 0;
 		this.plantado = false;
+		this.eliminado = false;
 	}
 	
 	public void robar() {
@@ -61,6 +63,14 @@ public abstract  class Player {
 	
 	public boolean isPlantado() {
 		return plantado;
+	}
+	
+	public void eliminar() {
+		eliminado = true;
+	}
+	
+	public boolean isEliminado() {
+		return eliminado;
 	}
 		
 	@Override

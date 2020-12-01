@@ -394,14 +394,20 @@ public class SieteYMedio extends Game {
 				  "Valor a alcanzar: " + valorAlcanzar + "\n"
 				+ "Tipo de baraja: " + tipoBaraja);
 		br();
-		do {
+		do { // Juegadores juegan
 			for (Player player : jugadores) {
 				
-				if(!player.isPlantado())
-					player.jugarTurno(Juegos.SIETEYMEDIO);
+				if(!player.isPlantado() && !player.isEliminado()) {
+					if(!restoEliminados(player))
+						player.jugarTurno(Juegos.SIETEYMEDIO);
+					else
+						player.plantarse();
+				}
 				
-				if(player.getPuntos() >= valorAlcanzar)
+				if(player.getPuntos() >= valorAlcanzar) {
 					player.plantarse();
+					player.eliminar();
+				}
 				
 			}
 		} while(!checkPlantados());
@@ -451,6 +457,7 @@ public class SieteYMedio extends Game {
 					mayorPuntuacion = player.getPuntos();
 				}
 			}
+			
 			for (Player player : jugadores) { // Contamos los jugadores que la han sacado.
 				if(player.getPuntos() == mayorPuntuacion)
 					numeroGanadores++;
@@ -462,7 +469,7 @@ public class SieteYMedio extends Game {
 			for (Player player : jugadores) {
 				if(player.getPuntos() == mayorPuntuacion)
 					ganador = player;
-			} else if(numeroGanadores != 0) {
+			} else if(numeroGanadores != 0 && numeroGanadores > 1) {
 				ganadores = new ArrayList<Player>(); // Se reserva espacio solo si hay más de 1 ganador.
 				for (Player player : jugadores) {
 					if(player.getPuntos() == mayorPuntuacion)
@@ -481,7 +488,9 @@ public class SieteYMedio extends Game {
 		else if(numeroGanadores == 1)
 			System.out.println("EL GANADOR ES...." + "¡¡¡" + ganador.getNombre() + "!!!");
 		
-		else {
+		else if(numeroGanadores > 1) {
+			System.out.println("Paro de control 2");
+			sc.nextLine();
 			empate = true;
 			System.out.print("LOS GANADORES SON... ¡¡¡");
 			for (Player player : ganadores) {
@@ -490,7 +499,7 @@ public class SieteYMedio extends Game {
 						System.out.print(player.getNombre() + ", ");
 					else if (ganadores.get(jugadores.size() - 2) == player)
 						System.out.print(player.getNombre() + " y ");
-				} else {
+				} else if(numeroGanadores == 2) {
 					if(ganadores.get(0) == player)
 						System.out.println(player.getNombre() + " y ");
 					else
@@ -499,6 +508,8 @@ public class SieteYMedio extends Game {
 			}
 			System.out.print("!!!");
 			br();
+			System.out.println(jugadores);
+			finish();
 		}
 		
 		if(empate) {
@@ -529,8 +540,20 @@ public class SieteYMedio extends Game {
 			}
 		}
 		
-		// Volverá al menú del propio juego, no se borrarán los jugadores, pero sí se resetearán los valores necesarios.
-		this.finish();
+		finish();
+	}
+
+	/**
+	 * Método que comprueba si todos los jugadore a parte del recibido, están
+	 * eliminados.
+	 */
+	private boolean restoEliminados(Player player) {
+		for (Player players : jugadores) {
+			if (players != player)
+				if (!players.isEliminado())
+					return false;
+		}
+		return true;
 	}
 
 	@Override

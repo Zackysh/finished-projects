@@ -42,7 +42,6 @@ public abstract class Game {
 		this.finished = false;
 		bienvenida();
 		menuPrincipal();
-		finish();
 	}
 	
 	public void barajar() {
@@ -53,7 +52,7 @@ public abstract class Game {
 	 * Método que devuleve las cartas de los jugadores a la baraja y
 	 * restablece los datos de los jugadores (ver método resetPlayerState).
 	 */
-	public void finish() {		
+	public void finish() {
 		for (Player player : jugadores) {
 			for (int i = 0; i < player.getNumeroCartas(); i++) {
 				mesa.addCartaBaraja(player.jugarCarta());				
