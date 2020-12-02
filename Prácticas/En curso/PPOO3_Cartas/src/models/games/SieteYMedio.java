@@ -32,20 +32,8 @@ public class SieteYMedio extends Game {
 		
 		// Cada juego tendrá su propia configuración
 		this.config = new double[2];
-		this.config[0] = 1;
-		this.config[1] = 7.5;
-	}
-	
-	public void mostrarListaJugadores() {
-		int cont = 1;
-		for (Player player : jugadores) {
-			System.out.println(cont++ + ". " + StringUtils.normalizarString(player.getNombre()) + ".");
-		}
-	}
-	
-	public void addPlayer(Player player) {
-		jugadores.add(player);
-		Collections.shuffle(jugadores);
+		this.config[0] = 1; // Tipo de baraja
+		this.config[1] = 7.5; // Valor a alcanzar
 	}
 	
 	// LÓGICA DEL JUEGO
@@ -60,7 +48,7 @@ public class SieteYMedio extends Game {
 	/**
 	 * Método que muestra el <strong>menú principal</strong>.<br>
 	 * Este método controlará el flujo del juego, desde que se inicia el menú hasta
-	 * que el jugador presione salga del juego.
+	 * que el jugador presione salir.
 	 */
 	@Override
 	public void menuPrincipal() {
@@ -73,7 +61,7 @@ public class SieteYMedio extends Game {
 					+ "2. Configurar reglas de juego.\n"
 					+ "3. Añadir/Quitar jugadores.\n"
 					+ "4. Cómo se juega.\n"
-					+ "5. Simular partidas (testing)"
+					+ "5. Simular partidas (testing)\n"
 					+ "6. Salir.");
 			System.out.println("Número de cartas en la baraja: " + this.mesa.contarCartasBaraja());
 			
@@ -84,7 +72,8 @@ public class SieteYMedio extends Game {
 				System.out.print("Opción: ");
 				strOpcion = sc.nextLine().trim();
 				
-				if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4") || strOpcion.equals("5"))
+				if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4")
+				 || strOpcion.equals("5") || strOpcion.equals("6"))
 					esValida = true;
 				else
 					System.out.println("Opción no válida, vuelve a intentarlo.");
@@ -126,7 +115,7 @@ public class SieteYMedio extends Game {
 						+ "2. Forzar ganador con pleno.\n"
 						+ "3. Forzar ganador sin pleno.\n"
 						+ "4. Forzar partida sin ganador (un solo jugador)\n"
-						+ "4. Atrás.");
+						+ "5. Atrás.");
 				
 				// Variables de control/validación (las reutilizo, no causa conflicto).
 				strOpcion = "";
@@ -135,7 +124,8 @@ public class SieteYMedio extends Game {
 					System.out.print("Opción: ");
 					strOpcion = sc.nextLine().trim();
 					
-					if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4"))
+					if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4")
+					 || strOpcion.equals("5"))
 						esValida = true;
 					else
 						System.out.println("Opción no válida, vuelve a intentarlo.");
@@ -230,6 +220,7 @@ public class SieteYMedio extends Game {
 					br();
 					break;
 				}
+				jugadores.clear();
 				br();
 				break;
 			case "6":
@@ -244,193 +235,7 @@ public class SieteYMedio extends Game {
 		this.finished = true; // El juego habrá terminado.
 	}
 	
-	private void mostrarMenuJugadores() {
-		
-		boolean salir = false;
-		do {
-			System.out.println("===== Jugadores =====");
-			System.out.println(
-					  "1. Añadir nuevo.\n"
-					+ "2. Actualizar existente.\n"
-					+ "3. Mostrar lista.\n"
-					+ "4. Atrás.");
-			
-			// Variables de control/validación.
-			String strOpcion = "";
-			boolean esValida = false;
-			do {
-				System.out.print("Opción: ");
-				strOpcion = sc.nextLine().trim();
-				
-				if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3") || strOpcion.equals("4"))
-					esValida = true;
-				else
-					System.out.println("Opción no válida, vuelve a intentarlo.");
-				
-			} while (!esValida);
-
-			switch (strOpcion) {
-			case "1":
-				
-				br();
-				System.out.println(
-						    "Nuevo Jugador:\n"
-						  + "1. Añadir CPU Player.\n"
-						  + "2. Añadir Human Player.\n"
-						  + "3. Atrás.");
-				// Variables de control/validación.
-				strOpcion = ""; // Reutilizamos esta variable (no causa conflicto.
-				boolean esTipo = false;
-				do {
-					System.out.print("Opción: ");
-					strOpcion = sc.nextLine().trim();
-					
-					if (strOpcion.equals("1") || strOpcion.equals("2")
-							|| strOpcion.equals("3"))
-						esTipo = true;
-					else
-						System.out.println("Opción no válida, vuelve a intentarlo.");
-					
-				} while (!esTipo);
-				
-				// Declaramos esta variable fuera del switch pues se utiliza más de un caso.
-				// Creo que queda más limpio
-				String nombre;
-				switch (strOpcion) {
-				case "1":
-					// Asignación de nombre (CPU Player).
-					System.out.print("Nuevo jugador (CPU):\n"
-							+ "Introduce un nombre para este jugador\n"
-							+ "(dejar en blanco para usar un nombre aleatorio): ");
-					
-					nombre = sc.nextLine();
-					if (nombre.isBlank())
-						nombre = StringUtils.nombreAleatorio();
-					
-					// Añadir CPU a este juego con dicho nombre.
-					addPlayer(new CPUPlayer(nombre, this.mesa));
-					
-					System.out.println("¡CPU Player añadido con exito! :)");
-					break;
-					
-				case "2":
-					// Asignación de nombre (Human Player).
-					System.out.print("Nuevo jugador (humano):\n"
-							+ "Introduce un nombre para este jugador\n"
-							+ "(dejar en blanco para usar un nombre aleatorio): ");
-					nombre = sc.nextLine();
-					if (nombre.isBlank())
-						nombre = StringUtils.nombreAleatorio();
-					
-					// Añadir jugador a este juego con dicho nombre.
-					addPlayer(new HumanPlayer(nombre, this.mesa));
-					System.out.println("¡Human Player añadido con exito! :)");
-					break;
-					
-				case "3":
-					salir = true;
-				}
-				br();
-				break;
-				
-			case "2":
-				
-				br();
-				int indiceJugador;
-
-				boolean esIndice = false;
-
-				do {
-					// Variable que utiliza el usuario para seleccionar un jugador antes de editarlo.
-					String strIndiceJugador = "";
-					
-					// Se muestra una lista con los jugadores. Se debe seleccionar uno para poder continuar.
-					System.out.println("Jugadores:");
-					this.mostrarListaJugadores();
-
-					boolean esInt = false; // Debe ser int, pues hará referencia a un índice de una lista.
-					do {
-						System.out.print("Opción: ");
-						strIndiceJugador = sc.nextLine().trim();
-						
-						esInt = Validator.validateInt(strIndiceJugador);
-						
-						if (!esInt)
-							System.out.println("Debes introducir un número.");
-						
-					} while (!esInt); // No pasará hasta que sea un entero.
-
-					indiceJugador = Integer.parseInt(strIndiceJugador) - 1;
-
-					if (indiceJugador >= 0 && indiceJugador <= jugadores.size() - 1)
-						esIndice = true;
-					else
-						System.out.println("Opción no válida.");
-
-				} while (!esIndice); // No pasa hasta que se haya introducido un índice válido.
-				
-				// El jugador ya está seleccionado, hora de editarlo / eliminarlo.
-				System.out.println(
-					    "Nuevo Jugador:\n"
-					  + "1. Cambiar nombre.\n"
-					  + "2. Eliminar.\n"
-					  + "3. Atrás.");
-				
-				// Reutilizamos las variables de control del anterior menú (no genera conflicto).
-				strOpcion = "";
-				esValida = false;
-				do {
-					System.out.print("Opción: ");
-					strOpcion = sc.nextLine().trim();
-					if (strOpcion.equals("1") || strOpcion.equals("2") || strOpcion.equals("3"))
-						esValida = true;
-					else
-						System.out.println("Opción no válida, vuelve a intentarlo.");
-				} while (!esValida);
-				
-				switch (strOpcion) {
-				case "1":
-					// Obtenemos la referencia del jugador deseado.
-					Player temp = jugadores.get(indiceJugador);
-					
-					// Le asignamos un nuevo nombre...
-					System.out.print(
-							  "Nuevo nombre\n"
-							+ "(dejar en blanco para usar un nombre aleatorio):");
-					
-					nombre = sc.nextLine();
-					if (nombre.isBlank())
-						nombre = StringUtils.nombreAleatorio();
-					
-					temp.setNombre(nombre); //  ...a través de su referencia.
-					break;
-					
-				case "2":
-					
-					System.out.println("Jugador eliminado: "
-							+ StringUtils.normalizarString(jugadores.get(indiceJugador).getNombre()));
-					// Eliminamos el jugador al que hace referencia el índice.
-					jugadores.remove(indiceJugador);
-					break;
-				}
-				br();
-				break;
-				
-			case "3":
-				// Mostramos la lista de jugadores.
-				br();
-				System.out.println("Jugadores:");
-				this.mostrarListaJugadores();
-				br();
-				break;
-				
-			case "4":
-				salir = true;
-				break;
-			}
-		} while (!salir); // No saldrá hasta que el usuario pulse salir.
-	}
-
+	
 	/**
 	 * <h3>Método que ejecuta el juego.</h3>
 	 * <p>Recibe <strong>dos parámetros</strong> como configuración
@@ -448,7 +253,7 @@ public class SieteYMedio extends Game {
 		
 		config[1] = configE[1];
 		
-		this.barajar();
+		this.barajar();		
 		
 		System.out.println("         Comienza el juego\n");
 		System.out.println(
@@ -662,8 +467,6 @@ public class SieteYMedio extends Game {
 	 */
 	private void mostrarMenuConfiguracion() {
 
-		double nuevoTipoBaraja 	 = config[0];
-		double nuevoValorAlcanzar = config[1];
 		String strOpcion 	 = "";
 		String strOpcion2 	 = "";
 
