@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 import enums.EnumGame.Juegos;
 import models.Baraja;
-import models.Mano;
+import models.Carta;
 import models.Mesa;
 import models.players.CPUPlayer;
 import models.players.HumanPlayer;
@@ -23,35 +23,17 @@ public class SieteYMedio extends Game {
 	 * en el propio juego. Sin embargo, para facilitar la lectura se extraen sus
 	 * valores en estas variables en el constructor.
 	 */
-	private double valorAlcanzar;
-	private int tipoBaraja;
-
 	
 	/**
 	 * Constructor.
 	 */
-	public SieteYMedio() {
-		this.jugadores = new ArrayList<Player>();
-		this.modo = Juegos.SIETEYMEDIO;
-		this.finished = false;
-		this.mesa = new Mesa(new Baraja(1));
+	public SieteYMedio(Mesa mesa) {
+		super(Juegos.SIETEYMEDIO, mesa);
+		
+		// Cada juego tendrá su propia configuración
 		this.config = new double[2];
-		// Establezco una configuración por defecto al crear el juego.
 		this.config[0] = 1;
 		this.config[1] = 7.5;
-		// Le asigno estos valores a las variables que facilitarán su implementación.
-		this.tipoBaraja = (int) config[0];
-		this.valorAlcanzar = config[1];
-	}
-	
-	public void cambiarConfig(double[] nuevaConfig) {
-		config = nuevaConfig;
-		tipoBaraja = (int) config[0];
-		valorAlcanzar = config[1];		
-	}
-
-	public double[] obtenerConfigActual() {
-		return this.config;
 	}
 	
 	public void mostrarListaJugadores() {
@@ -93,9 +75,10 @@ public class SieteYMedio extends Game {
 					+ "4. Cómo se juega.\n"
 					+ "5. Simular partidas (testing)"
 					+ "6. Salir.");
+			System.out.println("Número de cartas en la baraja: " + this.mesa.contarCartasBaraja());
 			
 			// Variables de control/validación.
-			String strOpcion = "";
+			String strOpcion;
 			boolean esValida = false;
 			do {
 				System.out.print("Opción: ");
@@ -135,11 +118,16 @@ public class SieteYMedio extends Game {
 				br();
 				break;
 			case "5":
+				br();
 				System.out.println(
-						  "1. Forzar empate.\n"
+						  "Los jugadores serán CPUs, la simulación modifica la\n"
+						+ "baraja para forzar las situaciones:\n"
+						+ "1. Forzar empate.\n"
 						+ "2. Forzar ganador con pleno.\n"
 						+ "3. Forzar ganador sin pleno.\n"
+						+ "4. Forzar partida sin ganador (un solo jugador)\n"
 						+ "4. Atrás.");
+				
 				// Variables de control/validación (las reutilizo, no causa conflicto).
 				strOpcion = "";
 				esValida = false;
@@ -156,14 +144,93 @@ public class SieteYMedio extends Game {
 				
 				switch(strOpcion) {
 				case "1":
+					br();
 					System.out.println(
 							  "Todos los jugadores existentes han sido borrados para lograr una simulación exitosa.\n"
-							 + "También se ha restablecido la configuración (1, 7.5)\n"
-							 + "Se añadirán dos jugadores. La baraja solo contendrá cuatro cartas cartas que causarán un empate.");
-//					this.mesa = new Mesa
-					Player simu1 = new HumanPlayer("Simu Uno", this);
+							 + "También se ha restablecido la configuración (1, 7.5)\n\n"
+							 + "Se añadirán dos jugadores y se establecerá para cada uno de ellos\n"
+							 + "una puntuación que provocará empate.");
 					
+					this.jugadores.clear();
+					
+					Player simu1 = new CPUPlayer("CPU 1", this.mesa);
+					Player simu2 = new CPUPlayer("CPU 2", this.mesa);
+
+					simu1.setPuntos(7.5);
+					simu2.setPuntos(7.5);
+					
+					jugadores.add(simu1);
+					jugadores.add(simu2);
+
+					this.start(config);
+					br();
+					break;
+				case "2":
+					System.out.println(
+							"Todos los jugadores existentes han sido borrados para lograr una simulación exitosa.\n"
+									+ "También se ha restablecido la configuración (1, 7.5)\n\n"
+									+ "Se añadirán dos jugadores y se modificará su puntuación para que uno de los jugadores\n"
+									+ "sea eliminado y el otro se plante a tiempo (con pleno).");
+
+					this.jugadores.clear();
+
+					simu1 = new CPUPlayer("CPU 1", this.mesa);
+					simu2 = new CPUPlayer("CPU 2", this.mesa);
+
+					simu1.setPuntos(8.5);
+					simu1.eliminar();
+					simu2.setPuntos(7.5);
+
+					jugadores.add(simu1);
+					jugadores.add(simu2);
+
+					this.start(config);
+					break;
+				case "3":
+					br();
+					System.out.println(
+							  "Todos los jugadores existentes han sido borrados para lograr una simulación exitosa.\n"
+							 + "También se ha restablecido la configuración (1, 7.5)\n\n"
+							 + "Se añadirán dos jugadores y se modificará su puntuación para que uno de los jugadores\n"
+							 + "sea eliminado y el otro se plante a tiempo (sin pleno).");
+					
+					this.jugadores.clear();
+					
+					simu1 = new CPUPlayer("CPU 1", this.mesa);
+					simu2 = new CPUPlayer("CPU 2", this.mesa);
+
+					simu1.setPuntos(8.5);
+					simu1.eliminar();
+					simu2.setPuntos(6.5);
+					
+					jugadores.add(simu1);
+					jugadores.add(simu2);
+
+					this.start(config);
+					br();
+					break;
+				case "4":
+					br();
+					System.out.println(
+							  "Todos los jugadores existentes han sido borrados para lograr una simulación exitosa.\n"
+							 + "También se ha restablecido la configuración (1, 7.5)\n\n"
+							 + "Esta simulación solo es posible (en esta versión del juego), ya que antes de permitir\n,"
+							 + "a los jugadores jugar su turno, debe haber almenos un jugador no-eliminado. Lo que implica\n"
+							 + "al menos un ganador siempre que haya más de un jugador.\n\n"
+							 + "Se añadirá un jugador y se modificará su puntuación para que pierda.");
+					
+					this.jugadores.clear();
+					
+					simu1 = new CPUPlayer("CPU 1", this.mesa);
+					simu1.setPuntos(8.5);
+					
+					jugadores.add(simu1);
+
+					this.start(config);
+					br();
+					break;
 				}
+				br();
 				break;
 			case "6":
 				salir = true;
@@ -241,7 +308,7 @@ public class SieteYMedio extends Game {
 						nombre = StringUtils.nombreAleatorio();
 					
 					// Añadir CPU a este juego con dicho nombre.
-					addPlayer(new CPUPlayer(nombre, this));
+					addPlayer(new CPUPlayer(nombre, this.mesa));
 					
 					System.out.println("¡CPU Player añadido con exito! :)");
 					break;
@@ -256,7 +323,7 @@ public class SieteYMedio extends Game {
 						nombre = StringUtils.nombreAleatorio();
 					
 					// Añadir jugador a este juego con dicho nombre.
-					addPlayer(new HumanPlayer(nombre, this));
+					addPlayer(new HumanPlayer(nombre, this.mesa));
 					System.out.println("¡Human Player añadido con exito! :)");
 					break;
 					
@@ -375,26 +442,21 @@ public class SieteYMedio extends Game {
 	 * @param config Arreglo de tipo double, debe contener dos parámetros.
 	 */
 	@Override
-	public void start(double[] config) {
+	public void start(double[] configE) {
 		
-		/*
-		 * La mesa se genera después de haber elegido la configuración en el menú
-		 * principal. Gracias a esto, es posible utilizar distintos tipos de barjas en
-		 * cada ejecución.
-		 */
-		tipoBaraja = (int) config[0]; // Primer parámetro de la configuración.
-		this.mesa 	   = new Mesa(new Baraja(tipoBaraja));
+		config[0] = configE[0];
 		
-		valorAlcanzar = config[1]; // Segundo parámetro de la configuración.
+		config[1] = configE[1];
 		
-		this.barajar(); // BARAJA la baraja que está en la mesa.
+		this.barajar();
 		
 		System.out.println("         Comienza el juego\n");
 		System.out.println(
-				  "Valor a alcanzar: " + valorAlcanzar + "\n"
-				+ "Tipo de baraja: " + tipoBaraja);
+				  "Valor a alcanzar: " + config[1] + "\n"
+				+ "Tipo de baraja: " + config[0]);
 		br();
 		do { // Juegadores juegan
+			System.out.println("Número de cartas en la baraja: " + this.mesa.contarCartasBaraja());
 			for (Player player : jugadores) {
 				
 				if(!player.isPlantado() && !player.isEliminado()) {
@@ -404,7 +466,7 @@ public class SieteYMedio extends Game {
 						player.plantarse();
 				}
 				
-				if(player.getPuntos() >= valorAlcanzar) {
+				if(player.getPuntos() >= config[1]) {
 					player.plantarse();
 					player.eliminar();
 				}
@@ -432,7 +494,7 @@ public class SieteYMedio extends Game {
 		// Variable auxiliar.
 		int numeroGanadores = 0;
 		for (Player player : jugadores) {
-			if(player.getPuntos() == valorAlcanzar)
+			if(player.getPuntos() == config[1])
 				numeroGanadores++;
 		}
 		
@@ -451,9 +513,9 @@ public class SieteYMedio extends Game {
 		if(numeroGanadores == 0) {
 			
 			// Variable auxiliares.
-			int mayorPuntuacion = 0;
+			double mayorPuntuacion = 0;
 			for (Player player : jugadores) { // Primero vemos cuál es la mayor puntuación válida.			
-				if(player.getPuntos() > mayorPuntuacion && player.getPuntos() < valorAlcanzar) {
+				if(player.getPuntos() > mayorPuntuacion && !player.isEliminado()) {
 					mayorPuntuacion = player.getPuntos();
 				}
 			}
@@ -486,29 +548,27 @@ public class SieteYMedio extends Game {
 			System.out.println("¡¡¡HAN PERDIDO TODOS!!! Esto se parece un poco al lol.");
 			
 		else if(numeroGanadores == 1)
-			System.out.println("EL GANADOR ES...." + "¡¡¡" + ganador.getNombre() + "!!!");
+			System.out.println("EL GANADOR ES...." + "¡¡¡" + ganador.getNombre() + " CON " + ganador.getPuntos() + " PUNTOS!!!");
 		
 		else if(numeroGanadores > 1) {
-			System.out.println("Paro de control 2");
-			sc.nextLine();
 			empate = true;
 			System.out.print("LOS GANADORES SON... ¡¡¡");
 			for (Player player : ganadores) {
 				if(numeroGanadores > 2) {
 					if (ganadores.get(jugadores.size() - 2) != player && ganadores.get(jugadores.size() - 1) != player)
-						System.out.print(player.getNombre() + ", ");
+						System.out.print(player.getNombre() + " CON " + player.getPuntos() + " PUNTOS!!!" + ", ");
 					else if (ganadores.get(jugadores.size() - 2) == player)
-						System.out.print(player.getNombre() + " y ");
-				} else if(numeroGanadores == 2) {
-					if(ganadores.get(0) == player)
-						System.out.println(player.getNombre() + " y ");
-					else
-						System.out.println(player.getNombre());
+						System.out.print(player.getNombre() + " CON " + player.getPuntos() + " PUNTOS" + " y ");
+				} else if(numeroGanadores == 2) {                   
+					if(ganadores.get(0) == player)                  
+						System.out.print(player.getNombre() + " CON " + player.getPuntos() + " PUNTOS" + " y ");
+					else                                             
+						System.out.print(player.getNombre() + " CON " + player.getPuntos() + " PUNTOS!!!");
 				}
 			}
 			System.out.print("!!!");
 			br();
-			System.out.println(jugadores);
+			br();
 			finish();
 		}
 		
@@ -632,12 +692,12 @@ public class SieteYMedio extends Game {
 						switch (strOpcion2) {
 						case "1":
 							System.out.println("Has elegido la baraja común (40 cartas).");
-							tipoBaraja = 1;
+							config[0] = 1;
 							esValida2 = true;
 							break;
 						case "2":
 							System.out.println("Has elegido la baraja doble (80 caras).");
-							tipoBaraja = 2;
+							config[0] = 2;
 							esValida2 = true;
 							break;
 						default:
@@ -677,7 +737,7 @@ public class SieteYMedio extends Game {
 						else
 							System.out.println("El valor es mayor a 29.5.");
 					} while (!esValida3);
-					valorAlcanzar = temp;
+					config[1] = temp;
 					esValida = true;
 					br();
 					break;
@@ -692,12 +752,8 @@ public class SieteYMedio extends Game {
 		} while (!strOpcion.equals("3")); // Hasta que la opcíon del SUBMENÚ 1 no sea "3"
 		br();
 		System.out.println(""
-				+ "Tipo de baraja: " + tipoBaraja + "\n"
-				+ "Valor a alcanzar: " + valorAlcanzar);
-		
-		double[] nuevaConfig = {nuevoTipoBaraja, nuevoValorAlcanzar};
-		
-		cambiarConfig(nuevaConfig);
+				+ "Tipo de baraja: " + config[0] + "\n"
+				+ "Valor a alcanzar: " + config[1]);
 	}
 	
 	/**

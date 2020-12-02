@@ -1,30 +1,35 @@
 package models.players;
 
+import java.util.ArrayList;
+
 import enums.EnumGame.Juegos;
 import models.Carta;
 import models.Mano;
 import models.Mesa;
-import models.games.Game;
 import utils.StringUtils;
 
-public abstract  class Player {
-	
-	protected String nombre;
-	protected int puntos;
-	protected Mano mano;
-	protected Game game;
+public abstract class Player {
+
+	// Juega en una mesa y tiene una mano
 	protected Mesa mesa;
+	protected Mano mano;
+
+	// Atributos
+	protected String nombre;
+	protected double puntos;
+	// Atributos de estado
 	protected boolean plantado;
 	protected boolean eliminado;
-	
-	public Player(String nombre, int puntos, Mano mano, Game game) {
-		super();
+
+	public Player(String nombre, Mesa mesa) {
 		this.nombre = nombre;
-		this.puntos = puntos;
-		this.mano = mano;
-		this.mesa = game.getMesa();
+		this.mesa = mesa;
+		this.mano = new Mano(this.mesa.getBaraja());
+		this.puntos = 0;
+		this.eliminado = false;
+		this.plantado = false;
 	}
-	
+
 	public abstract void jugarTurno(Juegos juego);
 
 	public void resetPlayerState() {
@@ -32,50 +37,62 @@ public abstract  class Player {
 		this.plantado = false;
 		this.eliminado = false;
 	}
-	
+
 	public void robar() {
 		this.mano.insertarCarta(this.mesa.robarCarta());
 	}
-	
-	public Carta jugarCarta() {
-		return this.mano.jugarCarta(0);		
+
+	public void devolverCartas() {
+		this.mesa.insertarVariasCartas(this.mano.devolverPrimeraCarta());
 	}
-	
+
+	public Carta jugarCarta(int index) {
+		return this.mano.jugarCarta(index);
+	}
+
 	public int getNumeroCartas() {
 		return this.mano.getNumroCartas();
 	}
-	
-	public int getPuntos() {
-		return this.puntos;	
+
+	public double getPuntos() {
+		return this.puntos;
 	}
 	
+	/**
+	 * Este setter es utilizado en las simulaciones exclusivamente.
+	 * @param nuevaPuntuacion
+	 */
+	public void setPuntos(double nuevaPuntuacion) {
+		this.puntos = nuevaPuntuacion;
+	}
+
 	public String getNombre() {
 		return StringUtils.normalizarString(nombre);
 	}
-	
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
+
 	public void plantarse() {
 		this.plantado = true;
 	}
-	
+
 	public boolean isPlantado() {
 		return plantado;
 	}
-	
+
 	public void eliminar() {
 		eliminado = true;
 	}
-	
+
 	public boolean isEliminado() {
 		return eliminado;
 	}
-		
+
 	@Override
 	public String toString() {
 		return "AbstractPlayer [nombre=" + nombre + ", puntos=" + puntos + ", mano=" + mano + ", mesa=" + mesa + "]";
 	}
-	
+
 }

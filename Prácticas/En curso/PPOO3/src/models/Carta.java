@@ -145,9 +145,11 @@ public class Carta {
 	public double getValor7yMedia() {
 		double valor;
 		switch (this.numero) {
-		case SOTA, CABALLO, REY: valor = 0.5;
+		case SOTA, CABALLO, REY:
+			valor = 0.5;
 			break;
-		default: valor = this.numero.ordinal() + 1;
+		default:
+			valor = this.numero.ordinal() + 1;
 			break;
 		}
 		return valor;

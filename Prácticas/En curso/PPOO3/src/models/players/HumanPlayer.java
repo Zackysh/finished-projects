@@ -3,8 +3,7 @@ package models.players;
 import java.util.Scanner;
 
 import enums.EnumGame.Juegos;
-import models.Mano;
-import models.games.Game;
+import models.Mesa;
 import utils.StringUtils;
 
 public class HumanPlayer extends Player {
@@ -23,9 +22,8 @@ public class HumanPlayer extends Player {
 	 * @param nombre String con el nombre del jugador.
 	 * @param mesa Mesa en la que jugará.
 	 */
-	public HumanPlayer(String nombre, Game game) {
-		super(nombre, 0, new Mano(game.getMesa()), game);
-		super.plantado = false;
+	public HumanPlayer(String nombre, Mesa mesa) {
+		super(nombre, mesa);
 	}
 	
 	/**

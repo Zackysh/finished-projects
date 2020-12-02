@@ -10,13 +10,23 @@ import utils.StringUtils;
 
 public abstract class Game {
 
+	// El juego transcurre en una mesa
+	protected Mesa mesa;
+	
+	// Atributos importantes
 	protected Juegos modo;
 	protected ArrayList<Player> jugadores;
-	protected Mesa mesa;
-	protected int ronda;
-	// Cuando se termina una partida es false, cuando se empieza es true.
-	protected boolean finished;
+	
+	// Atributos de estado
 	protected double[] config;
+	protected int ronda;
+	protected boolean finished;
+	
+	public Game (Juegos modo, Mesa mesa) {
+		this.modo = modo;
+		this.mesa = mesa;
+		this.jugadores = new ArrayList<Player>();
+	}
 	
 	public double[] getConfig() {
 		return config;
@@ -54,9 +64,7 @@ public abstract class Game {
 	 */
 	public void finish() {
 		for (Player player : jugadores) {
-			for (int i = 0; i < player.getNumeroCartas(); i++) {
-				mesa.addCartaBaraja(player.jugarCarta());				
-			}
+			player.devolverCartas();
 			player.resetPlayerState();
 		}
 		this.finished = true;

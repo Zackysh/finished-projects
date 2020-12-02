@@ -11,7 +11,7 @@ public class Baraja extends Mazo {
 	 * Puede contener varias cartas.
 	 */
 	public Baraja() {
-		lista = new ArrayList<Carta>();
+		
 	};
 	
 	/**
@@ -50,15 +50,31 @@ public class Baraja extends Mazo {
 	/**
 	 * Método que recibirá un entero, este señalará una posición en la baraja y la
 	 * cortará por ese punto.
+	 * Si la posición indicada no es válida, cortará la baraja por la mitad.
 	 * 
 	 * @param interseccion Punto por el que cortar.
 	 */
 	public void cortar(int interseccion) {
+		if(interseccion < 0 || interseccion > this.lista.size() - 1)
+			interseccion = (int) ((this.lista.size() / 2));
+		
 		List<Carta> mitadUno = this.lista.subList(0, interseccion);
 		List<Carta> mitadDos = this.lista.subList(interseccion, this.lista.size());
-		System.out.println(mitadDos);
-		System.out.println();
-		System.out.println(mitadUno);
+		
+		ArrayList<Carta> mitadUno2 = new ArrayList<Carta>();
+		mitadUno2.addAll(mitadUno);
+		ArrayList<Carta> mitadDos2 = new ArrayList<Carta>();
+		mitadDos2.addAll(mitadDos);
+		
+		this.lista.clear();
+		
+		for (Carta carta : mitadDos2) {
+			this.lista.add(carta);
+		}
+		
+		for (Carta carta : mitadUno2) {
+			this.lista.add(carta);
+		}
 	}
 	
 	/**
@@ -67,8 +83,8 @@ public class Baraja extends Mazo {
 	 * @return
 	 */
 	public Carta robar() {
-		Carta temp = this.lista.get(0);
-		this.lista.remove(0);
+		Carta temp = this.lista.get(this.lista.size()-1);
+		this.lista.remove(this.lista.size()-1);
 		return temp;
 	}
 	
@@ -125,7 +141,9 @@ public class Baraja extends Mazo {
 	 * 
 	 * @return number Número de cartas que contiene la baraja.
 	 */
-	public int getNumeroCartas() {return this.lista.size();}
+	public int getNumeroCartas() {
+		return this.lista.size();
+	}
 	
 	/**
 	 * Método que comprueba si la baraja está vacía.

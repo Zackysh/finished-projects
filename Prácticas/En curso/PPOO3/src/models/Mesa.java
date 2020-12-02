@@ -18,6 +18,10 @@ public class Mesa {
 		this.baraja = baraja;
 	}
 	
+	public int contarCartasBaraja() {
+		return this.baraja.getNumeroCartas();
+	}
+	
 	/**
 	 * Método que llama al método barajar de la baraja. No sería correcto declarar
 	 * la lista de cartas como pública, ya que la mesa tendría cartas y una baraja
@@ -56,6 +60,10 @@ public class Mesa {
 		} else
 			return null;
 	}
+	
+	public void insertarVariasCartas(ArrayList<Carta> cartas) {
+		this.baraja.lista.addAll(cartas);
+	}
 
 	/**
 	 * Método que añade una carta a la baraja. Se insertará abajo, para no ser
@@ -65,5 +73,9 @@ public class Mesa {
 	 */
 	public void addCartaBaraja(Carta carta) {
 		baraja.insertarCartaAbajo(carta);
+	}
+	
+	public Baraja getBaraja() {
+		return this.baraja;
 	}
 }

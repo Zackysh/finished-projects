@@ -1,14 +1,13 @@
 package models.players;
 
 import enums.EnumGame.Juegos;
-import models.Mano;
-import models.games.Game;
+import models.Mesa;
 import utils.StringUtils;
 
 public class CPUPlayer extends Player {
 
-	public CPUPlayer(String nombre, Game game) {
-		super(nombre, 0, new Mano(game.getMesa()), game);
+	public CPUPlayer(String nombre, Mesa mesa) {
+		super(nombre, mesa);
 	}
 
 	@Override
@@ -20,7 +19,10 @@ public class CPUPlayer extends Player {
 		if(this.puntos < 6) {
 			System.out.println("Ha decidido robar");
 			this.robar();
+			System.out.println("puntos" + this.mano.ultimaCartaInsertada().getValor7yMedia());
 			this.puntos += this.mano.ultimaCartaInsertada().getValor7yMedia();
+			System.out.println("puntos" + this.mano.ultimaCartaInsertada().getValor7yMedia());
+			
 			System.out.println(
 					  "Carta robada: " + this.mano.ultimaCartaInsertada() + "\n"
 					+ "Valor que suma: " + this.mano.ultimaCartaInsertada().getValor7yMedia() + "\n"

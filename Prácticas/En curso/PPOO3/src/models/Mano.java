@@ -1,40 +1,18 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Mano extends Mazo {
 	
-	/**
-	 * He optado por relacionar la mano con la mesa, para que pueda interactuar
-	 * directamente con cualquier elemento (jugador, baraja...) en lugar de solo con
-	 * la baraja.
-	 * 
-	 * Para que esta clase cumpliese con el diagrama original, debería relacionarse
-	 * solo con la baraja. En el costructor recibiría la
-	 * baraja en lugar de la mesa.
-	 * 
-	 * private Baraja baraja; en lugar de private Mesa mesa;
-	 */	 
-	private Mesa mesa;
-	
+	private Baraja baraja;
 	/**
 	 * Constructor que sigue el modelo UML.
 	 * 
 	 * @param baraja
 	 */
 	public Mano(Baraja baraja) { // No se implementa en los juegos.
-		
-	}
-	
-	/**
-	 * Costructor de mano. Recibirá la mesa en la que jugará y contendrá los
-	 * elemetnos con los que interactuará cuando sea necesario.
-	 * 
-	 * @param mesa Mesa de juego.
-	 */
-	public Mano(Mesa mesa) { // Se implementa en cada juego.
-		this.lista = new ArrayList<Carta>();
-		this.mesa = mesa;
+		this.baraja = baraja;
 	}
 	
 	/**
@@ -45,6 +23,14 @@ public class Mano extends Mazo {
 		if(carta != null)
 			this.lista.add(carta);
 	}
+	
+	public ArrayList<Carta> devolverPrimeraCarta() {
+		List<Carta> cartas = this.lista;
+		ArrayList<Carta> cartas2 = new ArrayList<Carta>();
+		cartas2.addAll(cartas);
+		this.lista.clear();
+		return cartas2;
+	}
 
 	/**
 	 * Método que devolverá la carta cuyo índice coincida con el parámetro que
@@ -54,7 +40,8 @@ public class Mano extends Mazo {
 	 * @return carta Carta deseada. Se borra de la mano.
 	 */
 	public Carta jugarCarta(int index) {
-		Carta temp = this.lista.get(index);
+		Carta temp = new Carta(1);
+		temp = this.lista.get(index);
 		this.lista.remove(index);
 		return temp;
 	}

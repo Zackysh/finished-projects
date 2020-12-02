@@ -3,6 +3,7 @@ package main;
 import java.util.Scanner;
 
 import enums.EnumGame.Juegos;
+import models.Baraja;
 import models.Mesa;
 import models.games.Game;
 import models.games.SieteYMedio;
@@ -18,9 +19,11 @@ public class Mainapp {
 	}
 	
 	public static void main(String[] args) {	
-		
-		Game game = null;
+
+		Baraja barajaDeJuego = new Baraja(1);
+		Mesa mesaDeJuego = new Mesa(barajaDeJuego);
 		Juegos juegoSeleccionado = Juegos.SIETEYMEDIO;
+		Game game = new SieteYMedio(mesaDeJuego);
 		
 		boolean salir = false;
 		do {
@@ -36,6 +39,7 @@ public class Mainapp {
 					+ "4. Qué es CardTeam.\n"
 					+ "5. Salir.");
 			
+			
 			String strOpcion = "";
 			boolean esValida = false;
 			do {
@@ -49,12 +53,22 @@ public class Mainapp {
 
 			switch (strOpcion) {
 			case "1":
-				if(juegoSeleccionado.ordinal() == Juegos.values()[0].ordinal()) game = new SieteYMedio();
-//				else if(juegoSeleccionado.ordinal() == Juegos.values()[1].ordinal()) game = new Tute(false, null, null, 0);
-//				else if(juegoSeleccionado.ordinal() == Juegos.values()[2].ordinal()) game = new Mus(false, null, null, 0);
-				if(game != null) game.launch();
-				else System.out.println("Muy mal :/\n");
-				break;
+				
+				if(juegoSeleccionado == Juegos.SIETEYMEDIO)
+					game = new SieteYMedio(mesaDeJuego);
+				
+//				else if(juegoSeleccionado.ordinal() == Juegos.values()[1].ordinal())
+//					game = new Tute(false, null, null, 0);
+				
+//				else if(juegoSeleccionado.ordinal() == Juegos.values()[2].ordinal())
+//					game = new Mus(false, null, null, 0);
+				
+				if(game != null)
+					game.launch();
+				else
+					System.out.println("Muy mal :/\n");
+				
+				break;				
 			case "2":
 				br();
 				juegoSeleccionado = mostrarBiblioteca(juegoSeleccionado);
