@@ -260,6 +260,7 @@ public class SieteYMedio extends Game {
 				  "Valor a alcanzar: " + config[1] + "\n"
 				+ "Tipo de baraja: " + config[0]);
 		br();
+		if(jugadores.size() > 1) // Modo multijugador
 		do { // Juegadores juegan
 			System.out.println("Número de cartas en la baraja: " + this.mesa.contarCartasBaraja());
 			for (Player player : jugadores) {
@@ -279,6 +280,20 @@ public class SieteYMedio extends Game {
 			}
 		} while(!checkPlantados());
 		
+		else { // Moodo un jugador
+			Player player = jugadores.get(0);
+			do {
+				player.jugarTurno(Juegos.SIETEYMEDIO);
+				if(player.getPuntos() >= config[1]) {
+					player.plantarse();
+					player.eliminar();
+				}
+				
+				System.out.println(player.isPlantado());
+				System.out.println(player.isEliminado());
+			} while(!player.isPlantado());
+		}
+		
 		/**
 		 * He opdato por esta forma de obtener al ganador/ganadores, me ha resultado intuitiva.
 		 * No tengo tiempo para implementar otra más eficiente. Pero aquí dejo la que creo que es más eficiente:
@@ -289,13 +304,13 @@ public class SieteYMedio extends Game {
 		 * Y ya tendrías los ganadores.
 		 * Es similar.
 		 */
-		// RESULTADOS
-		boolean empate = false; // Si hay empate, los ganadores podrán jugar una revancha.
-		Player ganador = null;
+		
+		// OBTENIENDO GANADORES
 		ArrayList<Player> ganadores = null;
+		Player ganador = null;
+		boolean empate = false; // Si hay empate, los ganadores podrán jugar una revancha.
 		
-		// En caso de pleno.
-		
+		// En caso de pleno.		
 		// Variable auxiliar.
 		int numeroGanadores = 0;
 		for (Player player : jugadores) {
@@ -343,8 +358,9 @@ public class SieteYMedio extends Game {
 						ganadores.add(player);					
 				}
 			}
-		} // Ganadores obtenidos.
+		}
 		
+		// MOSTRANDO RESULTADOS
 		System.out.println(
 				  "==================================\n"
 				+ "|           RESULTADOS           |\n"

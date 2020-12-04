@@ -56,19 +56,15 @@ public class Mainapp {
 				
 				if(juegoSeleccionado == Juegos.SIETEYMEDIO)
 					game = new SieteYMedio(mesaDeJuego);
-				
-//				else if(juegoSeleccionado.ordinal() == Juegos.values()[1].ordinal())
-//					game = new Tute(false, null, null, 0);
-				
-//				else if(juegoSeleccionado.ordinal() == Juegos.values()[2].ordinal())
-//					game = new Mus(false, null, null, 0);
+				if(juegoSeleccionado == Juegos.TUTE || juegoSeleccionado == Juegos.MUS)
+					System.out.println("Solo está implementado SieteYMedio.");
 				
 				if(game != null)
 					game.launch();
 				else
 					System.out.println("Muy mal :/\n");
 				
-				break;				
+				break;
 			case "2":
 				br();
 				juegoSeleccionado = mostrarBiblioteca(juegoSeleccionado);
@@ -174,7 +170,7 @@ public class Mainapp {
 				do {
 					System.out.print("Opción: ");
 					strOpcion = sc.nextLine().trim();
-					esInt = Validator.validateInt(strOpcion);
+					esInt = Validator.validateStrInt(strOpcion);
 					if(!esInt) System.out.println("Debes introducir un número.");
 				} while (!esInt);
 				

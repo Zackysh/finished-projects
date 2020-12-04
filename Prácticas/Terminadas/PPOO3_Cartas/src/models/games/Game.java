@@ -196,7 +196,7 @@ public abstract class Game {
 						System.out.print("Opción: ");
 						strIndiceJugador = sc.nextLine().trim();
 						
-						esInt = Validator.validateInt(strIndiceJugador);
+						esInt = Validator.validateStrInt(strIndiceJugador);
 						
 						if (!esInt)
 							System.out.println("Debes introducir un número.");

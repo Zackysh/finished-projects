@@ -128,17 +128,45 @@ public class Tute extends Game {
 		this.finished = true; // El juego habrá terminado.
 		
 	}
-
-	private void mostrarMenuConfiguracion() {
+	
+	private void mostrarReglas() {
+		System.out.println("===== Reglas =====\n");
+		System.out.println(
+				    "La versión del juego es una simplificada, tiene en cuenta las siguientes reglas:\n"
+				  + "- Se partirá una determinada cantidad de cartas según el número de jugadores.\n"
+				  + "   - 2 jugadores: 8 cartas cada uno.\n"
+				  + "   - 3 jugadores: 12 cartas cada uno.\n"
+				  + "   - 4 jugadores: 10 cartas cada uno.\n"
+				  + "- Cada carta tiene un valor, el objetivo es sumar el máximo posible:\n"
+				  + "   - As: 11 puntos.\n"
+				  + "   - Tres: 10 punto.s\n"
+				  + "   - Rey: 4 puntos.\n"
+				  + "   - Caballo: 3 puntos.\n"
+				  + "   - Sota: 2 puntos.\n"
+				  + "   - Resto sin valor.\n"
+				  + "- La última carta que se raparta será mostrada. El palo al que pertenezca se convertirá\n"
+				  + "  en el triunfo. Este palo vencerá al resto sin importar su valor.\n"
+				  + "- El primer jugador en jugar pondrá sobre la mesa una carta cualquiera.\n"
+				  + "- El resto de jugadores jugarán una carta que deberá ser del mismo palo.\n"
+				  + "- En caso de no tener una carta del mismo palo, se deberá \"fallar\", poner obligatoriamente\n"
+				  + "  un triunfo.\n"
+				  + "- En caso de no tener un triunfo, se puede lanzar cualquier carta.\n"
+				  + "- En caso de tener que \"fallar\" y que otro jugador haya fallado justo antes, se deberá fallar\n"
+				  + "  solo en caso de tener un triunfo de mayor valor. En caso contrario n"
+				  + "- "
+				  + "- ");
 		
 	}
+
+	private void mostrarMenuConfiguracion() {
+
 		String strOpcion 	 = "";
 		String strOpcion2 	 = "";
 
 		// SUBMENÚ 1
 		do {
 			System.out.println("===== Configuración =====\n"
-					+ "1. Tipo de baraja.\n"
+					+ "1. Número de rondas.\n"
 					+ "2. Valor objetivo (7.5, 15, etc).\n"
 					+ "3. Atrás.");
 			boolean esValida = false;
@@ -209,7 +237,19 @@ public class Tute extends Game {
 					esValida = true;
 					br();
 					break;
-		
+				case "3": // Atrás
+					esValida = true;
+					break;
+				default:
+					System.out.println("Opción no válida, vuelve a intentarlo.");
+				}
+
+			} while (!esValida);
+		} while (!strOpcion.equals("3")); // Hasta que la opcíon del SUBMENÚ 1 no sea "3"
+		br();
+		System.out.println(""
+				+ "Tipo de baraja: " + config[0] + "\n"
+				+ "Valor a alcanzar: " + config[1]);
 	}
 
 	private void br() {

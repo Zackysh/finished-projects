@@ -158,7 +158,7 @@ public class Baraja extends Mazo {
 	
 	@Override
 	public String toString() {
-		String strLista = "";
+		String strLista = "";	
 		for (Carta carta : this.lista) {
 			strLista += carta + "\n";
 		}

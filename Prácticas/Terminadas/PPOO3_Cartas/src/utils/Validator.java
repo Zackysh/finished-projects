@@ -1,7 +1,7 @@
 package utils;
 
 public class Validator {
-	public static boolean validateInt(String strInt) {
+	public static boolean validateStrInt(String strInt) {
 		boolean isInt = false;		
 		try {
 			Integer.parseInt(strInt);

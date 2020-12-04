@@ -31,9 +31,35 @@ import java.awt.event.ActionListener;
  */
 public class MainApp extends JFrame implements ActionListener{
 
+	private static ArrayList<Student> list = new ArrayList<Student>();;
+	
+	
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		// FRAME
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					MainApp frame = new MainApp();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		// Aquí genero 4 estudiantes por defecto, aquí no se da la chicha, fíjate en
+		// actionPerformed y las funciones a las que llama.
+		list = new ArrayList<Student>();
+		list.add(new Student(1, "Pepito el del Garrote", " 2 DAM"));
+		list.add(new Student(2, "Carlos González", "1 DAW"));
+		list.add(new Student(3, "Pipo García", "1 DAM"));
+		list.add(new Student(4, "María Matarín", "2 DAM"));		
+	}
 	private int studentController = 0;
 	private boolean readyToAdd = false;
-	private static ArrayList<Student> list = new ArrayList<Student>();
 	private JPanel contentPane;
 	private JTextField textF_studentNum;
 	private JTextField textF_studentName;
@@ -46,12 +72,13 @@ public class MainApp extends JFrame implements ActionListener{
 	private JButton jbutton_New;
 	private JButton jbutton_Add;
 	private JButton jbutton_Previous;
-	private JButton jbutton_Next;
 
+	private JButton jbutton_Next;
 	/**
 	 * Create the frame.
 	 */
 	public MainApp() {
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage("imges\\iconDB.png"));
 		contentPane = new JPanel();
 		setResizable(false);
@@ -144,7 +171,7 @@ public class MainApp extends JFrame implements ActionListener{
 		jbutton_Add.setForeground(new Color(255, 255, 255));
 		jbutton_Add
 				.setBorder(new CompoundBorder(new LineBorder(new Color(171, 173, 179)), new EmptyBorder(5, 0, 5, 0)));
-		contentPane.add(jbutton_Add);		
+		contentPane.add(jbutton_Add);	
 		// PREVIOUS
 		jbutton_Previous = new JButton("Previous");
 		jbutton_Previous.addActionListener(this);
@@ -172,6 +199,7 @@ public class MainApp extends JFrame implements ActionListener{
 		background.setBounds(0, 0, 419, 451);
 		contentPane.add(background);
 	}
+	
 	/**
 	 * En este controlador de eventos ocurre lo siguiente:
 	 * 
@@ -226,6 +254,41 @@ public class MainApp extends JFrame implements ActionListener{
 	}
 	
 	/**
+	 * Añado un nuevo objeto con new Student(parámetros).
+	 * 
+	 * ¿Qué leches hay dentro del nuevo alumno?
+	 * Al asignarle list.size()+1 al número del nuevo alumno, su número será el último de la lista.
+	 * Uso ejemploTextField.getText() para extraer lo que haya en dichos campos y utilizarlo para crear el nuevo estudiante.
+	 * 
+	 * @param list Lista a la que añadir un nuevo objeto de tipo Student.
+	 */
+	public void addStudent(ArrayList<Student> list) {		
+		list.add(new Student(list.size()+1,textF_studentName.getText(), textF_studentGroup.getText()));
+	}
+	
+	public void eraseFields() {
+		textF_studentNum.setText("");
+		textF_studentName.setText("");
+		textF_studentGroup.setText("");
+	}
+	
+
+	/**
+	 * Función que recibe una lista y un índice.
+	 * Selecciona el objeto de la lista con dicho índice list.get(index), extrae sus datos y los
+	 * incrusta en los campos de texto.
+	 * 
+	 * @param list Lista de alumnos
+	 * @param index El número del alumno deseado.
+	 */
+	public void printStudent(ArrayList<Student> list, int index) {
+		setReadyToShow();
+		textF_studentNum.setText(list.get(index).getNum());
+		textF_studentName.setText(list.get(index).getName());
+		textF_studentGroup.setText(list.get(index).getGroup());
+	}
+	
+	/**
 	 * Esta función hace lo siguiente:
 	 * 		Llama a eraseFields() para vaciar los campos.
 	 * 
@@ -258,65 +321,5 @@ public class MainApp extends JFrame implements ActionListener{
 		textF_studentName.disable();
 		textF_studentGroup.disable();
 		readyToAdd=false;
-	}
-	
-	/**
-	 * Función que recibe una lista y un índice.
-	 * Selecciona el objeto de la lista con dicho índice list.get(index), extrae sus datos y los
-	 * incrusta en los campos de texto.
-	 * 
-	 * @param list Lista de alumnos
-	 * @param index El número del alumno deseado.
-	 */
-	public void printStudent(ArrayList<Student> list, int index) {
-		setReadyToShow();
-		textF_studentNum.setText(list.get(index).getNum());
-		textF_studentName.setText(list.get(index).getName());
-		textF_studentGroup.setText(list.get(index).getGroup());
-	}
-	
-
-	/**
-	 * Añado un nuevo objeto con new Student(parámetros).
-	 * 
-	 * ¿Qué leches hay dentro del nuevo alumno?
-	 * Al asignarle list.size()+1 al número del nuevo alumno, su número será el último de la lista.
-	 * Uso ejemploTextField.getText() para extraer lo que haya en dichos campos y utilizarlo para crear el nuevo estudiante.
-	 * 
-	 * @param list Lista a la que añadir un nuevo objeto de tipo Student.
-	 */
-	public void addStudent(ArrayList<Student> list) {		
-		list.add(new Student(list.size()+1,textF_studentName.getText(), textF_studentGroup.getText()));
-	}
-	
-	public void eraseFields() {
-		textF_studentNum.setText("");
-		textF_studentName.setText("");
-		textF_studentGroup.setText("");
-	}
-	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		// FRAME
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainApp frame = new MainApp();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		
-		// Aquí genero 4 estudiantes por defecto, aquí no se da la chicha, fíjate en
-		// actionPerformed y las funciones a las que llama.
-		list = new ArrayList<Student>();
-		list.add(new Student(1, "Pepito el del Garrote", " 2 DAM"));
-		list.add(new Student(2, "Carlos González", "1 DAW"));
-		list.add(new Student(3, "Pipo García", "1 DAM"));
-		list.add(new Student(4, "María Matarín", "2 DAM"));		
 	}	
 }
