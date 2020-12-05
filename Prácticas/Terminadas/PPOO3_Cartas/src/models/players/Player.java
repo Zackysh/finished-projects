@@ -1,7 +1,5 @@
 package models.players;
 
-import java.util.ArrayList;
-
 import enums.EnumGame.Juegos;
 import models.Carta;
 import models.Mano;
@@ -24,7 +22,7 @@ public abstract class Player {
 	public Player(String nombre, Mesa mesa) {
 		this.nombre = nombre;
 		this.mesa = mesa;
-		this.mano = new Mano(this.mesa.getBaraja());
+		this.mano = new Mano();
 		this.puntos = 0;
 		this.eliminado = false;
 		this.plantado = false;
@@ -38,6 +36,10 @@ public abstract class Player {
 		this.eliminado = false;
 	}
 
+	/**
+	 * Ya que en el UML Mano no se relaciona con Mesa, es Player quien le pasa la
+	 * carta desde su mesa.
+	 */
 	public void robar() {
 		this.mano.insertarCarta(this.mesa.robarCarta());
 	}
@@ -57,9 +59,10 @@ public abstract class Player {
 	public double getPuntos() {
 		return this.puntos;
 	}
-	
+
 	/**
 	 * Este setter es utilizado en las simulaciones exclusivamente.
+	 * 
 	 * @param nuevaPuntuacion
 	 */
 	public void setPuntos(double nuevaPuntuacion) {

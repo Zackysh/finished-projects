@@ -1,6 +1,5 @@
 package main;
 
-import enums.EnumGame.Juegos;
 import models.Baraja;
 import models.Mesa;
 import models.players.CPUPlayer;
@@ -8,6 +7,14 @@ import models.players.Player;
 
 public class Testing {
 	public static void main(String[] args) {
+		
+		Baraja barajaCortar = new Baraja(1);
+		
+		System.out.println(barajaCortar);
+		
+		barajaCortar.cortar(20);
+		
+		System.out.println(barajaCortar);
 		
 		Baraja baraja = new Baraja();
 		for (int i = 1; i <= 6; i++) {

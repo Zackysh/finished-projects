@@ -5,14 +5,13 @@ import java.util.List;
 
 public class Mano extends Mazo {
 	
-	private Baraja baraja;
+
 	/**
-	 * Constructor que sigue el modelo UML.
+	 * Constructor de la clase. No recibe nada.
 	 * 
 	 * @param baraja
 	 */
-	public Mano(Baraja baraja) { // No se implementa en los juegos.
-		this.baraja = baraja;
+	public Mano() {		
 	}
 	
 	/**

@@ -61,20 +61,13 @@ public class Baraja extends Mazo {
 		List<Carta> mitadUno = this.lista.subList(0, interseccion);
 		List<Carta> mitadDos = this.lista.subList(interseccion, this.lista.size());
 		
-		ArrayList<Carta> mitadUno2 = new ArrayList<Carta>();
-		mitadUno2.addAll(mitadUno);
-		ArrayList<Carta> mitadDos2 = new ArrayList<Carta>();
-		mitadDos2.addAll(mitadDos);
+		ArrayList<Carta> barajaCortada = new ArrayList<Carta>();
+		barajaCortada.addAll(mitadDos);
+		barajaCortada.addAll(mitadUno);
 		
 		this.lista.clear();
 		
-		for (Carta carta : mitadDos2) {
-			this.lista.add(carta);
-		}
-		
-		for (Carta carta : mitadUno2) {
-			this.lista.add(carta);
-		}
+		this.lista.addAll(barajaCortada);
 	}
 	
 	/**
@@ -114,12 +107,7 @@ public class Baraja extends Mazo {
 	 * @param id_carta Recibe la carta en forma de id.
 	 */
 	public void insertarCartaAbajo(int id_carta) {
-		ArrayList<Carta> copia = new ArrayList<Carta>(this.lista);
-		this.lista.clear();
-		this.lista.add(new Carta(id_carta));
-		for (Carta carta : copia) {
-			this.lista.add(carta);
-		}
+		this.lista.add(0, new Carta(id_carta));
 	}
 	
 	/**
@@ -128,12 +116,7 @@ public class Baraja extends Mazo {
 	 * @param id_carta Recibe la carta en forma de objeto.
 	 */
 	public void insertarCartaAbajo(Carta carta) {
-		ArrayList<Carta> copia = new ArrayList<Carta>(this.lista);
-		this.lista.clear();
-		this.lista.add(carta);
-		for (Carta carta2 : copia) {
-			this.lista.add(carta2);
-		}
+		this.lista.add(0, carta);
 	}
 	
 	/**
