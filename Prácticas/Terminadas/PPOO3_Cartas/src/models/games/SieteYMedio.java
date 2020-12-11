@@ -77,7 +77,6 @@ public class SieteYMedio extends Game {
 					esValida = true;
 				else
 					System.out.println("Opción no válida, vuelve a intentarlo.");
-				
 			} while (!esValida); // La opción debe ser válida.
 
 			switch (strOpcion) {
