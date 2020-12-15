@@ -5,6 +5,15 @@ import java.util.Scanner;
 
 import utils.Validator;
 
+/**
+ * Clase que simula una tienda.
+ * 	- Controla una caja (dinero):
+ *  - Puede almacenar InstrumentosMusicales.
+ *  - Puede insertar nuevos InstrumentosMusicales.
+ *  - Puede vender InstrumentosMusicales (suma dineroa la caja).
+ * @author alumnado
+ *
+ */
 public class Tienda {
 	
 	private Scanner sc = new Scanner(System.in);
