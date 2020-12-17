@@ -1,0 +1,5 @@
+BD: Tablas "Pokemon", "Tipo", "Poke_Tipo"
+Aprox 10 pokemos de: https://www.pokemon.com/es/pokedex/ivysaur
+
+Extra:
+Animación, inkscape backgrounds..
