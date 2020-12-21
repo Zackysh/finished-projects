@@ -25,6 +25,7 @@ public class SignupDAO extends AbstractDAO {
 			Statement stmt = conn.createStatement();
 			int affectedRows = stmt.executeUpdate(
 					"INSERT INTO pokedb.user (Username, Password) VALUES ('" + username + "', '" + password + "')");
+			// TODO usar prepared statement
 
 			return affectedRows;
 		} catch (SQLException ex) {

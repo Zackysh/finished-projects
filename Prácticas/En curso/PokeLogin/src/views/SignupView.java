@@ -50,9 +50,8 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 	private JButton jB_Clear;
 	
 	private SignupDAO sd;
-	private Font flexoFont;
 	private Timer timer;
-
+	
 	/**
 	 * Constructor of this view, it just call initialize().
 	 */
@@ -73,14 +72,13 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 	private void initialize() {
 
 		timer = new Timer(500, this);
-		importFonts();
 
 		// Pane initialization
 		contentPane = new JPanel();
 		contentPane.setLayout(null);
 
 		// Frame initialization
-		setTitle("Pokedex Login");
+		setTitle("Pokedex SignUp");
 		setIconImage(Toolkit.getDefaultToolkit().getImage("imges\\icon.png"));
 		setBounds(0, 0, 440, 540);
 		setResizable(false);
@@ -88,23 +86,6 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setContentPane(contentPane);
 		initializeUIComponentes();
-
-	}
-
-	/**
-	 * Import fonts from .ttf files into local GraphicEnviroment.
-	 * 
-	 * First a new Font is initialized, it receives an input stream that brings
-	 * desired font. Later its registered into the current Graphic Environment.
-	 */
-	public void importFonts() {
-		try {
-			flexoFont = Font.createFont(Font.TRUETYPE_FONT, new File("Flexo-Light.ttf")).deriveFont(30f);
-			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Flexo-Light.ttf")));
-		} catch (FontFormatException | IOException e2) {
-			e2.fillInStackTrace();
-		}
 	}
 
 	/**
@@ -120,7 +101,7 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		// Username textField
 		tF_Username = new JTextField();
 		tF_Username.setBounds(206, 180, 150, 34);
-		tF_Username.setFont(new Font(flexoFont.getName(), WIDTH, 18));
+		tF_Username.setFont(new Font("Flexo-Light", WIDTH, 18));
 		tF_Username.setHorizontalAlignment(SwingConstants.LEFT);
 		tF_Username.setColumns(10);
 		tF_Username.setForeground(new Color(150, 0, 0, 200));
@@ -129,7 +110,7 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		getContentPane().add(tF_Username);
 		// Username Prompt
 		tP_Username = new TextPrompt("Username", tF_Username);
-		tP_Username.setFont(new Font(flexoFont.getName(), WIDTH, 18));
+		tP_Username.setFont(new Font("Flexo-Light", WIDTH, 18));
 		tP_Username.setHorizontalAlignment(SwingConstants.LEADING);
 		tP_Username.changeAlpha(0.75f);
 		tP_Username.setForeground(new Color(150, 0, 0, 180));
@@ -138,7 +119,7 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		// PASSWORD FIELDS -----------------------------------------------------------------
 		// Password
 		pF_Password = new JPasswordField();
-		pF_Password.setFont(new Font(flexoFont.getName(), WIDTH, 18));
+		pF_Password.setFont(new Font("Flexo-Light", WIDTH, 18));
 		pF_Password.setHorizontalAlignment(SwingConstants.LEFT);
 		pF_Password.setForeground(new Color(150, 0, 0, 200));
 		pF_Password.setColumns(10);
@@ -148,7 +129,7 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		contentPane.add(pF_Password);
 		// Password prompt
 		tP_Password = new TextPrompt("Password", pF_Password);
-		tP_Password.setFont(new Font(flexoFont.getName(), WIDTH, 18));
+		tP_Password.setFont(new Font("Flexo-Light", WIDTH, 18));
 		tP_Password.setHorizontalAlignment(SwingConstants.LEADING);
 		tP_Password.changeAlpha(0.75f);
 		tP_Password.setForeground(new Color(150, 0, 0, 180));
@@ -159,7 +140,7 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		jB_Register = new JButton("SIGN UP");
 		jB_Register.setBounds(302, 310, 100, 35);
 		jB_Register.setBorder(null);
-		jB_Register.setFont(new Font(flexoFont.getName(), Font.BOLD, 18));
+		jB_Register.setFont(new Font("Flexo-Light", Font.BOLD, 18));
 		jB_Register.setForeground(new Color(255, 255, 255));
 		jB_Register.setBackground(new Color(0.76f, 0.42f, 0.42f, 0.01f));
 		jB_Register.setContentAreaFilled(false);
@@ -171,7 +152,7 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		jB_Clear.setBounds(157, 310, 100, 35);
 		jB_Clear.setBorder(null);
 		jB_Clear.setForeground(Color.WHITE);
-		jB_Clear.setFont(new Font(flexoFont.getName(), Font.BOLD, 13));
+		jB_Clear.setFont(new Font("Flexo-Light", Font.BOLD, 13));
 		jB_Clear.setBackground(new Color(0.76f, 0.42f, 0.42f, 0.01f));
 		jB_Clear.setContentAreaFilled(false);
 		jB_Clear.addActionListener(this); // ActionListener
@@ -224,7 +205,7 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 	public void actionPerformed(ActionEvent e) {
 
 		// Specifies font for local JOptionPanes
-		UIManager.put("OptionPane.messageFont", new Font(flexoFont.getName(), Font.BOLD, 14));
+		UIManager.put("OptionPane.messageFont", new Font("Flexo-Light", Font.BOLD, 14));
 
 		// This button starts a timer, this timer will handle a delayed clear field
 		// function in its own event clause
