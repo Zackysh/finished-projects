@@ -1,6 +1,0 @@
-BD: Tablas "Pokemon", "Tipo", "Poke_Tipo"
-Aprox 10 pokemos de: https://www.pokemon.com/es/pokedex/ivysaur
-Para campo sexo: https://social.msdn.microsoft.com/Forums/windowsserver/es-ES/6e01a2ce-1a9e-4d8b-8720-23837b726930/crear-una-restriccion?forum=sqlserveres
-
-Extra:
-Animación, inkscape backgrounds..

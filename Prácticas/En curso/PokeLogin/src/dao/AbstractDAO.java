@@ -51,7 +51,7 @@ public abstract class AbstractDAO {
 	}
 
 	/**
-	 * Check if the connection is null or is linked with PikeDB.
+	 * Check if the connection is null or if its linked with PokeDB.
 	 * 
 	 * @returns false If conn is null.
 	 * @returns true If conn isn't null.
