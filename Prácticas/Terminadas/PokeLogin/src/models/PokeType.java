@@ -2,8 +2,15 @@ package models;
 
 import java.awt.Color;
 
+/**
+ * Method that simulate a Pokemon Type. It has a color attached.
+ * 
+ * @author AdriGB
+ *
+ */
 public class PokeType {
 	
+	// Attributes
 	private int idT;
 	private String name;
 	private Color color;
@@ -14,6 +21,7 @@ public class PokeType {
 		this.color = color;
 	}
 	
+	// GETTERS AND SETTERS
 	public Color getColor() {
 		return color;
 	}

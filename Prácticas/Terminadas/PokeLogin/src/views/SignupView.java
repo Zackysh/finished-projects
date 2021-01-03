@@ -27,6 +27,21 @@ import dao.DAO_SignUp;
 import utils.MediaFormer;
 import utils.TextPrompt;
 
+/**
+ * Class that extends JFrame which controls sin-up functionality of
+ * this application.
+ * 
+ * Features added:
+ * 	- Avoid blank fields.
+ *  - Clear fields button (progressive).
+ *  - Repeat password system.
+ *  - Check if user exist on DB.
+ *  - Sign-up.
+ *  - Access to log-in.
+ * 
+ * @author AdriGB
+ *
+ */
 public class SignupView extends JFrame implements ActionListener, MouseListener {
 
 	private static final long serialVersionUID = 1L;
@@ -226,22 +241,23 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 			timer.start();
 
 		} else if (e.getSource() == jB_Register) {
+			
 			if (tF_Username.getText().isBlank() || String.valueOf(pF_Password.getPassword()).isBlank())
-				JOptionPane.showMessageDialog(null, "Please, dont leave empty fields.", getTitle(),
-						JOptionPane.INFORMATION_MESSAGE);
-			else if (String.valueOf(pF_Password.getPassword()) != String.valueOf(pF_PasswordConfirm.getPassword()))
-				JOptionPane.showMessageDialog(null, "Passwords must match.", getTitle(),
-						JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Please, dont leave empty fields.", getTitle(),	JOptionPane.INFORMATION_MESSAGE);
+			
+			else if (!String.valueOf(pF_Password.getPassword()).equals(String.valueOf(pF_PasswordConfirm.getPassword())))
+				JOptionPane.showMessageDialog(null, "Passwords must match.", getTitle(), JOptionPane.INFORMATION_MESSAGE);
+			
 			else if (sd.registerNewUser(tF_Username.getText(), String.valueOf(pF_Password.getPassword())) != 0) {
-				JOptionPane.showMessageDialog(null, "Succesful sign-up, try to log-in!.", getTitle(),
-						JOptionPane.INFORMATION_MESSAGE);
+				
+				JOptionPane.showMessageDialog(null, "Succesful sign-up, try to log-in!.", getTitle(), JOptionPane.INFORMATION_MESSAGE);
 				parent.setVisible(true);
 				dispose();
+				
 			} else {
-				JOptionPane.showMessageDialog(null, "That username is taken. Try another.", getTitle(),
-						JOptionPane.WARNING_MESSAGE);
-				parent.setVisible(true);
-				dispose();
+				
+				JOptionPane.showMessageDialog(null, "That username is taken. Try another.", getTitle(), JOptionPane.WARNING_MESSAGE);
+				
 			}
 
 		} else if (e.getSource() == timer) { // Clear fields with 0,2 delay

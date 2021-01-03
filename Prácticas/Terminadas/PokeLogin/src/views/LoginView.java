@@ -32,6 +32,18 @@ import utils.MediaFormer;
 import utils.StringUtils;
 import utils.TextPrompt;
 
+/**
+ * Class that extends JFrame which controls log-in functionality of
+ * this application.
+ * 
+ * Features added:
+ *  - Avoid blank fields.
+ *  - Login.
+ *  - Access to sign-up.
+ *  
+ * @author AdriGB
+ *
+ */
 public class LoginView extends JFrame implements ActionListener, MouseListener {
 		
 	private static final long serialVersionUID = 1L;

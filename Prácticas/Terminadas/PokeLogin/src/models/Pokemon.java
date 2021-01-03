@@ -2,8 +2,16 @@ package models;
 
 import java.util.ArrayList;
 
+/**
+ * A simple pokemon implementation, it stores necessary information to be able
+ * to store the object into a Pokedex.
+ * 
+ * @author AdriGB
+ *
+ */
 public class Pokemon {
 
+	// Attributes
 	private int idP;
 	private String name;
 	private int number;
@@ -33,11 +41,7 @@ public class Pokemon {
 
 	}
 
-	public Pokemon(int int1, String string, String string2, double double1, double double2, String string3,
-			String string4, ArrayList<PokeType> tiko) {
-		// TODO Auto-generated constructor stub
-	}
-	
+	// GETTERS AND SETTERS
 	public int[] getBaseAtt() {
 		return baseAtt;
 	}
@@ -78,6 +82,11 @@ public class Pokemon {
 		return sex;
 	}
 
+	/**
+	 * Method that returns an arrayList of PokeType objects.
+	 * 
+	 * @return types.
+	 */
 	public ArrayList<PokeType> getTypes() {
 		return types;
 	}

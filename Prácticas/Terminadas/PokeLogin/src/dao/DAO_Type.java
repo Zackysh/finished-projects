@@ -6,17 +6,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Class that extends AbstractDAO and is oriented to extract
- * information from PokeDB.Types and PokeDB.PokeType to this application
+ * Class that extends AbstractDAO and is oriented to extract information from
+ * PokeDB.Types and PokeDB.PokeType to this application.
  * 
  * @author AdriGB
  *
  */
 public class DAO_Type extends AbstractDAO {
-	
+
 	/**
-	 * Method which extracts a resultSet from PokeDB
-	 * that will contain a list with all existing Types.
+	 * Method which extracts a resultSet from PokeDB that will contain a list with
+	 * all existing Types.
 	 * 
 	 * @return rs Result set with desired list.
 	 */
@@ -40,9 +40,8 @@ public class DAO_Type extends AbstractDAO {
 	}
 
 	/**
-	 * Method which extracts a resultSet from PokeDB
-	 * that will contain a list with all existing Types associated
-	 * to a Pokemon id (given as an integer parameter)
+	 * Method which extracts a resultSet from PokeDB that will contain a list with
+	 * all existing Types associated to a Pokemon id (given as an integer parameter).
 	 * 
 	 * @return rs Result set with desired list.
 	 */
@@ -50,13 +49,12 @@ public class DAO_Type extends AbstractDAO {
 
 		try {
 
-			Statement stmt = conn.createStatement();	
-			String sql = "SELECT type.name FROM poketype, type "
-					+ "WHERE poketype.idtype = type.idtype "
+			Statement stmt = conn.createStatement();
+			String sql = "SELECT type.name FROM poketype, type " + "WHERE poketype.idtype = type.idtype "
 					+ "AND poketype.idpoke = " + idPoke;
 
 			ResultSet rs = stmt.executeQuery(sql);
-			
+
 			return rs;
 
 		} catch (SQLException ex) {

@@ -179,10 +179,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				int green = Integer.parseInt(strColor.substring(5, 8));
 				int blue = Integer.parseInt(strColor.substring(9, 12));
 
+				// New color extracted from pokeDB RGB String color
 				Color color = new Color(red, green, blue);
-
+				
 				typeList.add(new PokeType(idtype, name, color));
-
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
