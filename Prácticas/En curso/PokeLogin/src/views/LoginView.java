@@ -51,8 +51,8 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 	private JPanel contentPane;
 	
 	private JLabel background;
-	private JLabel lbl_PokeRegister;
 	private JLabel lbl_PokeLogin;
+	private JLabel lbl_PokeRegister;
 
 	private JTextField tF_Username;
 	private TextPrompt tP_Username;
@@ -90,7 +90,7 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 		
 		// Frame initialization
 		setTitle("Pokedex Login");
-		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\icon.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\Other\\icon.png"));
 		setBounds(0, 0, 440, 540);
 		setResizable(false);
 		setLocationRelativeTo(null);
@@ -109,9 +109,9 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 	public void importFonts() {
 		try {
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Flexo-Light.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Flexo-Regular.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Flexo-Medium.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Light.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Regular.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Medium.ttf")));
 		} catch(FontFormatException | IOException e2) {
 			e2.fillInStackTrace();
 		}
@@ -192,17 +192,17 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 		// lbl_PokeLogin
 		lbl_PokeLogin = new JLabel();
 		lbl_PokeLogin.setBounds(219, 320, 117, 107);
-		lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeLogin, "images\\pokeButton_1.png"));
+		lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeLogin, "images\\Buttons\\pokeButton_1.png"));
 		contentPane.add(lbl_PokeLogin);
 		// lbl_PokeRegister
 		lbl_PokeRegister = new JLabel();
 		lbl_PokeRegister.setBounds(81, 320, 117, 107);
-		lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_1.png"));
+		lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\pokeButton_1.png"));
 		contentPane.add(lbl_PokeRegister);
 		
 		// Set JLabel as background to the contentPane
 		// It must be done the latter, otherwise it would be proposed and cover other elements
-		background = new JLabel(new ImageIcon("images\\loginback.png"));
+		background = new JLabel(new ImageIcon("images\\Background\\loginBackground.png"));
 		background.setBounds(-10, -13, 440, 540);
 		contentPane.add(background);
 	}
@@ -241,18 +241,18 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (e.getSource() == jB_Register)
-			lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_2.png"));
+			lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\pokeButton_2.png"));
 		if (e.getSource() == jB_Login)
-			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_2.png"));
+			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\\\pokeButton_2.png"));
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if (e.getSource() == jB_Register) {
-			lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_1.png"));
+			lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\\\pokeButton_1.png"));
 			
 		} else if (e.getSource() == jB_Login)
-			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_1.png"));
+			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\\\pokeButton_1.png"));
 	}
 
 	@Override

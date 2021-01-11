@@ -153,10 +153,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	public void importFonts() {
 		try {
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Flexo-Light.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Flexo-Regular.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Flexo-Medium.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Pokefont.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Light.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Regular.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Medium.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Pokefont.ttf")));
 		} catch (FontFormatException | IOException e2) {
 			e2.fillInStackTrace();
 		}
@@ -267,7 +267,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 
 		// Frame initialization
 		setTitle("Pokedex");
-		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\icon.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\Other\\icon.png"));
 		setBounds(0, 0, 953, 659);
 		setResizable(false);
 		setLocationRelativeTo(null);
@@ -350,7 +350,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		exit.setBackground(new Color(0, 0, 0, 0));
 		exit.setBorder(null);
 		exit.setEnabled(false);
-		exit.setFont(new Font("LMS Poke'mon Master Solid", Font.BOLD, 26));
+		exit.setFont(new Font("Flexo-Medium", Font.BOLD, 26));
 		exit.setForeground(Color.WHITE);
 		exit.setDisabledIcon(MediaFormer.getImageIconFitLabel(exit, "images\\welcome.png"));
 		exit.setIcon(MediaFormer.getImageIconFitLabel(exit, "images\\welcome.png"));
@@ -371,10 +371,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		box.setBackground(new Color(0, 0, 0, 0));
 		box.setBorder(null);
 		box.setEnabled(false);
-		box.setFont(new Font("LMS Poke'mon Master Solid", Font.BOLD, 26));
+		box.setFont(new Font("Flexo-Medium", Font.BOLD,36));
 		box.setForeground(Color.WHITE);
-		box.setDisabledIcon(MediaFormer.getImageIconFitLabel(box, "images\\welcome.png"));
-		box.setIcon(MediaFormer.getImageIconFitLabel(box, "images\\welcome.png"));
+		box.setDisabledIcon(MediaFormer.getImageIconFitLabel(box, "images\\Other\\welcomeIcon.png"));
+		box.setIcon(MediaFormer.getImageIconFitLabel(box, "images\\Other\\welcomeIcon.png"));
 		box.setVerticalTextPosition(SwingConstants.CENTER);
 		box.setHorizontalTextPosition(SwingConstants.CENTER);
 		box.repaint();
@@ -432,7 +432,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// SpeakerImage
 		speaker = new JLabel();
 		speaker.setBounds(350, 325, 50, 50);
-		speaker.setIcon(MediaFormer.getImageIconFitLabel(speaker, "images\\speaker.png"));
+		speaker.setIcon(MediaFormer.getImageIconFitLabel(speaker, "images\\Other\\speakerIcon.png"));
 		speaker.addMouseListener(this);
 
 		contentPane.add(previousName);
@@ -446,7 +446,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(pokeImage);
 
 		// lbl_buttonLeft
-		lbl_buttonLeft = new JLabel(new ImageIcon("images\\buttonLeft.png"));
+		lbl_buttonLeft = new JLabel(new ImageIcon("images\\Buttons\\buttonLeft.png"));
 		lbl_buttonLeft.setBounds(107, 0, 372, 79);
 
 		// lbl_buttonLeft formers (for custom listen-event shape, compund by two
@@ -460,7 +460,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		leftButtonFormer2.addMouseListener(this);
 
 		// lbl_buttonRight
-		lbl_buttonRight = new JLabel(new ImageIcon("images\\buttonRight.png"));
+		lbl_buttonRight = new JLabel(new ImageIcon("images\\Buttons\\buttonRight.png"));
 		lbl_buttonRight.setBounds(479, 0, 372, 79);
 
 		// lbl_buttonRight formers (for custom listen-event shape, compound by two
@@ -665,7 +665,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(speed);
 
 		// BACKGROUND -----------------------------------------------------------
-		background = new JLabel(new ImageIcon("images\\pokedexBack.png"));
+		background = new JLabel(new ImageIcon("images\\Background\\pokedexBackground.png"));
 		background.setBounds(-5, -13, 953, 659);
 		contentPane.add(background);
 
@@ -689,7 +689,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		showGrayBox(current);
 		showTypes(current);
 		pokeImage.setIcon(MediaFormer.getImageIconFitLabel(pokeImage,
-				"PokeImages\\" + pokeList.get(listController).getName() + ".png"));
+				"images\\Pokemons\\" + pokeList.get(listController).getName() + ".png"));
 
 	}
 
@@ -899,7 +899,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			}
 		} else if (e.getSource() == speaker) {
 			if (play)
-				playSound("PokeCry\\" + pokeList.get(listController).getName().toLowerCase() + ".wav");
+				playSound("Sounds\\" + pokeList.get(listController).getName().toLowerCase() + ".wav");
 			else
 				JOptionPane.showMessageDialog(null, "There's a 4 second delay to play a sound again.", getTitle(),
 						JOptionPane.WARNING_MESSAGE);
@@ -916,9 +916,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2)
-			lbl_buttonLeft.setIcon(new ImageIcon("images\\buttonLeft2.png"));
+			lbl_buttonLeft.setIcon(new ImageIcon("images\\Buttons\\buttonLeft2.png"));
 		else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2)
-			lbl_buttonRight.setIcon(new ImageIcon("images\\buttonRight2.png"));
+			lbl_buttonRight.setIcon(new ImageIcon("images\\Buttons\\buttonRight2.png"));
 		else if (e.getSource() == exit) {
 			exit.setBounds(exit.getBounds().x - 30, exit.getBounds().y - 30, exit.getWidth(), exit.getHeight());
 		}
@@ -927,9 +927,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2)
-			lbl_buttonLeft.setIcon(new ImageIcon("images\\buttonLeft.png"));
+			lbl_buttonLeft.setIcon(new ImageIcon("images\\Buttons\\buttonLeft.png"));
 		else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2)
-			lbl_buttonRight.setIcon(new ImageIcon("images\\buttonRight.png"));
+			lbl_buttonRight.setIcon(new ImageIcon("images\\Buttons\\buttonRight.png"));
 		else if (e.getSource() == exit) {
 			exit.setBounds(exit.getBounds().x + 30, exit.getBounds().y + 30, exit.getWidth(), exit.getHeight());
 		}

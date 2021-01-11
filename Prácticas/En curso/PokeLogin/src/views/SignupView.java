@@ -95,7 +95,7 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 
 		// Frame initialization
 		setTitle("Pokedex SignUp");
-		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\icon.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\Other\\icon.png"));
 		setBounds(0, 0, 440, 540);
 		setResizable(false);
 		setLocationRelativeTo(null);
@@ -204,23 +204,23 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		// lbl_PokeRegister
 		lbl_PokeLogin = new JLabel();
 		lbl_PokeLogin.setBounds(291, 290, 117, 107);
-		lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeLogin, "images\\pokeButton_1.png"));
+		lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeLogin, "images\\Buttons\\pokeButton_1.png"));
 		contentPane.add(lbl_PokeLogin);
 		// lbl_PokeClear
 		lbl_PokeRegister = new JLabel();
 		lbl_PokeRegister.setBounds(148, 290, 117, 107);
-		lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_1.png"));
+		lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\pokeButton_1.png"));
 		contentPane.add(lbl_PokeRegister);
 		// lbl_PokeBack
 		lbl_PokeBack = new JLabel();
 		lbl_PokeBack.setBounds(238, 370, 80, 80);
-		lbl_PokeBack.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeBack, "images\\pokeButton_1.png"));
+		lbl_PokeBack.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeBack, "images\\Buttons\\pokeButton_1.png"));
 		contentPane.add(lbl_PokeBack);
 
 		// Set JLabel as background to the contentPane
 		// It must be done the latter, otherwise it would be proposed and cover other
 		// elements
-		background = new JLabel(new ImageIcon("images\\signupback.png"));
+		background = new JLabel(new ImageIcon("images\\Background\\signupBackground.png"));
 		background.setBounds(-5, -13, 440, 540);
 		contentPane.add(background);
 	}
@@ -287,21 +287,21 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (e.getSource() == jB_Register)
-			lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_2.png"));
+			lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\pokeButton_2.png"));
 		if (e.getSource() == jB_Clear)
-			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_2.png"));
+			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\\\pokeButton_2.png"));
 		if (e.getSource() == jB_Back)
-			lbl_PokeBack.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeBack, "images\\pokeButton_2.png"));
+			lbl_PokeBack.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeBack, "images\\Buttons\\\\pokeButton_2.png"));
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
 		if (e.getSource() == jB_Register)
-			lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_1.png"));
+			lbl_PokeLogin.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\\\pokeButton_1.png"));
 		if (e.getSource() == jB_Clear)
-			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\pokeButton_1.png"));
+			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\\\pokeButton_1.png"));
 		if (e.getSource() == jB_Back)
-			lbl_PokeBack.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeBack, "images\\pokeButton_1.png"));
+			lbl_PokeBack.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeBack, "images\\Buttons\\\\pokeButton_1.png"));
 	}
 
 	// Unused Overridden methods
