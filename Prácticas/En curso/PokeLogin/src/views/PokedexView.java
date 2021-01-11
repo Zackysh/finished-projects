@@ -75,7 +75,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JLabel background;
 
 	// WELCOME-ANIMATION components ----------
-	private JButton box;
+	private JButton welcomeMessage;
 	private Timer welcomeTimer;
 	private Timer welcomeTimerTwo;
 	private String userName;
@@ -132,34 +132,66 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	// FOOTER ------------------------------
 	private JButton exit;
 
+	// LOGIC HANDLERS ---------------------
 	// DAOs
 	private DAO_Pokemon pokeDAO;
 	private DAO_Type typeDAO;
-
 	// Lists
 	private ArrayList<Pokemon> pokeList = new ArrayList<Pokemon>();
 	private ArrayList<PokeType> typeList = new ArrayList<PokeType>();
 	private int listController = 0;
-
 	// Sound Control
 	private boolean play = true;
 	Timer soundTimer;
 
 	/**
-	 * Import fonts from .ttf files. First a new Font is initialized, it receives an
-	 * input stream that brings desired font. Later its registered into the current
-	 * Graphic Environment.
+	 * Constructor of the class. Call main methods that will control whole frame and
+	 * pane.
+	 * 
+	 * Then set visible this frame.
 	 */
-	public void importFonts() {
-		try {
-			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Light.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Regular.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Medium.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Pokefont.ttf")));
-		} catch (FontFormatException | IOException e2) {
-			e2.fillInStackTrace();
-		}
+	public PokedexView(String userName) {
+
+		this.userName = userName;
+		initialize();
+		insertTypes();
+		insertPokemons();
+		initializeUIComponentes();
+		setVisible(true);
+		welcome();
+		// Rest of the logic continue on showPokemon() method
+		// and event listener (Action/Mouse listeners)
+	}
+
+	/**
+	 * Initialize the frame (this class) and its contentPane.
+	 * 
+	 * This method import fonts for this Graphic Environment (not the same as
+	 * Login-Register environment).
+	 */
+	private void initialize() {
+
+		importFonts();
+		soundTimer = new Timer(2050, this);
+		welcomeTimer = new Timer(4000, this);
+		welcomeTimerTwo = new Timer(4000, this);
+
+		// Initialize DAO objects
+		pokeDAO = new DAO_Pokemon();
+		typeDAO = new DAO_Type();
+
+		// Pane initialization
+		contentPane = new JPanel();
+		contentPane.setLayout(null);
+
+		// Frame initialization
+		setTitle("Pokedex");
+		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\Other\\icon.png"));
+		setBounds(0, 0, 953, 659);
+		setResizable(false);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setContentPane(contentPane);
 	}
 
 	/**
@@ -181,7 +213,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 
 				// New color extracted from pokeDB RGB String color
 				Color color = new Color(red, green, blue);
-				
+
 				typeList.add(new PokeType(idtype, name, color));
 			}
 		} catch (SQLException e) {
@@ -245,34 +277,20 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	/**
-	 * Initialize the frame (this class) and its contentPane.
-	 * 
-	 * This method import fonts for this Graphic Environment (not the same as
-	 * Login-Register environment).
+	 * Import fonts from .ttf files. First a new Font is initialized, it receives an
+	 * input stream that brings desired font. Later its registered into the current
+	 * Graphic Environment.
 	 */
-	private void initialize() {
-
-		importFonts();
-		soundTimer = new Timer(2050, this);
-		welcomeTimer = new Timer(4000, this);
-		welcomeTimerTwo = new Timer(4000, this);
-
-		// Initialize DAO objects
-		pokeDAO = new DAO_Pokemon();
-		typeDAO = new DAO_Type();
-
-		// Pane initialization
-		contentPane = new JPanel();
-		contentPane.setLayout(null);
-
-		// Frame initialization
-		setTitle("Pokedex");
-		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\Other\\icon.png"));
-		setBounds(0, 0, 953, 659);
-		setResizable(false);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setContentPane(contentPane);
+	public void importFonts() {
+		try {
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Light.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Regular.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Medium.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Pokefont.ttf")));
+		} catch (FontFormatException | IOException e2) {
+			e2.fillInStackTrace();
+		}
 	}
 
 	/**
@@ -288,16 +306,16 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	private void animTwo() {
 		welcomeTimerTwo.start();
-		Point punto = new Point(940, (int) box.getBounds().getY());
-		animate(box, punto, 150, 2);
+		Point punto = new Point(940, (int) welcomeMessage.getBounds().getY());
+		animate(welcomeMessage, punto, 150, 2);
 	}
 
 	/**
 	 * Second loop of the animation.
 	 */
 	private void animOne() {
-		Point punto = new Point((int) this.getBounds().getWidth() / 2 - 150, (int) box.getBounds().getY());
-		animate(box, punto, 150, 2);
+		Point punto = new Point((int) this.getBounds().getWidth() / 2 - 150, (int) welcomeMessage.getBounds().getY());
+		animate(welcomeMessage, punto, 150, 2);
 	}
 
 	/**
@@ -340,6 +358,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	public void initializeUIComponentes() {
 
 		// FOOTER
+		// Quit button - Exit app
 		exit = new JButton("Quit");
 		exit.setBounds(this.getBounds().width - 180, this.getBounds().height - 200, 240, 240);
 		exit.setUI(new MetalButtonUI() {
@@ -360,81 +379,76 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(exit);
 
 		// WELCOME
-		String boxText = "WELCOME " + userName + "!";
-		box = new JButton(boxText);
-		box.setBounds(-300, this.getBounds().height / 2 - 250, 400, 400);
-		box.setUI(new MetalButtonUI() {
+		// welcomeMessage - Invoked when Pokedex (this) is instantiated
+		welcomeMessage = new JButton("WELCOME " + userName + "!");
+		welcomeMessage.setBounds(-300, this.getBounds().height / 2 - 250, 400, 400);
+		welcomeMessage.setUI(new MetalButtonUI() {
 			protected Color getDisabledTextColor() {
 				return Color.WHITE;
 			}
 		});
-		box.setBackground(new Color(0, 0, 0, 0));
-		box.setBorder(null);
-		box.setEnabled(false);
-		box.setFont(new Font("Flexo-Medium", Font.BOLD,36));
-		box.setForeground(Color.WHITE);
-		box.setDisabledIcon(MediaFormer.getImageIconFitLabel(box, "images\\Other\\welcomeIcon.png"));
-		box.setIcon(MediaFormer.getImageIconFitLabel(box, "images\\Other\\welcomeIcon.png"));
-		box.setVerticalTextPosition(SwingConstants.CENTER);
-		box.setHorizontalTextPosition(SwingConstants.CENTER);
-		box.repaint();
-		contentPane.add(box);
+		welcomeMessage.setBackground(new Color(0, 0, 0, 0));
+		welcomeMessage.setBorder(null);
+		welcomeMessage.setEnabled(false);
+		welcomeMessage.setFont(new Font("Flexo-Medium", Font.BOLD, 36));
+		welcomeMessage.setForeground(Color.WHITE);
+		welcomeMessage.setDisabledIcon(MediaFormer.getImageIconFitLabel(welcomeMessage, "images\\Other\\welcomeIcon.png"));
+		welcomeMessage.setIcon(MediaFormer.getImageIconFitLabel(welcomeMessage, "images\\Other\\welcomeIcon.png"));
+		welcomeMessage.setVerticalTextPosition(SwingConstants.CENTER);
+		welcomeMessage.setHorizontalTextPosition(SwingConstants.CENTER);
+		welcomeMessage.repaint();
+		contentPane.add(welcomeMessage);
 
 		// TOP_LABELS ---------------------------------------------------------
-		// Previous info
+		// Previous pokemon name
 		previousName = new JLabel();
 		previousName.setBounds(317, 5, 120, 50);
 		previousName.setFont(new Font("Flexo-Regular", NORMAL, 26));
 		previousName.setHorizontalAlignment(SwingConstants.LEADING);
 		previousName.setForeground(new Color(103, 97, 97));
-
+		// Previous pokemon number
 		previousNumber = new JLabel();
 		previousNumber.setBounds(237, 5, 100, 50);
 		previousNumber.setFont(new Font("Flexo-Regular", Font.BOLD, 24));
 		previousNumber.setHorizontalAlignment(SwingConstants.LEADING);
 		previousNumber.setForeground(Color.white);
-
-		// Next info
+		// Next pokemon name
 		nextName = new JLabel();
 		nextName.setBounds(545, 5, 120, 50);
 		nextName.setFont(new Font("Flexo-Regular", NORMAL, 26));
 		nextName.setHorizontalAlignment(SwingConstants.LEADING);
 		nextName.setForeground(new Color(103, 97, 97));
-
+		// Next pokemon number
 		nextNumber = new JLabel();
 		nextNumber.setBounds(646, 5, 100, 50);
 		nextNumber.setFont(new Font("Flexo-Regular", Font.BOLD, 24));
 		nextNumber.setHorizontalAlignment(SwingConstants.LEADING);
 		nextNumber.setForeground(Color.white);
-
-		// Current info
+		// Current pokemon name
 		currentName = new JLabel();
 		currentName.setBounds(375, 55, 130, 50);
 		currentName.setFont(new Font("Flexo-Regular", NORMAL, 30));
 		currentName.setHorizontalAlignment(SwingConstants.LEADING);
-
+		// Current pokemon number
 		currentNumber = new JLabel();
 		currentNumber.setBounds(500, 55, 100, 50);
 		currentNumber.setFont(new Font("Flexo-Regular", WIDTH, 26));
 		currentNumber.setHorizontalAlignment(SwingConstants.LEADING);
 		currentNumber.setForeground(new Color(103, 107, 107));
-
 		// Description
 		description = new JLabel("<html><p>" + "" + "</p><html>");
 		description.setBounds(430, 20, 390, 300);
 		description.setFont(new Font("Flexo-Regular", NORMAL, 15));
 		description.setHorizontalAlignment(SwingConstants.LEADING);
-
 		// PokeImage
 		pokeImage = new JLabel();
 		pokeImage.setBounds(120, 90, 280, 280);
-
 		// SpeakerImage
 		speaker = new JLabel();
 		speaker.setBounds(350, 325, 50, 50);
 		speaker.setIcon(MediaFormer.getImageIconFitLabel(speaker, "images\\Other\\speakerIcon.png"));
 		speaker.addMouseListener(this);
-
+		// Add previous components
 		contentPane.add(previousName);
 		contentPane.add(previousNumber);
 		contentPane.add(nextName);
@@ -444,17 +458,15 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(description);
 		contentPane.add(speaker);
 		contentPane.add(pokeImage);
-
+		
 		// lbl_buttonLeft
 		lbl_buttonLeft = new JLabel(new ImageIcon("images\\Buttons\\buttonLeft.png"));
-		lbl_buttonLeft.setBounds(107, 0, 372, 79);
-
+		lbl_buttonLeft.setBounds(107, 0, 372, 79);		
 		// lbl_buttonLeft formers (for custom listen-event shape, compund by two
 		// rectangles)
 		leftButtonFormer1 = new JLabel(); // Rectangle 1
 		leftButtonFormer1.setBounds(107, 0, 372, 50);
 		leftButtonFormer1.addMouseListener(this);
-
 		leftButtonFormer2 = new JLabel(); // Rectangle 2
 		leftButtonFormer2.setBounds(107, 50, 125, 30);
 		leftButtonFormer2.addMouseListener(this);
@@ -462,17 +474,15 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// lbl_buttonRight
 		lbl_buttonRight = new JLabel(new ImageIcon("images\\Buttons\\buttonRight.png"));
 		lbl_buttonRight.setBounds(479, 0, 372, 79);
-
 		// lbl_buttonRight formers (for custom listen-event shape, compound by two
 		// rectangles)
 		rightButtonFormer1 = new JLabel(); // Rectangle 1
 		rightButtonFormer1.setBounds(479, 0, 372, 50);
 		rightButtonFormer1.addMouseListener(this);
-
 		rightButtonFormer2 = new JLabel(); // Rectangle 2
 		rightButtonFormer2.setBounds(726, 50, 125, 30);
 		rightButtonFormer2.addMouseListener(this);
-
+		// Add previous components
 		contentPane.add(lbl_buttonLeft);
 		contentPane.add(leftButtonFormer1);
 		contentPane.add(leftButtonFormer2);
@@ -535,7 +545,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		skillV.setBounds(638, 348, 120, 20);
 		skillV.setFont(new Font("Flexo-Light", 1, 18));
 		skillV.setHorizontalAlignment(SwingConstants.LEADING);
-
+		// Add previous characteristics labels
 		contentPane.add(heightT);
 		contentPane.add(heightV);
 		contentPane.add(weightT);
@@ -547,10 +557,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(skillT);
 		contentPane.add(skillV);
 
-		// UNDER-BLUE-BOX BUTTONS ------------------------------------------------------
-
+		// UNDER-BLUE-BOX BUTTONS --------------------------------------
+		// Border which typeLabels will receive
 		Border loweredbevel = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-
+		// typeOneLabel
 		typeOneLabel = new JButton();
 		typeOneLabel.setBounds(448, 460, 150, 36);
 		typeOneLabel.setEnabled(false);
@@ -561,8 +571,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		});
 		typeOneLabel.setFont(new Font("Flexo-Light", Font.BOLD, 16));
 		typeOneLabel.setBorder(loweredbevel);
-		contentPane.add(typeOneLabel);
-
+		// typeTwoLabel
 		typeTwoLabel = new JButton();
 		typeTwoLabel.setBounds(628, 460, 150, 36);
 		typeTwoLabel.setEnabled(false);
@@ -573,10 +582,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		});
 		typeTwoLabel.setFont(new Font("Flexo-Light", Font.BOLD, 16));
 		typeTwoLabel.setBorder(loweredbevel);
+		// Add typeLabels
+		contentPane.add(typeOneLabel);
 		contentPane.add(typeTwoLabel);
-
-		// GRAY-BOX ------------------------------------------------------------
-
+		
+		// GRAY-BOX LABELS ---------------------------------------------------------
 		lbl_ps = new JLabel("PS");
 		lbl_ps.setBounds(130, 385, 50, 20);
 		lbl_ps.setFont(new Font("Flexo-Light", Font.PLAIN, 11));
@@ -650,7 +660,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		speed.setBackground(new Color(164, 164, 164));
 		speed.setUI(new FancyProgressBar());
 		speed.setBorder(null);
-
+		// Add previuos attribute labels and its progressBar (no value yet)
 		contentPane.add(lbl_ps);
 		contentPane.add(ps);
 		contentPane.add(lbl_att);
@@ -669,20 +679,19 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		background.setBounds(-5, -13, 953, 659);
 		contentPane.add(background);
 
-		showPokemon();
+		showPokemon(); // Show first Pokemon (avoid blank default state)
 	}
 
 	/**
-	 * Method that control whole filling process to show all pokemons information on
-	 * the panel.
+	 * Method that control whole filling process to show all Pokemon information on
+	 * the panel. It shows listController associated pokemon.
+	 * Instead of receiving Pokemon id as int parameter, it access to listController.
 	 * 
 	 * His task is subdivided on methods specialized on complete a specific
 	 * sub-task.
 	 */
 	public void showPokemon() {
-
 		Pokemon current = pokeList.get(listController);
-
 		showHeadder(current);
 		description.setText("<html><p>" + pokeList.get(listController).getDescription() + "</p><html>");
 		showBlueBox(current);
@@ -690,7 +699,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		showTypes(current);
 		pokeImage.setIcon(MediaFormer.getImageIconFitLabel(pokeImage,
 				"images\\Pokemons\\" + pokeList.get(listController).getName() + ".png"));
-
 	}
 
 	/**
@@ -828,7 +836,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 
 	public void playSound(String source) {
 
-		try {
+		try { // TODO
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(source).getAbsoluteFile());
 			Clip clip = AudioSystem.getClip();
 
@@ -840,23 +848,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
 			System.out.println("Error al reproducir el sonido.");
 		}
-	}
-
-	/**
-	 * Constructor of the class. Call main methods that will control whole frame and
-	 * pane.
-	 * 
-	 * Then set visible this frame.
-	 */
-	public PokedexView(String userName) {
-
-		this.userName = userName;
-		initialize();
-		insertTypes();
-		insertPokemons();
-		initializeUIComponentes();
-		setVisible(true);
-		welcome();
 	}
 
 	/**
@@ -949,19 +940,22 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				soundTimer.stop();
 			}
 		} else if (e.getSource() == welcomeTimer) { // welcomeTimers controls welcome animation
-			if (!box.isVisible())
+			if (!welcomeMessage.isVisible())
 				welcomeTimer.stop(); // Second call: stop timer
 			else {
 				animTwo(); // First call: starts second loop
 			}
 		} else if (e.getSource() == welcomeTimerTwo) { // when this timer is called, end the animation
-			box.setVisible(false); 
+			welcomeMessage.setVisible(false);
 			welcomeTimerTwo.stop();
 		}
 
 	}
-	
+
 	// Unused Overridden methods
-	public void mousePressed(MouseEvent e) {} // Unused
-	public void mouseReleased(MouseEvent e) {} // Unused
+	public void mousePressed(MouseEvent e) {
+	} // Unused
+
+	public void mouseReleased(MouseEvent e) {
+	} // Unused
 }

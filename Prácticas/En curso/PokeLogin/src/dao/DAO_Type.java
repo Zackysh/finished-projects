@@ -48,20 +48,20 @@ public class DAO_Type extends AbstractDAO {
 	public ResultSet getTypesFromPoke(int idPoke) {
 
 		try {
-
+			
 			Statement stmt = conn.createStatement();
 			String sql = "SELECT type.name FROM poketype, type " + "WHERE poketype.idtype = type.idtype "
 					+ "AND poketype.idpoke = " + idPoke;
-
+			
 			ResultSet rs = stmt.executeQuery(sql);
-
+			
 			return rs;
-
+			
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
 		}
-
+		
 		return null;
-
+		
 	}
 }
