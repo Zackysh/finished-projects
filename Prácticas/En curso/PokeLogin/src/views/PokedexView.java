@@ -28,11 +28,16 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.plaf.metal.MetalButtonUI;
@@ -73,6 +78,16 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 
 	private JPanel contentPane;
 	private JLabel background;
+
+	// MENU_BAR, MENUS, MENU_ITEMS -----------
+	private JMenuBar menuBar;
+	private JMenu menu_options;
+	private JMenu menu_save;
+	private JMenuItem mOptionsItem_add, mOptionsItem_edit;
+	private JMenuItem mSaveItem_save, mSaveItem_discard;
+
+	// MENU_CONTROLLERS ----------------------
+	private boolean isEdited;
 
 	// WELCOME-ANIMATION components ----------
 	private JButton welcomeMessage;
@@ -143,6 +158,14 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	// Sound Control
 	private boolean play = true;
 	Timer soundTimer;
+
+	public static void main(String[] args) {
+//		try {
+//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		} catch (Exception e) {
+//		}
+		new PokedexView("Pipo");
+	}
 
 	/**
 	 * Constructor of the class. Call main methods that will control whole frame and
@@ -357,6 +380,51 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	public void initializeUIComponentes() {
 
+		// Menu standard color
+		Color menuBackground = new Color(51, 51, 51);
+		Color menuForeground = Color.white;
+		// MenuBar
+		menuBar = new JMenuBar();
+//		menuBar.setBackground(menuBackground);
+//		menuBar.setForeground(menuForeground);
+//		menuBar.setBorder(null);
+		// Menu options
+		menu_options = new JMenu("Options"); // Menu 1
+		menu_options.setHorizontalAlignment(SwingConstants.LEFT);
+//		menu_options.setForeground(menuForeground);
+		menu_options.addSeparator();
+//		menu_options.setBorder(null);
+		// Menu save
+		menu_save = new JMenu("Save changes"); // Menu 2
+//		menu_save.setForeground(menuForeground);
+//		menu_save.add(new JSeparator());
+//		menu_save.setBorder(null);
+		// Menu Options Items
+		mOptionsItem_add = new JMenuItem("Add new Pokemon."); // 1
+		mOptionsItem_add.setHorizontalAlignment(SwingConstants.RIGHT);
+//		mOptionsItem_add.setBackground(menuBackground);
+//		mOptionsItem_add.setForeground(menuForeground);
+		mOptionsItem_edit = new JMenuItem("Edit current Pokemon."); // 2
+//		mOptionsItem_edit.setBackground(menuBackground);
+//		mOptionsItem_edit.setForeground(menuForeground);
+		// Menu Save Items
+		mSaveItem_save = new JMenuItem("Save changes."); // 1
+//		mSaveItem_save.setBackground(menuBackground);
+//		mSaveItem_save.setForeground(menuForeground);
+		mSaveItem_discard = new JMenuItem("Discard changes."); // 2
+//		mSaveItem_discard.setBackground(menuBackground);
+//		mSaveItem_discard.setForeground(menuForeground);
+
+		// Connect menus
+		menuBar.add(menu_options);
+		menuBar.add(menu_save);
+		menu_options.add(mOptionsItem_edit);
+		menu_options.add(mOptionsItem_add);
+		menu_save.add(mSaveItem_save);
+		menu_save.add(mSaveItem_discard);
+
+		setJMenuBar(menuBar);
+
 		// FOOTER
 		// Quit button - Exit app
 		exit = new JButton("Quit");
@@ -371,8 +439,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		exit.setEnabled(false);
 		exit.setFont(new Font("Flexo-Medium", Font.BOLD, 26));
 		exit.setForeground(Color.WHITE);
-		exit.setDisabledIcon(MediaFormer.getImageIconFitLabel(exit, "images\\welcome.png"));
-		exit.setIcon(MediaFormer.getImageIconFitLabel(exit, "images\\welcome.png"));
+		exit.setDisabledIcon(MediaFormer.getImageIconFitLabel(exit, "images\\Other\\welcomeIcon.png"));
+		exit.setIcon(MediaFormer.getImageIconFitLabel(exit, "images\\Other\\welcomeIcon.png"));
 		exit.setVerticalTextPosition(SwingConstants.CENTER);
 		exit.setHorizontalTextPosition(SwingConstants.CENTER);
 		exit.addMouseListener(this);
@@ -392,7 +460,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		welcomeMessage.setEnabled(false);
 		welcomeMessage.setFont(new Font("Flexo-Medium", Font.BOLD, 36));
 		welcomeMessage.setForeground(Color.WHITE);
-		welcomeMessage.setDisabledIcon(MediaFormer.getImageIconFitLabel(welcomeMessage, "images\\Other\\welcomeIcon.png"));
+		welcomeMessage
+				.setDisabledIcon(MediaFormer.getImageIconFitLabel(welcomeMessage, "images\\Other\\welcomeIcon.png"));
 		welcomeMessage.setIcon(MediaFormer.getImageIconFitLabel(welcomeMessage, "images\\Other\\welcomeIcon.png"));
 		welcomeMessage.setVerticalTextPosition(SwingConstants.CENTER);
 		welcomeMessage.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -458,10 +527,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(description);
 		contentPane.add(speaker);
 		contentPane.add(pokeImage);
-		
+
 		// lbl_buttonLeft
 		lbl_buttonLeft = new JLabel(new ImageIcon("images\\Buttons\\buttonLeft.png"));
-		lbl_buttonLeft.setBounds(107, 0, 372, 79);		
+		lbl_buttonLeft.setBounds(107, 0, 372, 79);
 		// lbl_buttonLeft formers (for custom listen-event shape, compund by two
 		// rectangles)
 		leftButtonFormer1 = new JLabel(); // Rectangle 1
@@ -585,7 +654,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// Add typeLabels
 		contentPane.add(typeOneLabel);
 		contentPane.add(typeTwoLabel);
-		
+
 		// GRAY-BOX LABELS ---------------------------------------------------------
 		lbl_ps = new JLabel("PS");
 		lbl_ps.setBounds(130, 385, 50, 20);
@@ -684,8 +753,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 
 	/**
 	 * Method that control whole filling process to show all Pokemon information on
-	 * the panel. It shows listController associated pokemon.
-	 * Instead of receiving Pokemon id as int parameter, it access to listController.
+	 * the panel. It shows listController associated pokemon. Instead of receiving
+	 * Pokemon id as int parameter, it access to listController.
 	 * 
 	 * His task is subdivided on methods specialized on complete a specific
 	 * sub-task.
@@ -836,7 +905,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 
 	public void playSound(String source) {
 
-		try { // TODO
+		try {
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(source).getAbsoluteFile());
 			Clip clip = AudioSystem.getClip();
 
