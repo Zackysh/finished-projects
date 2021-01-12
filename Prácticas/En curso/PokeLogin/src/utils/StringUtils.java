@@ -28,9 +28,27 @@ public class StringUtils {
 		}
 		return temp;
 	}
-	
+
 	public static void br() {
 		System.out.println();
+	}
+
+	public static boolean checkInt(String str) {
+		try {
+			Integer.parseInt(str);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public static boolean checkDouble(String str) {
+		try {
+			Double.parseDouble(str);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public static String nombreAleatorio() {
