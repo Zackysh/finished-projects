@@ -185,7 +185,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JLabel descRules;
 	private boolean isDescriptionReady;
 	// Sound Control
-	private boolean play = true;
+	private boolean isSoundEnable = true;
 	Timer soundTimer;
 
 	public static void main(String[] args) {
@@ -569,7 +569,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// TOP_LABELS ---------------------------------------------------------
 		// EditMode
 		editMode = new JLabel("E D I T  M O D E  O N");
-		editMode.setBounds(getBounds().width/2 - 155, 15, 330, 50);
+		editMode.setBounds(getBounds().width / 2 - 155, 15, 330, 50);
 		editMode.setFont(new Font("Flexo-Regular", NORMAL, 36));
 		editMode.setVisible(false);
 		// Previous pokemon name
@@ -1163,7 +1163,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		readyFields.add(sdefI);
 		readyFields.add(speedI);
 		isDescriptionReady = true;
-		
+
 		editMode.setVisible(true);
 	}
 
@@ -1217,91 +1217,85 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	public void playSound(String source) {
-
 		try {
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(source).getAbsoluteFile());
 			Clip clip = AudioSystem.getClip();
-
 			clip.open(audioInputStream);
-			actionPerformed(new ActionEvent(soundTimer, 1, "")); // Send null action to turn false "play"
-			soundTimer.start(); // in 5segs it will be possible to play sound again
+			actionPerformed(new ActionEvent(soundTimer, 1, "")); // Send null action to turn false "isSoundEnable"
+			soundTimer.start(); // in 5segs it will be possible to isSoundEnable sound again
 			clip.start();
-
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
 			System.out.println("Error al reproducir el sonido.");
 		}
 	}
 
 	/**
-	 * When the mouse is clicked, we check the source, then...
+	 * Logic of main buttons.
 	 */
-	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2) {
-			/**
-			 * If current Pokemon is the first on the list, previous Pokemon (left button)
-			 * will show Last Pokemon.
-			 */
-			if (listController != 0) { // Is not the first
+			// leftButton
+			if (listController != 0) {
 				listController--;
 				showPokemon();
-			} else { // Is the first
+			} else {
 				listController = pokeList.size() - 1;
 				showPokemon();
 			}
 		} else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2) {
-			/**
-			 * If current Pokemon is the last on the list, next Pokemon (right button) will
-			 * show First Pokemon.
-			 */
-			if (listController < pokeList.size() - 1) { // Is not the last
+			// rightButton
+			if (listController < pokeList.size() - 1) {
 				listController++;
 				showPokemon();
-			} else { // Is the last
+			} else {
 				listController = 0;
 				showPokemon();
 			}
 		} else if (e.getSource() == speaker) {
-			if (play)
+			// playSoundButton
+			if (isSoundEnable)
 				playSound("Sounds\\" + pokeList.get(listController).getName().toLowerCase() + ".wav");
-			else
-				JOptionPane.showMessageDialog(null, "There's a 4 second delay to play a sound again.", getTitle(),
-						JOptionPane.WARNING_MESSAGE);
 		} else if (e.getSource() == exit) {
-			this.dispose();
+			this.dispose(); // exitButton
 		} else if (e.getSource() == pokeImage && isEditOn) {
-			JCheckBox upload = new JCheckBox("Upload Image instead of input url.");
+			setNewPokeImage(); // changePokeimageButton
+		}
+	}
 
-			String msg = "Mark this check box if you want to open image instead of Input an image url.";
-
-			Object[] msgContent = { msg, upload };
-
-			int n = JOptionPane.showConfirmDialog(null, msgContent, "Method selection", JOptionPane.OK_CANCEL_OPTION);
-			if (n == 0) {
-				if (upload.isSelected()) {
-
-				} else {
-					String url;
-					boolean isValid;
-					do {
-						url = JOptionPane.showInputDialog("Insert Image Url");
-						isValid = MediaFormer.testImage(url);
-						if (isValid) {
-							pokeImage.setIcon(MediaFormer.getImageIconFitLabelURL(pokeImage, url));
-						} else {
-							JOptionPane.showMessageDialog(null, "This is not a valid url.", "Error",
-									JOptionPane.ERROR_MESSAGE);
-						}
-					} while (!isValid);
-				}
+	/**
+	 * Method that allow user to change pokeImage trough UI components. It asks the
+	 * user for insert new image via URL or via File.
+	 */
+	private void setNewPokeImage() {
+		JCheckBox upload = new JCheckBox("Upload Image instead of input url.");
+		String msg = "Mark this check box if you want to open image instead of Input an image url.";
+		Object[] msgContent = { msg, upload };
+		// User chose upload new image via URL or via file
+		int n = JOptionPane.showConfirmDialog(null, msgContent, "Method selection", JOptionPane.OK_CANCEL_OPTION);
+		if (n == 0) {
+			if (upload.isSelected()) {
+				// TODO insert files
+			} else {
+				String url;
+				boolean isValid;
+				do { // Check if URL is valid
+					url = JOptionPane.showInputDialog("Insert Image Url");
+					isValid = MediaFormer.testImage(url);
+					if (isValid) {
+						pokeImage.setIcon(MediaFormer.getImageIconFitLabelURL(pokeImage, url));
+					} else {
+						JOptionPane.showMessageDialog(null, "This is not a valid url.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} while (!isValid);
 			}
 		}
 	}
 
 	/**
-	 * mouesEntered and mouseExited are used to gain a roll over effect.
+	 * mouesEntered and mouseExited are used to gain a roll over effect to
+	 * top_buttons and JMenuItems.
 	 */
-	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2)
 			lbl_buttonLeft.setIcon(new ImageIcon("images\\Buttons\\buttonLeft2.png"));
@@ -1316,7 +1310,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		}
 	}
 
-	@Override
+	/**
+	 * mouesEntered and mouseExited are used to gain a roll over effect to
+	 * top_buttons and JMenuItems.
+	 */
 	public void mouseExited(MouseEvent e) {
 		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2)
 			lbl_buttonLeft.setIcon(new ImageIcon("images\\Buttons\\buttonLeft.png"));
@@ -1332,10 +1329,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	/**
-	 * It might be possible to control whole sound and animation in a better way.
-	 * But and don't think its necessary here, because it will not grow enough.
+	 * 
 	 */
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (menuIList.contains(e.getSource())) {
 			// set default color to JMenuItem when its pressed
@@ -1343,23 +1338,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			source.setBackground(menuDefaultColor);
 		}
 		if (e.getSource() == soundTimer) {
-			// Sound timer controls when its possible to play a sound
-			// every time speaker is pressed, soundTimer send two actions
-			if (play) // first action - when speaker is pressed timer starts and first action is
-						// called
-				play = false; // When a sound is played, is not possible to play a sound again
-			else { // second action - (timers run actions every x seconds when they start)
-				play = true; // is possible to play a sound again
-				// Timer stops itself at second action (cause first turn play false),
-				// second action always fall into this else
-				soundTimer.stop();
-			}
+			runSoundTimer(); // soundTimer event
 		} else if (e.getSource() == welcomeTimer) { // welcomeTimers controls welcome animation
-			if (!welcomeMessage.isVisible())
-				welcomeTimer.stop(); // Second call: stop timer
-			else {
-				animTwo(); // First call: starts second loop
-			}
+			runWelcomeTimer();
 		} else if (e.getSource() == welcomeTimerTwo) { // when this timer is called, end the animation
 			welcomeMessage.setVisible(false);
 			welcomeTimerTwo.stop();
@@ -1380,97 +1361,166 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		}
 	}
 
-	@Override
-	public void keyReleased(KeyEvent e) { // Controls input of attributes
+	/**
+	 * This method is called by welcomeTimer. It controls welcome Animation. Note
+	 * that welcomeTimer is called by welcome(). - First call: it's committed 4000ms
+	 * after welcomeTimer is started, at this point firstLoop of animation will be
+	 * over, so secondLoop (animTwo()) is called. - Second call: It's committed
+	 * 4000ms after secondLoop is over. This timer is no longer necessary, so it's
+	 * stopped.
+	 */
+	private void runWelcomeTimer() {
+		if (!welcomeMessage.isVisible())
+			welcomeTimer.stop(); // Second call: stop timer
+		else {
+			animTwo(); // First call: starts second loop
+		}
+	}
+
+	/**
+	 * This method is called by soundTimer. It just turn isSoundEnable into false
+	 * for 2050ms, enough to avoid sound slap / overlap.
+	 * 
+	 * It makes soundTimer stops at second loop: - First event: after soundTimer
+	 * first loop it sends first event. As isSoundEnable = true at the beginning,
+	 * first event will turn isSoundEnable into false. Look if conditional. - Second
+	 * event: As isSoundEnable = false at this time (only manipulated by
+	 * soundTimer), second event will turn isSoundEnable into true and
+	 * soundTimer.stop() will be called. So there's never a third event.
+	 */
+	private void runSoundTimer() {
+		if (isSoundEnable)
+			isSoundEnable = false;
+		else {
+			isSoundEnable = true;
+			soundTimer.stop();
+		}
+	}
+
+	/**
+	 * KeyRealeased controls field verification.
+	 */
+	public void keyReleased(KeyEvent e) {
 		if (attIntputList.contains(e.getSource())) {
-			JTextField source = (JTextField) e.getSource();
-			boolean isValid = StringUtils.checkInt(source.getText());
+			verifyAttFields(e);
+		} else if (e.getSource() == prop_heightV || e.getSource() == prop_weightV) {
+			verifyDoubleFields(e);
+		} else if (e.getSource() == currentNumber) {
+			verifyCurrentNumber();
+		} else if (e.getSource() == description) {
+			verifyDescription();
+		} else if (strFields.contains(e.getSource())) {
+			verifyStrFields(e);
+		} else if (e.getSource() == currentName) {
+			verifyCurrentName();
+		}
+	}
+
+	private void verifyAttFields(KeyEvent e) {
+		JTextField source = (JTextField) e.getSource();
+		boolean isValid = StringUtils.checkInt(source.getText());
+		if (!isValid) {
+			source.setBackground(new Color(202, 129, 129));
+			readyFields.remove(source);
+		} else {
+			int newInt = Integer.parseInt(source.getText());
+			if (newInt < 1) {
+				newInt = 1;
+				source.setText(Integer.toString(newInt));
+			} else if (newInt > 15) {
+				newInt = 15;
+				source.setText(Integer.toString(newInt));
+			}
+			source.setBackground(new Color(179, 179, 179));
+			if (!readyFields.contains(source))
+				readyFields.add(source);
+		}
+	}
+
+	private void verifyDoubleFields(KeyEvent e) {
+		JTextField source = (JTextField) e.getSource();
+		if (!source.getText().isBlank()) {
+			boolean isValid = StringUtils.checkDouble(source.getText());
 			if (!isValid) {
-				source.setBackground(new Color(202, 129, 129));
+				source.setForeground(Color.red);
 				readyFields.remove(source);
 			} else {
-				int newInt = Integer.parseInt(source.getText());
-				if (newInt < 1) {
-					newInt = 1;
-					source.setText(Integer.toString(newInt));
-				} else if (newInt > 15) {
-					newInt = 15;
-					source.setText(Integer.toString(newInt));
-				}
-				source.setBackground(new Color(179, 179, 179));
+				source.setForeground(Color.black);
 				if (!readyFields.contains(source))
 					readyFields.add(source);
 			}
-		} else if (e.getSource() == prop_heightV || e.getSource() == prop_weightV) {
-			JTextField source = (JTextField) e.getSource();
-			if (!source.getText().isBlank()) {
-				boolean isValid = StringUtils.checkDouble(source.getText());
-				if (!isValid) {
-					source.setForeground(Color.red);
-					readyFields.remove(source);
-				} else {
-					source.setForeground(Color.black);
-					if (!readyFields.contains(source))
-						readyFields.add(source);
-				}
+		} else {
+			source.setBackground(new Color(202, 129, 129));
+		}
+	}
+
+	private void verifyCurrentNumber() {
+		if (!currentNumber.getText().isBlank()) {
+			currentNumber.setBackground(Color.white);
+			boolean isValid = StringUtils.checkInt(currentNumber.getText());
+			if (!isValid) {
+				currentNumber.setForeground(Color.red);
+				readyFields.remove(currentNumber);
 			} else {
-				source.setBackground(new Color(202, 129, 129));
+				currentNumber.setForeground(Color.black);
+				if (!readyFields.contains(currentNumber))
+					readyFields.add(currentNumber);
 			}
-		} else if (e.getSource() == currentNumber) {
-			if(!currentNumber.getText().isBlank()) {
-				currentNumber.setBackground(Color.white);
-				boolean isValid = StringUtils.checkInt(currentNumber.getText());
-				if (!isValid) {
-					currentNumber.setForeground(Color.red);
-					readyFields.remove(currentNumber);
-				} else {
-					currentNumber.setForeground(Color.black);
-					if (!readyFields.contains(currentNumber))
-						readyFields.add(currentNumber);
-				}
+		} else {
+			currentNumber.setBackground(new Color(202, 129, 129));
+		}
+	}
+
+	private void verifyDescription() {
+		int length = description.getText().length();
+		System.out.println(length);
+		if (length < 30) {
+			if (length <= 1) {
+				description.setBackground(new Color(202, 129, 129));
 			} else {
-				currentNumber.setBackground(new Color(202, 129, 129));
+				description.setBackground(Color.white);
 			}
-			
-		} else if (e.getSource() == description) {
-			int length = description.getText().length();
-			System.out.println(length);
-			if (length < 30) {
-				if(length <= 1) {
-					description.setBackground(new Color(202, 129, 129));
-				} else {
-					description.setBackground(Color.white);
-				}
-				description.setForeground(Color.red);
-				isDescriptionReady = false;
-				descRules.setVisible(true);
-			} else {
-				description.setForeground(Color.black);
-				isDescriptionReady = true;
-				descRules.setVisible(false);
+			description.setForeground(Color.red);
+			isDescriptionReady = false;
+			descRules.setVisible(true);
+		} else {
+			description.setForeground(Color.black);
+			isDescriptionReady = true;
+			descRules.setVisible(false);
+		}
+	}
+	
+	/**
+	 * This method verifies strFields are not blank.
+	 * It warns the user to fill this fields.
+	 */
+	private void verifyStrFields(KeyEvent e) {
+		JTextField source = (JTextField) e.getSource();
+		if (source.getText().isBlank()) {
+			source.setBackground(new Color(202, 129, 129));
+			readyFields.remove(source);
+		} else {
+			if (!readyFields.contains(source)) {
+				readyFields.add(source);
 			}
-		} else if (strFields.contains(e.getSource())) {
-			JTextField source = (JTextField) e.getSource();
-			if (source.getText().isBlank()) {
-				source.setBackground(new Color(202, 129, 129));
-				readyFields.remove(source);
-			} else {
-				if (!readyFields.contains(source)) {
-					readyFields.add(source);
-				}
-				source.setBackground(new Color(48, 167, 215));
+			source.setBackground(new Color(48, 167, 215));
+		}
+	}
+	
+	/**
+	 * This method verifies currentName is not blank.
+	 * It warns the user to fill this field.
+	 */
+	private void verifyCurrentName() {
+		if (currentName.getText().isBlank()) {
+			currentName.setBackground(new Color(202, 129, 129));
+			readyFields.remove(currentName);
+		} else {
+			currentName.setBackground(Color.white);
+			if (!readyFields.contains(currentName)) {
+				readyFields.add(currentName);
 			}
-		} else if (e.getSource() == currentName) {
-			if (currentName.getText().isBlank()) {				
-				currentName.setBackground(new Color(202, 129, 129));
-				readyFields.remove(currentName);
-			} else {
-				currentName.setBackground(Color.white);
-				if (!readyFields.contains(currentName)) {
-					readyFields.add(currentName);
-				}
-				currentName.setBackground(Color.white);
-			}
+			currentName.setBackground(Color.white);
 		}
 	}
 
