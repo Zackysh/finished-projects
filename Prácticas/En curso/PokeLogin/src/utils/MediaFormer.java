@@ -12,7 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 public class MediaFormer {
-	
+
 	/**
 	 * Method that given a JLabel and a String returns an ImageIcon. This ImageIcon
 	 * will snap to the given JLabel and search for the source image.
@@ -24,16 +24,16 @@ public class MediaFormer {
 	 * @return imageIcon adapted to given label.
 	 */
 	public static ImageIcon getImageIconFitLabel(JLabel label, String source) {
-		
+
 		Image img = new ImageIcon(source).getImage();
 
 		Image redimensionedImg = img.getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
 		ImageIcon imageIcon = new ImageIcon(redimensionedImg);
 		return imageIcon;
 	}
-	
+
 	public static ImageIcon getImageIconFitLabelURL(JLabel label, String url) {
-		
+
 		BufferedImage image = null;
 		try {
 			image = ImageIO.read(new URL(url));
@@ -47,30 +47,24 @@ public class MediaFormer {
 		ImageIcon imageIcon = new ImageIcon(redimensionedImg);
 		return imageIcon;
 	}
-	
-	public static Boolean testImage(String url){  
-        try {  
-            BufferedImage image = ImageIO.read(new URL(url));  
-            //BufferedImage image = ImageIO.read(new URL("http://someimage.jpg"));  
-            if(image != null){  
-                return true;
-            } else{
-                return false;
-            }
 
-        } catch (MalformedURLException e) {  
-            // TODO Auto-generated catch block  
-            System.err.println("URL error with image");  
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {  
-            System.err.println("IO error with image");  
-            // TODO Auto-generated catch block  
-            e.printStackTrace();
-            return false;  
-        }  
-    }
-	
+	public static Boolean testImage(String url) {
+		try {
+			BufferedImage image = ImageIO.read(new URL(url));
+			if (image != null)
+				return true;
+			else
+				return false;
+		} catch (MalformedURLException e) {
+			System.err.println("URL error with image: line " + 
+					Thread.currentThread().getStackTrace()[2].getLineNumber());
+			return false;
+		} catch (IOException e) {
+			System.err.println("IO error with image");
+			return false;
+		}
+	}
+
 	/**
 	 * Overload to work with JButtons.
 	 * 
@@ -79,7 +73,7 @@ public class MediaFormer {
 	 * @return imageIcon adapted to given button.
 	 */
 	public static ImageIcon getImageIconFitLabel(JButton button, String source) {
-		
+
 		Image img = new ImageIcon(source).getImage();
 
 		Image redimensionedImg = img.getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);

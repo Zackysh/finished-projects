@@ -14,7 +14,11 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,6 +34,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -98,6 +103,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JMenuItem mEdit_on, mEdit_save, mEdit_discard;
 	private Color menuDefaultColor = new Color(51, 51, 51);
 	private Color menuHoverColor = new Color(159, 162, 162);
+	private Color foreground;
 
 	// MENU_CONTROLLERS ----------------------
 	private boolean isEditOn; // limit user interaction when its on
@@ -685,6 +691,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(rightButtonFormer2);
 
 		// BLUE_BOX LABELS -------------------------------------------------------
+		foreground = new Color(77, 77, 77);
 		prop_heightT = new JLabel("Height");
 		prop_heightT.setBounds(438, 265, 120, 20);
 		prop_heightT.setFont(new Font("Flexo-Light", Font.BOLD, 14));
@@ -694,6 +701,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_heightV.setBounds(438, 290, 150, 20);
 		prop_heightV.setBorder(null);
 		prop_heightV.setBackground(new Color(48, 167, 215));
+		prop_heightV.setForeground(foreground);
+		prop_heightV.setDisabledTextColor(foreground);
 		prop_heightV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_heightV.addKeyListener(this);
 		prop_heightV.setEditable(false);
@@ -707,6 +716,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_weightV.setBounds(438, 348, 150, 20);
 		prop_weightV.setBorder(null);
 		prop_weightV.setBackground(new Color(48, 167, 215));
+		prop_weightV.setForeground(foreground);
+		prop_weightV.setDisabledTextColor(foreground);
 		prop_weightV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_weightV.addKeyListener(this);
 		prop_weightV.setEditable(false);
@@ -720,6 +731,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_sexV.setBounds(438, 401, 150, 20);
 		prop_sexV.setBorder(null);
 		prop_sexV.setBackground(new Color(48, 167, 215));
+		prop_sexV.setForeground(foreground);
+		prop_sexV.setDisabledTextColor(foreground);
 		prop_sexV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_sexV.setEditable(false);
 		prop_sexV.addKeyListener(this);
@@ -734,6 +747,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_categoryV.setBounds(638, 290, 150, 20);
 		prop_categoryV.setBorder(null);
 		prop_categoryV.setBackground(new Color(48, 167, 215));
+		prop_categoryV.setForeground(foreground);
+		prop_categoryV.setDisabledTextColor(foreground);
 		prop_categoryV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_categoryV.setEditable(false);
 		prop_categoryV.addKeyListener(this);
@@ -748,6 +763,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_skillV.setBounds(638, 348, 150, 20);
 		prop_skillV.setBackground(new Color(48, 167, 215));
 		prop_skillV.setBorder(null);
+		prop_skillV.setForeground(foreground);
+		prop_skillV.setDisabledTextColor(foreground);
 		prop_skillV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_skillV.setEditable(false);
 		prop_skillV.addKeyListener(this);
@@ -1198,7 +1215,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	private void emptyFields() {
-		// TODO Auto-generated method stub
 		prop_categoryV.setText("...");
 		prop_heightV.setText("...");
 		prop_sexV.setText("...");
@@ -1267,7 +1283,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * user for insert new image via URL or via File.
 	 */
 	private void setNewPokeImage() {
-		JCheckBox upload = new JCheckBox("Upload Image instead of input url.");
+		JCheckBox upload = new JCheckBox("Upload Image from system file instead of input url.");
 		String msg = "Mark this check box if you want to open image instead of Input an image url.";
 		Object[] msgContent = { msg, upload };
 		// User chose upload new image via URL or via file
@@ -1275,21 +1291,59 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		if (n == 0) {
 			if (upload.isSelected()) {
 				// TODO insert files
+				final JFileChooser fc = new JFileChooser();
+				int returnVal = fc.showOpenDialog(null);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+		            File file = fc.getSelectedFile();
+		            File source = new File("H:\\work-temp\\file");
+		            File dest = new File("H:\\work-temp\\file2");
+		            try {
+		                Copy.file(source, dest);
+		            } catch (IOException e) {
+		                e.printStackTrace();
+		            }
 			} else {
-				String url;
+				String url = "";
 				boolean isValid;
 				do { // Check if URL is valid
-					url = JOptionPane.showInputDialog("Insert Image Url");
-					isValid = MediaFormer.testImage(url);
-					if (isValid) {
-						pokeImage.setIcon(MediaFormer.getImageIconFitLabelURL(pokeImage, url));
-					} else {
-						JOptionPane.showMessageDialog(null, "This is not a valid url.", "Error",
-								JOptionPane.ERROR_MESSAGE);
-					}
+					url = JOptionPane.showInputDialog("Insert Image Url (blank to cancel)");
+					if(url != null) {
+						isValid = MediaFormer.testImage(url);
+						if (isValid) {
+							pokeImage.setIcon(MediaFormer.getImageIconFitLabelURL(pokeImage, url));
+						} else {
+							JOptionPane.showMessageDialog(null, "This is not a valid url.", "Error",
+									JOptionPane.ERROR_MESSAGE);
+						}						
+					} else
+						isValid = true;
 				} while (!isValid);
 			}
 		}
+	}
+	
+	private static void copyFile(File sourceFile, File destFile)
+	        throws IOException {
+	    if (!sourceFile.exists()) {
+	        return;
+	    }
+	    if (!destFile.exists()) {
+	        destFile.createNewFile();
+	    }
+	    FileChannel source = null;
+	    FileChannel destination = null;
+	    source = new FileInputStream(sourceFile).getChannel();
+	    destination = new FileOutputStream(destFile).getChannel();
+	    if (destination != null && source != null) {
+	        destination.transferFrom(source, 0, source.size());
+	    }
+	    if (source != null) {
+	        source.close();
+	    }
+	    if (destination != null) {
+	        destination.close();
+	    }
+
 	}
 
 	/**
@@ -1415,7 +1469,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			verifyCurrentName();
 		}
 	}
-
+	
+	/**
+	 * This method verifies if attIntputList fields contain only
+	 * Integer characters.
+	 * It warn user by changing its background.
+	 * @param e
+	 */
 	private void verifyAttFields(KeyEvent e) {
 		JTextField source = (JTextField) e.getSource();
 		boolean isValid = StringUtils.checkInt(source.getText());
@@ -1437,15 +1497,22 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		}
 	}
 
+	/**
+	 * This method verifies height and weight to be Double.
+	 * It warns user by changing its background if it's blank or its foreground if it's not Double.
+	 * 
+	 * @param e Height or Weight.
+	 */
 	private void verifyDoubleFields(KeyEvent e) {
 		JTextField source = (JTextField) e.getSource();
 		if (!source.getText().isBlank()) {
+			source.setBackground(new Color(48, 167, 215));
 			boolean isValid = StringUtils.checkDouble(source.getText());
 			if (!isValid) {
 				source.setForeground(Color.red);
 				readyFields.remove(source);
 			} else {
-				source.setForeground(Color.black);
+				source.setForeground(foreground);
 				if (!readyFields.contains(source))
 					readyFields.add(source);
 			}
@@ -1454,6 +1521,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		}
 	}
 
+	/**
+	 * This method verifies currentNumber. It should not be blank or contain no
+	 * Integer characters.
+	 */
 	private void verifyCurrentNumber() {
 		if (!currentNumber.getText().isBlank()) {
 			currentNumber.setBackground(Color.white);
@@ -1462,7 +1533,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				currentNumber.setForeground(Color.red);
 				readyFields.remove(currentNumber);
 			} else {
-				currentNumber.setForeground(Color.black);
+				currentNumber.setForeground(new Color(103, 107, 107));
 				if (!readyFields.contains(currentNumber))
 					readyFields.add(currentNumber);
 			}
@@ -1471,6 +1542,12 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		}
 	}
 
+	/**
+	 * This method verifies description. Description must be at least 30 character
+	 * length.
+	 * 
+	 * It warns the user to fulfill rules.
+	 */
 	private void verifyDescription() {
 		int length = description.getText().length();
 		System.out.println(length);
@@ -1489,12 +1566,15 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			descRules.setVisible(false);
 		}
 	}
-	
+
 	/**
-	 * This method verifies strFields are not blank.
-	 * It warns the user to fill this fields.
+	 * This method verifies strFields are not blank. It warns the user to fill this
+	 * fields.
+	 * 
+	 * @param e any of "strFields" list textField.
 	 */
 	private void verifyStrFields(KeyEvent e) {
+
 		JTextField source = (JTextField) e.getSource();
 		if (source.getText().isBlank()) {
 			source.setBackground(new Color(202, 129, 129));
@@ -1506,10 +1586,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			source.setBackground(new Color(48, 167, 215));
 		}
 	}
-	
+
 	/**
-	 * This method verifies currentName is not blank.
-	 * It warns the user to fill this field.
+	 * This method verifies currentName is not blank. It warns the user to fill this
+	 * field.
 	 */
 	private void verifyCurrentName() {
 		if (currentName.getText().isBlank()) {
@@ -1525,15 +1605,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	// Unused Overridden methods
-	public void mousePressed(MouseEvent e) {
-	}
-
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	public void keyTyped(KeyEvent e) {
-	}
-
-	public void keyPressed(KeyEvent e) {
-	}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
+	public void keyTyped(KeyEvent e) {}
+	public void keyPressed(KeyEvent e) {}
 }
