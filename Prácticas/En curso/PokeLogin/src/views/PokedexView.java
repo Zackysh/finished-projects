@@ -14,11 +14,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,11 +26,11 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -43,6 +39,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -133,7 +130,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JTextField currentNumber;
 	private JTextArea description;
 	private JLabel pokeImage;
+	private String pokeImageSource;
+	private String pokeImageDefaultSource;
 	private JLabel speaker;
+	private JLabel restore;
 
 	// BLUE-BOX (T: Title, V: Value) --------
 	private JLabel prop_skillT;
@@ -195,10 +195,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	Timer soundTimer;
 
 	public static void main(String[] args) {
-//		try {
-//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		} catch (Exception e) {
-//		}
 		new PokedexView("Pipo");
 	}
 
@@ -215,6 +211,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		insertTypes();
 		insertPokemons();
 		initializeUIComponentes();
+		setReadyToShow();
 		setVisible(true);
 //		welcome();
 		// Rest of the logic continue on showPokemon() method
@@ -339,23 +336,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	/**
-	 * Import fonts from .ttf files. First a new Font is initialized, it receives an
-	 * input stream that brings desired font. Later its registered into the current
-	 * Graphic Environment.
-	 */
-	public void importFonts() {
-		try {
-			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Light.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Regular.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Medium.ttf")));
-			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Pokefont.ttf")));
-		} catch (FontFormatException | IOException e2) {
-			e2.fillInStackTrace();
-		}
-	}
-
-	/**
 	 * Method that animates Welcome message at the beginning.
 	 */
 	public void welcome() {
@@ -411,11 +391,793 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	/**
-	 * Initialize main UI components. There're a bunch, so every component is
-	 * classified in a specific sector of the frame. There's six main sectors: -
-	 * Top_Labels (header). - Blue_Box Labels (first info sector, it shows main
-	 * characteristics). - Under Blue_Box Buttons (second info sector, it shows the
-	 * types). - Gray_Box Labels (third info sector, it shows base attributes).
+	 * Method that control whole filling process to show all Pokemon information on
+	 * the panel. It shows listController associated pokemon. Instead of receiving
+	 * Pokemon id as int parameter, it access to listController.
+	 * 
+	 * His task is subdivided on methods specialized on complete a specific
+	 * sub-task.
+	 */
+	public void showPokemon() {
+		Pokemon current = pokeList.get(listController);
+//		pokeDAO.updatePokemon(current.getIdP(), current.getName(), current.getNumber(), current.getDescription(),
+//				current.getSkill(), current.getCategory(), current.getHeight(), current.getWeight(), current.getSex(),
+//				current.getTypes(), current.getBaseAtt());
+		
+		showHeadder(current);
+		description.setText(pokeList.get(listController).getDescription());
+		showBlueBox(current);
+		showGrayBox(current);
+		showTypes(current);
+		pokeImageSource = "images\\Pokemons\\" + pokeList.get(listController).getName() + ".png";
+		pokeImageDefaultSource = "images\\Pokemons_restore_default\\" + pokeList.get(listController).getName() + ".png";
+		showPokeImage();
+	}
+
+	/**
+	 * Method that fill type labels with current pokemon types.
+	 * 
+	 * Two is the max number of types that a pokemon can have, so there's two label
+	 * (special label based on JButton) that contain possible types.
+	 * 
+	 * If there's no second type, second label 2ond label is set no non visible.
+	 * 
+	 * @param current Current Pokemon reference.
+	 */
+	private void showTypes(Pokemon current) {
+
+		typeOneLabel.setText(current.getTypes().get(0).getName());
+		typeOneLabel.setBackground(current.getTypes().get(0).getColor());
+
+		try {
+			typeTwoLabel.setVisible(true);
+			typeTwoLabel.setText(current.getTypes().get(1).getName());
+			typeTwoLabel.setBackground(current.getTypes().get(1).getColor());
+		} catch (Exception e) {
+			// Current Pokemon doesn't have 2ond type
+			typeTwoLabel.setText("");
+			typeTwoLabel.setVisible(false);
+		}
+
+	}
+
+	/**
+	 * Method that fills Gray-Box with current Pokemon baseAtt.
+	 * 
+	 * This Gray-Box is compound of six personalized JProgressBar. Those have
+	 * attached a ToolTip which is updated every time its progress bar is updated
+	 * too.
+	 * 
+	 * @param current Current Pokemon reference.
+	 */
+	private void showGrayBox(Pokemon current) {
+
+		int[] baseAtt = current.getBaseAtt();
+
+		ps.setValue(baseAtt[0]);
+		att.setValue(baseAtt[1]);
+		def.setValue(baseAtt[2]);
+		satt.setValue(baseAtt[3]);
+		sdef.setValue(baseAtt[4]);
+		speed.setValue(baseAtt[5]);
+
+		ps.setToolTipText(Integer.toString(ps.getValue()));
+		att.setToolTipText(Integer.toString(att.getValue()));
+		def.setToolTipText(Integer.toString(def.getValue()));
+		satt.setToolTipText(Integer.toString(satt.getValue()));
+		sdef.setToolTipText(Integer.toString(sdef.getValue()));
+		speed.setToolTipText(Integer.toString(speed.getValue()));
+
+	}
+
+	/**
+	 * Method that fills Blue-Box with current Pokemon baseAtt.
+	 * 
+	 * This Blue-Box contains six different attributes obtained from current. This
+	 * String attributes are passed to its correspondent JLabel.
+	 */
+	private void showBlueBox(Pokemon current) {
+		// Obtaining attributes
+		String height = Double.toString(current.getHeight());
+		String weight = Double.toString(current.getWeight());
+		String sex = current.getSex();
+		String category = current.getCategory();
+		String skill = current.getSkill();
+		// Showing attributes
+		prop_heightV.setText(height);
+		prop_weightV.setText(weight);
+		prop_sexV.setText(sex);
+		prop_categoryV.setText(category);
+		prop_skillV.setText(skill);
+	}
+
+	/**
+	 * Method that controls labels content on header section.
+	 * 
+	 * Header is compound by four labels for next and previous pokemon info, and two
+	 * labels for current pokemon info.
+	 * 
+	 * @param current Current pokemon reference.
+	 */
+	private void showHeadder(Pokemon current) {
+
+		// CURRENT INFO
+		// Always initialized int the same way
+		String currName = current.getName();
+		String currNumber = Integer.toString(current.getNumber());
+
+		// PREVIOUS INFO
+		String prevName;
+		String prevNumber;
+
+		if (listController > 0) { // if current pokemon is the first on the list
+			// previuous will be last on the list
+			prevName = pokeList.get(listController - 1).getName();
+			prevNumber = Integer.toString(pokeList.get(listController - 1).getNumber());
+
+			previousName.setText(prevName);
+			previousNumber.setText("N.�" + prevNumber);
+		} else {
+			prevName = pokeList.get(pokeList.size() - 1).getName();
+			prevNumber = Integer.toString(pokeList.get(pokeList.size() - 1).getNumber());
+
+			previousName.setText(prevName);
+			previousNumber.setText("N.�" + prevNumber);
+		}
+
+		// NEXT INFO
+		String nexName;
+		String nexNumber;
+
+		currentName.setText(currName);
+		currentNumber.setText(currNumber);
+
+		if (listController < pokeList.size() - 1) {
+			nexName = pokeList.get(listController + 1).getName();
+			nexNumber = Integer.toString(pokeList.get(listController + 1).getNumber());
+
+			nextName.setText(nexName);
+			nextNumber.setText("N.�" + nexNumber);
+		} else {
+			nexName = pokeList.get(0).getName();
+			nexNumber = Integer.toString(pokeList.get(0).getNumber());
+
+			nextName.setText(nexName);
+			nextNumber.setText("N.�" + nexNumber);
+		}
+	}
+
+	/**
+	 * Configure components to work as exhibitor view instead of edit view.
+	 */
+	private void setReadyToEdit() {
+		mNew_new.setEnabled(false);
+		mNew_discard.setEnabled(false);
+		mNew_save.setEnabled(false);
+		mEdit_on.setText("Disable edit mode");
+		
+		mEdit_save.setEnabled(true);
+		mEdit_discard.setEnabled(true);
+
+		rightButtonFormer1.setVisible(false);
+		rightButtonFormer2.setVisible(false);
+		lbl_buttonRight.setVisible(false);
+		leftButtonFormer1.setVisible(false);
+		leftButtonFormer2.setVisible(false);
+		lbl_buttonLeft.setVisible(false);
+		previousName.setVisible(false);
+		previousNumber.setVisible(false);
+		nextName.setVisible(false);
+		nextNumber.setVisible(false);
+		description.setEditable(true);
+
+		prop_categoryV.setEditable(true);
+		prop_heightV.setEditable(true);
+		prop_sexV.setEditable(true);
+		prop_skillV.setEditable(true);
+		prop_weightV.setEditable(true);
+		currentName.setEditable(true);
+		currentNumber.setEditable(true);
+		psI.setVisible(true);
+		psI.setText(Integer.toString(ps.getValue()));
+		attI.setVisible(true);
+		attI.setText(Integer.toString(att.getValue()));
+		defI.setVisible(true);
+		defI.setText(Integer.toString(def.getValue()));
+		sattI.setVisible(true);
+		sattI.setText(Integer.toString(satt.getValue()));
+		sdefI.setVisible(true);
+		sdefI.setText(Integer.toString(sdef.getValue()));
+		speedI.setVisible(true);
+		speedI.setText(Integer.toString(speed.getValue()));
+		isEditOn = true;
+
+		readyFields.add(currentName);
+		readyFields.add(currentNumber);
+		readyFields.add(prop_heightV);
+		readyFields.add(prop_weightV);
+		readyFields.add(prop_sexV);
+		readyFields.add(prop_categoryV);
+		readyFields.add(prop_skillV);
+		readyFields.add(psI);
+		readyFields.add(attI);
+		readyFields.add(defI);
+		readyFields.add(sattI);
+		readyFields.add(sdefI);
+		readyFields.add(speedI);
+		isDescriptionReady = true;
+
+		editMode.setVisible(true);
+	}
+
+	/**
+	 * Configure components to work as edit view instead of simple exhibitor view.
+	 */
+	private void setReadyToShow() {
+		mEdit_save.setEnabled(false);
+		mEdit_discard.setEnabled(false);
+		mNew_save.setEnabled(false);
+		mNew_discard.setEnabled(false);
+		editMode.setVisible(false);
+		
+		rightButtonFormer1.setVisible(true);
+		rightButtonFormer2.setVisible(true);
+		lbl_buttonRight.setVisible(true);
+		leftButtonFormer1.setVisible(true);
+		leftButtonFormer2.setVisible(true);
+		lbl_buttonLeft.setVisible(true);
+		previousName.setVisible(true);
+		previousNumber.setVisible(true);
+		nextName.setVisible(true);
+		nextNumber.setVisible(true);
+		description.setEditable(false);
+
+		prop_categoryV.setEditable(false);
+		prop_heightV.setEditable(false);
+		prop_sexV.setEditable(false);
+		prop_skillV.setEditable(false);
+		prop_weightV.setEditable(false);
+		currentName.setEditable(false);
+		currentNumber.setEditable(false);
+		psI.setVisible(false);
+		attI.setVisible(false);
+		defI.setVisible(false);
+		sattI.setVisible(false);
+		sdefI.setVisible(false);
+		speedI.setVisible(false);
+		showPokemon();
+		isEditOn = false;
+	}
+
+	private void emptyFields() {
+		prop_categoryV.setText("...");
+		prop_heightV.setText("...");
+		prop_sexV.setText("...");
+		prop_skillV.setText("...");
+		prop_weightV.setText("...");
+		description.setText("...");
+		currentName.setText("...");
+		currentNumber.setText("...");
+		ps.setValue(0);
+		att.setValue(0);
+		satt.setValue(0);
+		def.setValue(0);
+		sdef.setValue(0);
+		speed.setValue(0);
+		pokeImage.setIcon(MediaFormer.getImageIconFitLabel(pokeImage, "images\\Other\\clip.png"));
+	}
+
+	/**
+	 * Current --> Default
+	 */
+	private void setCurrentToDefault() {
+		File dest = new File(pokeImageDefaultSource);
+		dest.delete();
+		dest = new File(pokeImageDefaultSource);
+		try {
+			MediaFormer.copyFile(getCurrentImage(), dest);
+		} catch (IOException e1) {
+		}
+	}
+
+	/**
+	 * Default --> Current
+	 */
+	private void setDefaultToCurrent() {
+		File dest = new File(pokeImageSource);
+		dest.delete();
+		dest = new File(pokeImageSource);
+		try {
+			MediaFormer.copyFile(getDefaultImage(), dest);
+		} catch (IOException e1) {
+		}
+	}
+
+	private File getCurrentImage() {
+		return new File(pokeImageSource);
+	}
+
+	private File getDefaultImage() {
+		return new File(pokeImageDefaultSource);
+	}
+
+	private void setDefaultImage(File origin) {
+		File dest = new File(pokeImageDefaultSource);
+		dest.delete();
+		dest = new File(pokeImageDefaultSource);
+		try {
+			MediaFormer.copyFile(origin, dest);
+		} catch (IOException e1) {
+		}
+	}
+
+	private void setCurrentImage(File origin) {
+		File dest = new File(pokeImageSource);
+		dest.delete();
+		dest = new File(pokeImageSource);
+		try {
+			MediaFormer.copyFile(origin, dest);
+		} catch (IOException e1) {
+		}
+		origin.delete();
+	}
+
+	/**
+	 * Paint pokeImage with pokeImageSource. pokeImageSource is main reference to
+	 * each Pokemon image, so this method will show always current Pokemon image.
+	 */
+	private void showPokeImage() {
+		pokeImage.setIcon(MediaFormer.getImageIconFitLabel(pokeImage, pokeImageSource));
+	}
+
+	/**
+	 * Method that allow user to change pokeImage trough UI components. It asks the
+	 * user for insert new image via URL or via System explorer.
+	 */
+	private File choseFileFrom() {
+		File newFile = new File("images\\" + pokeList.get(listController).getName() + ".png");
+		ButtonGroup group = new ButtonGroup();
+		JRadioButton fromFile = new JRadioButton("From existing system file.", true);
+		JRadioButton fromURL = new JRadioButton("From image URL.", false);
+		group.add(fromFile);
+		group.add(fromURL);
+		String msg = "You are about to change current Pokemon image from an URL.";
+		Object[] msgContent = { msg, fromFile, fromURL };
+		// User chose upload new image via URL or via file
+		int n = JOptionPane.showConfirmDialog(null, msgContent, "Method selection", JOptionPane.OK_CANCEL_OPTION);
+		if (n == 0) {
+			if (fromFile.isSelected()) {// VIA FILE -------
+				File origin = MediaFormer.choseFileFromSystem("jpg", "png");
+				try {
+					MediaFormer.copyFile(origin, newFile);
+				} catch (IOException e) {
+				}
+			} else if (fromURL.isSelected()) { // VIA URL ---------------------------
+				String url = getUrlFromUser();
+				MediaFormer.downloadToFile(url, newFile);
+			} else {
+				JOptionPane.showMessageDialog(null, "Operation cancelled", "Warning", JOptionPane.WARNING_MESSAGE);
+			}
+		}
+		return newFile;
+	}
+
+	private String getUrlFromUser() {
+		String url = "";
+		boolean isValid;
+		do { // Check if URL is valid
+			url = JOptionPane.showInputDialog("Insert Image Url (blank to cancel)");
+			if (url != null) {
+				isValid = MediaFormer.testImage(url);
+				if (url.isBlank())
+					isValid = true;
+				if (!isValid) {
+					JOptionPane.showMessageDialog(null, "This is not a valid url.", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			} else
+				isValid = true;
+		} while (!isValid);
+		return url;
+	}
+
+	/**
+	 * This method play a sound clip given its source. InputStream and Clips are
+	 * used to achieve desired behavior.
+	 * 
+	 * @param source of sound clip
+	 */
+	public void playSound(String source) {
+		try {
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(source).getAbsoluteFile());
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioInputStream);
+			actionPerformed(new ActionEvent(soundTimer, 1, "")); // Send null action to turn false "isSoundEnable"
+			soundTimer.start(); // in 5segs it will be possible to isSoundEnable sound again
+			clip.start();
+		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+			System.out.println("Error al reproducir el sonido.");
+		}
+	}
+
+	/**
+	 * This method is called by welcomeTimer. It controls welcome Animation. Note
+	 * that welcomeTimer is called by welcome(). - First call: it's committed 4000ms
+	 * after welcomeTimer is started, at this point firstLoop of animation will be
+	 * over, so secondLoop (animTwo()) is called. - Second call: It's committed
+	 * 4000ms after secondLoop is over. This timer is no longer necessary, so it's
+	 * stopped.
+	 */
+	private void runWelcomeTimer() {
+		if (!welcomeMessage.isVisible())
+			welcomeTimer.stop(); // Second call: stop timer
+		else {
+			animTwo(); // First call: starts second loop
+		}
+	}
+
+	/**
+	 * This method is called by soundTimer. It just turn isSoundEnable into false
+	 * for 2050ms, enough to avoid sound slap / overlap.
+	 * 
+	 * It makes soundTimer stops at second loop: - First event: after soundTimer
+	 * first loop it sends first event. As isSoundEnable = true at the beginning,
+	 * first event will turn isSoundEnable into false. Look if conditional. - Second
+	 * event: As isSoundEnable = false at this time (only manipulated by
+	 * soundTimer), second event will turn isSoundEnable into true and
+	 * soundTimer.stop() will be called. So there's never a third event.
+	 */
+	private void runSoundTimer() {
+		if (isSoundEnable)
+			isSoundEnable = false;
+		else {
+			isSoundEnable = true;
+			soundTimer.stop();
+		}
+	}
+
+	/**
+	 * Logic of main buttons.
+	 */
+	public void mouseClicked(MouseEvent e) {
+		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2) {
+			// leftButton
+			if (listController != 0) {
+				listController--;
+				showPokemon();
+			} else {
+				listController = pokeList.size() - 1;
+				showPokemon();
+			}
+		} else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2) {
+			// rightButton
+			if (listController < pokeList.size() - 1) {
+				listController++;
+				showPokemon();
+			} else {
+				listController = 0;
+				showPokemon();
+			}
+		} else if (e.getSource() == speaker) {
+			// playSoundButton
+			if (isSoundEnable)
+				playSound("Sounds\\" + pokeList.get(listController).getName().toLowerCase() + ".wav");
+		} else if (e.getSource() == exit) {
+			this.dispose(); // exitButton
+		} else if (e.getSource() == pokeImage && isEditOn) {
+			String msg = "You are about to change " + pokeList.get(listController).getName() + "s image.";
+			int n = JOptionPane.showConfirmDialog(null, msg, "Pokemon image selector", JOptionPane.OK_CANCEL_OPTION);
+			if (n == 0) {
+				System.out.println("Bien 1");
+				File newFile = choseFileFrom();
+				setCurrentImage(newFile);
+				showPokeImage();
+			}
+		} else if (e.getSource() == restore) { // Restore defaultImage
+			JCheckBox muteDefault = new JCheckBox(
+					"Change " + pokeList.get(listController).getName() + "s default image");
+			String msg = "You are about to restore " + pokeList.get(listController).getName()
+					+ "s default image, do not check the checkbox if you want to keep the default image.";
+			Object[] list = { muteDefault, msg };
+			int n = JOptionPane.showConfirmDialog(null, list, "Pokemon default image restoring",
+					JOptionPane.OK_CANCEL_OPTION);
+			if (n == 0) {
+				if (muteDefault.isSelected()) {
+					ButtonGroup group = new ButtonGroup();
+					JRadioButton useCurrent = new JRadioButton(
+							"Set " + pokeList.get(listController).getName() + "s current image as default.", true);
+					JRadioButton useNew = new JRadioButton("Chose new file.", false);
+					group.add(useCurrent);
+					group.add(useNew);
+					String msg2 = "You are about to change " + pokeList.get(listController).getName()
+							+ "s default image. Indicate how you want to do it.";
+					Object[] list2 = { useCurrent, useNew, msg2 };
+					int m = JOptionPane.showConfirmDialog(null, list2, "Pokemon default image selection",
+							JOptionPane.OK_CANCEL_OPTION);
+					if (m == 0) {
+						if (useCurrent.isSelected()) {
+							setCurrentToDefault();
+							JOptionPane.showMessageDialog(null, "Now " + pokeList.get(listController).getName()
+									+ "s default image is his current image! :)");
+						} else if (useNew.isSelected()) {
+							File newFile = choseFileFrom();
+							setDefaultImage(newFile);
+							setDefaultToCurrent();
+							showPokeImage();
+						}
+					}
+				} else {
+					setDefaultToCurrent();
+					showPokeImage();
+				}
+
+				// String msg = "This pokemon doesn't have default image. Would you like to add
+				// one?";
+//				int n = JOptionPane.showConfirmDialog(null, msg, "Pokemon default image missing",
+//						JOptionPane.OK_CANCEL_OPTION);
+//				if (n == 0) {
+//					setDefaultImage();
+//				}
+			}
+		}
+	}
+
+	/**
+	 * mouesEntered and mouseExited are used to gain a roll over effect to
+	 * top_buttons and JMenuItems.
+	 */
+	public void mouseEntered(MouseEvent e) {
+		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2)
+			lbl_buttonLeft.setIcon(new ImageIcon("images\\Buttons\\buttonLeft2.png"));
+		else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2)
+			lbl_buttonRight.setIcon(new ImageIcon("images\\Buttons\\buttonRight2.png"));
+		else if (e.getSource() == exit)
+			exit.setBounds(exit.getBounds().x - 30, exit.getBounds().y - 30, exit.getWidth(), exit.getHeight());
+		else if (e.getSource() == speaker)
+			speaker.setIcon(MediaFormer.getImageIconFitLabel(speaker, "images\\Other\\speakerIconHover.png"));
+		else if (e.getSource() == restore)
+			restore.setIcon(MediaFormer.getImageIconFitLabel(restore, "images\\Other\\restoreIconHover.png"));
+		else if (menuIList.contains(e.getSource())) {
+			// -------------------- JMenuItems ---------------------------
+			JMenuItem source = (JMenuItem) e.getSource();
+			source.setBackground(menuHoverColor);
+		}
+	}
+
+	/**
+	 * mouesEntered and mouseExited are used to gain a roll over effect to
+	 * top_buttons and JMenuItems.
+	 */
+	public void mouseExited(MouseEvent e) {
+		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2)
+			lbl_buttonLeft.setIcon(new ImageIcon("images\\Buttons\\buttonLeft.png"));
+		else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2)
+			lbl_buttonRight.setIcon(new ImageIcon("images\\Buttons\\buttonRight.png"));
+		else if (e.getSource() == exit)
+			exit.setBounds(exit.getBounds().x + 30, exit.getBounds().y + 30, exit.getWidth(), exit.getHeight());
+		else if (e.getSource() == restore)
+			restore.setIcon(MediaFormer.getImageIconFitLabel(restore, "images\\Other\\restoreIcon.png"));
+		else if (e.getSource() == speaker)
+			speaker.setIcon(MediaFormer.getImageIconFitLabel(speaker, "images\\Other\\speakerIcon.png"));
+		// -------------------- JMenuItems ---------------------------
+		else if (menuIList.contains(e.getSource())) {
+			JMenuItem source = (JMenuItem) e.getSource();
+			source.setBackground(menuDefaultColor);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void actionPerformed(ActionEvent e) {
+		if (menuIList.contains(e.getSource())) {
+			// set default color to JMenuItem when its pressed
+			JMenuItem source = (JMenuItem) e.getSource();
+			source.setBackground(menuDefaultColor);
+		}
+		if (e.getSource() == soundTimer) {
+			runSoundTimer(); // soundTimer event
+		} else if (e.getSource() == welcomeTimer) { // welcomeTimers controls welcome animation
+			runWelcomeTimer();
+		} else if (e.getSource() == welcomeTimerTwo) { // when this timer is called, end the animation
+			welcomeMessage.setVisible(false);
+			welcomeTimerTwo.stop();
+			// JMenuItems unique behavior ------------------------------------
+		} else if (e.getSource() == mNew_new) { // New -> new
+			emptyFields();
+			setReadyToEdit();
+		} else if (e.getSource() == mNew_save) { // New -> save
+
+		} else if (e.getSource() == mNew_discard) { // New -> discard
+			setReadyToShow();
+		} else if (e.getSource() == mEdit_on) { // Edit -> on
+			if(!isEditOn)
+				setReadyToEdit();
+			else
+				setReadyToShow();
+		} else if (e.getSource() == mEdit_save) { // Edit -> save
+			
+		} else if (e.getSource() == mEdit_discard) { // Edit -> discard
+
+		}
+	}
+
+	// TODO KeyEvents
+	/**
+	 * KeyRealeased controls field verification.
+	 */
+	public void keyReleased(KeyEvent e) {
+		if (attIntputList.contains(e.getSource())) {
+			verifyAttFields(e);
+		} else if (e.getSource() == prop_heightV || e.getSource() == prop_weightV) {
+			verifyDoubleFields(e);
+		} else if (e.getSource() == currentNumber) {
+			verifyCurrentNumber();
+		} else if (e.getSource() == description) {
+			verifyDescription();
+		} else if (strFields.contains(e.getSource())) {
+			verifyStrFields(e);
+		} else if (e.getSource() == currentName) {
+			verifyCurrentName();
+		}
+	}
+
+	/**
+	 * This method verifies if attIntputList fields contain only Integer characters.
+	 * It warn user by changing its background.
+	 * 
+	 * @param e
+	 */
+	private void verifyAttFields(KeyEvent e) {
+		JTextField source = (JTextField) e.getSource();
+		boolean isValid = StringUtils.checkInt(source.getText());
+		if (!isValid) {
+			source.setBackground(new Color(202, 129, 129));
+			readyFields.remove(source);
+		} else {
+			int newInt = Integer.parseInt(source.getText());
+			if (newInt < 1) {
+				newInt = 1;
+				source.setText(Integer.toString(newInt));
+			} else if (newInt > 15) {
+				newInt = 15;
+				source.setText(Integer.toString(newInt));
+			}
+			source.setBackground(new Color(179, 179, 179));
+			if (!readyFields.contains(source))
+				readyFields.add(source);
+		}
+	}
+
+	/**
+	 * This method verifies height and weight to be Double. It warns user by
+	 * changing its background if it's blank or its foreground if it's not Double.
+	 * 
+	 * @param e Height or Weight.
+	 */
+	private void verifyDoubleFields(KeyEvent e) {
+		JTextField source = (JTextField) e.getSource();
+		if (!source.getText().isBlank()) {
+			source.setBackground(new Color(48, 167, 215));
+			boolean isValid = StringUtils.checkDouble(source.getText());
+			if (!isValid) {
+				source.setForeground(Color.red);
+				readyFields.remove(source);
+			} else {
+				source.setForeground(foreground);
+				if (!readyFields.contains(source))
+					readyFields.add(source);
+			}
+		} else {
+			source.setBackground(new Color(202, 129, 129));
+		}
+	}
+
+	/**
+	 * This method verifies currentNumber. It should not be blank or contain no
+	 * Integer characters.
+	 */
+	private void verifyCurrentNumber() {
+		if (!currentNumber.getText().isBlank()) {
+			currentNumber.setBackground(Color.white);
+			boolean isValid = StringUtils.checkInt(currentNumber.getText());
+			if (!isValid) {
+				currentNumber.setForeground(Color.red);
+				readyFields.remove(currentNumber);
+			} else {
+				currentNumber.setForeground(new Color(103, 107, 107));
+				if (!readyFields.contains(currentNumber))
+					readyFields.add(currentNumber);
+			}
+		} else {
+			currentNumber.setBackground(new Color(202, 129, 129));
+		}
+	}
+
+	/**
+	 * This method verifies description. Description must be at least 30 character
+	 * length.
+	 * 
+	 * It warns the user to fulfill rules.
+	 */
+	private void verifyDescription() {
+		int length = description.getText().length();
+		System.out.println(length);
+		if (length < 30) {
+			if (length <= 1) {
+				description.setBackground(new Color(202, 129, 129));
+			} else {
+				description.setBackground(Color.white);
+			}
+			description.setForeground(Color.red);
+			isDescriptionReady = false;
+			descRules.setVisible(true);
+		} else {
+			description.setForeground(Color.black);
+			isDescriptionReady = true;
+			descRules.setVisible(false);
+		}
+	}
+
+	/**
+	 * This method verifies strFields are not blank. It warns the user to fill this
+	 * fields.
+	 * 
+	 * @param e any of "strFields" list textField.
+	 */
+	private void verifyStrFields(KeyEvent e) {
+
+		JTextField source = (JTextField) e.getSource();
+		if (source.getText().isBlank()) {
+			source.setBackground(new Color(202, 129, 129));
+			readyFields.remove(source);
+		} else {
+			if (!readyFields.contains(source)) {
+				readyFields.add(source);
+			}
+			source.setBackground(new Color(48, 167, 215));
+		}
+	}
+
+	/**
+	 * This method verifies currentName is not blank. It warns the user to fill this
+	 * field.
+	 */
+	private void verifyCurrentName() {
+		if (currentName.getText().isBlank()) {
+			currentName.setBackground(new Color(202, 129, 129));
+			readyFields.remove(currentName);
+		} else {
+			currentName.setBackground(Color.white);
+			if (!readyFields.contains(currentName)) {
+				readyFields.add(currentName);
+			}
+			currentName.setBackground(Color.white);
+		}
+	}
+
+	/**
+	 * Import fonts from .ttf files. First a new Font is initialized, it receives an
+	 * input stream that brings desired font. Later its registered into the current
+	 * Graphic Environment.
+	 */
+	public void importFonts() {
+		try {
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Light.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Regular.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Flexo-Medium.ttf")));
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\Pokefont.ttf")));
+		} catch (FontFormatException | IOException e2) {
+			e2.fillInStackTrace();
+		}
+	}
+
+	/**
+	 * component is classified in a specific sector of the frame. There's six main
+	 * sectors: - Top_Labels (header). - Blue_Box Labels (first info sector, it
+	 * shows main characteristics). - Under Blue_Box Buttons (second info sector, it
+	 * shows the types). - Gray_Box Labels (third info sector, it shows base
+	 * attributes).
 	 */
 	public void initializeUIComponentes() {
 		// MenuBar
@@ -643,9 +1405,15 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		pokeImage.addMouseListener(this);
 		// SpeakerImage
 		speaker = new JLabel();
-		speaker.setBounds(350, 325, 50, 50);
+		speaker.setBounds(360, 335, 40, 40);
 		speaker.setIcon(MediaFormer.getImageIconFitLabel(speaker, "images\\Other\\speakerIcon.png"));
 		speaker.addMouseListener(this);
+		// RestoreImage
+		restore = new JLabel();
+		restore.setBounds(120, 333, 40, 40);
+		restore.setIcon(MediaFormer.getImageIconFitLabel(speaker, "images\\Other\\restoreIcon.png"));
+		restore.setToolTipText("Restore default pokeImage");
+		restore.addMouseListener(this);
 		// Add previous components
 		contentPane.add(numberSign);
 		contentPane.add(editMode);
@@ -658,6 +1426,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(description);
 		contentPane.add(descRules);
 		contentPane.add(speaker);
+		contentPane.add(restore);
 		contentPane.add(pokeImage);
 		// lbl_buttonLeft
 		lbl_buttonLeft = new JLabel(new ImageIcon("images\\Buttons\\buttonLeft.png"));
@@ -980,633 +1749,16 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		showPokemon(); // Show first Pokemon (avoid blank default state)
 	}
 
-	/**
-	 * Method that control whole filling process to show all Pokemon information on
-	 * the panel. It shows listController associated pokemon. Instead of receiving
-	 * Pokemon id as int parameter, it access to listController.
-	 * 
-	 * His task is subdivided on methods specialized on complete a specific
-	 * sub-task.
-	 */
-	public void showPokemon() {
-		Pokemon current = pokeList.get(listController);
-		showHeadder(current);
-		description.setText(pokeList.get(listController).getDescription());
-		showBlueBox(current);
-		showGrayBox(current);
-		showTypes(current);
-		pokeImage.setIcon(MediaFormer.getImageIconFitLabel(pokeImage,
-				"images\\Pokemons\\" + pokeList.get(listController).getName() + ".png"));
-	}
-
-	/**
-	 * Method that fill type labels with current pokemon types.
-	 * 
-	 * Two is the max number of types that a pokemon can have, so there's two label
-	 * (special label based on JButton) that contain possible types.
-	 * 
-	 * If there's no second type, second label 2ond label is set no non visible.
-	 * 
-	 * @param current Current Pokemon reference.
-	 */
-	private void showTypes(Pokemon current) {
-
-		typeOneLabel.setText(current.getTypes().get(0).getName());
-		typeOneLabel.setBackground(current.getTypes().get(0).getColor());
-
-		try {
-			typeTwoLabel.setVisible(true);
-			typeTwoLabel.setText(current.getTypes().get(1).getName());
-			typeTwoLabel.setBackground(current.getTypes().get(1).getColor());
-		} catch (Exception e) {
-			// Current Pokemon doesn't have 2ond type
-			typeTwoLabel.setText("");
-			typeTwoLabel.setVisible(false);
-		}
-
-	}
-
-	/**
-	 * Method that fills Gray-Box with current Pokemon baseAtt.
-	 * 
-	 * This Gray-Box is compound of six personalized JProgressBar. Those have
-	 * attached a ToolTip which is updated every time its progress bar is updated
-	 * too.
-	 * 
-	 * @param current Current Pokemon reference.
-	 */
-	private void showGrayBox(Pokemon current) {
-
-		int[] baseAtt = current.getBaseAtt();
-
-		ps.setValue(baseAtt[0]);
-		att.setValue(baseAtt[1]);
-		def.setValue(baseAtt[2]);
-		satt.setValue(baseAtt[3]);
-		sdef.setValue(baseAtt[4]);
-		speed.setValue(baseAtt[5]);
-
-		ps.setToolTipText(Integer.toString(ps.getValue()));
-		att.setToolTipText(Integer.toString(att.getValue()));
-		def.setToolTipText(Integer.toString(def.getValue()));
-		satt.setToolTipText(Integer.toString(satt.getValue()));
-		sdef.setToolTipText(Integer.toString(sdef.getValue()));
-		speed.setToolTipText(Integer.toString(speed.getValue()));
-
-	}
-
-	/**
-	 * Method that fills Blue-Box with current Pokemon baseAtt.
-	 * 
-	 * This Blue-Box contains six different attributes obtained from current. This
-	 * String attributes are passed to its correspondent JLabel.
-	 */
-	private void showBlueBox(Pokemon current) {
-		// Obtaining attributes
-		String height = Double.toString(current.getHeight());
-		String weight = Double.toString(current.getWeight());
-		String sex = current.getSex();
-		String category = current.getCategory();
-		String skill = current.getSkill();
-		// Showing attributes
-		prop_heightV.setText(height);
-		prop_weightV.setText(weight);
-		prop_sexV.setText(sex);
-		prop_categoryV.setText(category);
-		prop_skillV.setText(skill);
-	}
-
-	/**
-	 * Method that controls labels content on header section.
-	 * 
-	 * Header is compound by four labels for next and previous pokemon info, and two
-	 * labels for current pokemon info.
-	 * 
-	 * @param current Current pokemon reference.
-	 */
-	private void showHeadder(Pokemon current) {
-
-		// CURRENT INFO
-		// Always initialized int the same way
-		String currName = current.getName();
-		String currNumber = Integer.toString(current.getNumber());
-
-		// PREVIOUS INFO
-		String prevName;
-		String prevNumber;
-
-		if (listController > 0) { // if current pokemon is the first on the list
-			// previuous will be last on the list
-			prevName = pokeList.get(listController - 1).getName();
-			prevNumber = Integer.toString(pokeList.get(listController - 1).getNumber());
-
-			previousName.setText(prevName);
-			previousNumber.setText("N.�" + prevNumber);
-		} else {
-			prevName = pokeList.get(pokeList.size() - 1).getName();
-			prevNumber = Integer.toString(pokeList.get(pokeList.size() - 1).getNumber());
-
-			previousName.setText(prevName);
-			previousNumber.setText("N.�" + prevNumber);
-		}
-
-		// NEXT INFO
-		String nexName;
-		String nexNumber;
-
-		currentName.setText(currName);
-		currentNumber.setText(currNumber);
-
-		if (listController < pokeList.size() - 1) {
-			nexName = pokeList.get(listController + 1).getName();
-			nexNumber = Integer.toString(pokeList.get(listController + 1).getNumber());
-
-			nextName.setText(nexName);
-			nextNumber.setText("N.�" + nexNumber);
-		} else {
-			nexName = pokeList.get(0).getName();
-			nexNumber = Integer.toString(pokeList.get(0).getNumber());
-
-			nextName.setText(nexName);
-			nextNumber.setText("N.�" + nexNumber);
-		}
-	}
-
-	private void setReadyToEdit() {
-		rightButtonFormer1.setVisible(false);
-		rightButtonFormer2.setVisible(false);
-		lbl_buttonRight.setVisible(false);
-		leftButtonFormer1.setVisible(false);
-		leftButtonFormer2.setVisible(false);
-		lbl_buttonLeft.setVisible(false);
-		previousName.setVisible(false);
-		previousNumber.setVisible(false);
-		nextName.setVisible(false);
-		nextNumber.setVisible(false);
-		description.setEditable(true);
-
-		prop_categoryV.setEditable(true);
-		prop_heightV.setEditable(true);
-		prop_sexV.setEditable(true);
-		prop_skillV.setEditable(true);
-		prop_weightV.setEditable(true);
-		currentName.setEditable(true);
-		currentNumber.setEditable(true);
-		psI.setVisible(true);
-		psI.setText(Integer.toString(ps.getValue()));
-		attI.setVisible(true);
-		attI.setText(Integer.toString(att.getValue()));
-		defI.setVisible(true);
-		defI.setText(Integer.toString(def.getValue()));
-		sattI.setVisible(true);
-		sattI.setText(Integer.toString(satt.getValue()));
-		sdefI.setVisible(true);
-		sdefI.setText(Integer.toString(sdef.getValue()));
-		speedI.setVisible(true);
-		speedI.setText(Integer.toString(speed.getValue()));
-		isEditOn = true;
-
-		readyFields.add(currentName);
-		readyFields.add(currentNumber);
-		readyFields.add(prop_heightV);
-		readyFields.add(prop_weightV);
-		readyFields.add(prop_sexV);
-		readyFields.add(prop_categoryV);
-		readyFields.add(prop_skillV);
-		readyFields.add(psI);
-		readyFields.add(attI);
-		readyFields.add(defI);
-		readyFields.add(sattI);
-		readyFields.add(sdefI);
-		readyFields.add(speedI);
-		isDescriptionReady = true;
-
-		editMode.setVisible(true);
-	}
-
-	private void setReadyToShow() {
-		rightButtonFormer1.setVisible(true);
-		rightButtonFormer2.setVisible(true);
-		lbl_buttonRight.setVisible(true);
-		leftButtonFormer1.setVisible(true);
-		leftButtonFormer2.setVisible(true);
-		lbl_buttonLeft.setVisible(true);
-		previousName.setVisible(true);
-		previousNumber.setVisible(true);
-		nextName.setVisible(true);
-		nextNumber.setVisible(true);
-		description.setEditable(false);
-
-		prop_categoryV.setEditable(false);
-		prop_heightV.setEditable(false);
-		prop_sexV.setEditable(false);
-		prop_skillV.setEditable(false);
-		prop_weightV.setEditable(false);
-		currentName.setEditable(false);
-		currentNumber.setEditable(false);
-		psI.setVisible(false);
-		attI.setVisible(false);
-		defI.setVisible(false);
-		sattI.setVisible(false);
-		sdefI.setVisible(false);
-		speedI.setVisible(false);
-		showPokemon();
-		isEditOn = false;
-	}
-
-	private void emptyFields() {
-		prop_categoryV.setText("...");
-		prop_heightV.setText("...");
-		prop_sexV.setText("...");
-		prop_skillV.setText("...");
-		prop_weightV.setText("...");
-		description.setText("...");
-		currentName.setText("...");
-		currentNumber.setText("...");
-		ps.setValue(0);
-		att.setValue(0);
-		satt.setValue(0);
-		def.setValue(0);
-		sdef.setValue(0);
-		speed.setValue(0);
-		pokeImage.setIcon(MediaFormer.getImageIconFitLabel(pokeImage, "images\\Other\\clip.png"));
-	}
-
-	public void playSound(String source) {
-		try {
-			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(source).getAbsoluteFile());
-			Clip clip = AudioSystem.getClip();
-			clip.open(audioInputStream);
-			actionPerformed(new ActionEvent(soundTimer, 1, "")); // Send null action to turn false "isSoundEnable"
-			soundTimer.start(); // in 5segs it will be possible to isSoundEnable sound again
-			clip.start();
-		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-			System.out.println("Error al reproducir el sonido.");
-		}
-	}
-
-	/**
-	 * Logic of main buttons.
-	 */
-	public void mouseClicked(MouseEvent e) {
-		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2) {
-			// leftButton
-			if (listController != 0) {
-				listController--;
-				showPokemon();
-			} else {
-				listController = pokeList.size() - 1;
-				showPokemon();
-			}
-		} else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2) {
-			// rightButton
-			if (listController < pokeList.size() - 1) {
-				listController++;
-				showPokemon();
-			} else {
-				listController = 0;
-				showPokemon();
-			}
-		} else if (e.getSource() == speaker) {
-			// playSoundButton
-			if (isSoundEnable)
-				playSound("Sounds\\" + pokeList.get(listController).getName().toLowerCase() + ".wav");
-		} else if (e.getSource() == exit) {
-			this.dispose(); // exitButton
-		} else if (e.getSource() == pokeImage && isEditOn) {
-			setNewPokeImage(); // changePokeimageButton
-		}
-	}
-
-	/**
-	 * Method that allow user to change pokeImage trough UI components. It asks the
-	 * user for insert new image via URL or via File.
-	 */
-	private void setNewPokeImage() {
-		JCheckBox upload = new JCheckBox("Upload Image from system file instead of input url.");
-		String msg = "Mark this check box if you want to open image instead of Input an image url.";
-		Object[] msgContent = { msg, upload };
-		// User chose upload new image via URL or via file
-		int n = JOptionPane.showConfirmDialog(null, msgContent, "Method selection", JOptionPane.OK_CANCEL_OPTION);
-		if (n == 0) {
-			if (upload.isSelected()) {
-				// TODO insert files
-				final JFileChooser fc = new JFileChooser();
-				int returnVal = fc.showOpenDialog(null);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            File file = fc.getSelectedFile();
-		            File source = new File("H:\\work-temp\\file");
-		            File dest = new File("H:\\work-temp\\file2");
-		            try {
-		                Copy.file(source, dest);
-		            } catch (IOException e) {
-		                e.printStackTrace();
-		            }
-			} else {
-				String url = "";
-				boolean isValid;
-				do { // Check if URL is valid
-					url = JOptionPane.showInputDialog("Insert Image Url (blank to cancel)");
-					if(url != null) {
-						isValid = MediaFormer.testImage(url);
-						if (isValid) {
-							pokeImage.setIcon(MediaFormer.getImageIconFitLabelURL(pokeImage, url));
-						} else {
-							JOptionPane.showMessageDialog(null, "This is not a valid url.", "Error",
-									JOptionPane.ERROR_MESSAGE);
-						}						
-					} else
-						isValid = true;
-				} while (!isValid);
-			}
-		}
-	}
-	
-	private static void copyFile(File sourceFile, File destFile)
-	        throws IOException {
-	    if (!sourceFile.exists()) {
-	        return;
-	    }
-	    if (!destFile.exists()) {
-	        destFile.createNewFile();
-	    }
-	    FileChannel source = null;
-	    FileChannel destination = null;
-	    source = new FileInputStream(sourceFile).getChannel();
-	    destination = new FileOutputStream(destFile).getChannel();
-	    if (destination != null && source != null) {
-	        destination.transferFrom(source, 0, source.size());
-	    }
-	    if (source != null) {
-	        source.close();
-	    }
-	    if (destination != null) {
-	        destination.close();
-	    }
-
-	}
-
-	/**
-	 * mouesEntered and mouseExited are used to gain a roll over effect to
-	 * top_buttons and JMenuItems.
-	 */
-	public void mouseEntered(MouseEvent e) {
-		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2)
-			lbl_buttonLeft.setIcon(new ImageIcon("images\\Buttons\\buttonLeft2.png"));
-		else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2)
-			lbl_buttonRight.setIcon(new ImageIcon("images\\Buttons\\buttonRight2.png"));
-		else if (e.getSource() == exit) {
-			exit.setBounds(exit.getBounds().x - 30, exit.getBounds().y - 30, exit.getWidth(), exit.getHeight());
-			// ------------------------------------------------ JMenuItems hover effect
-		} else if (menuIList.contains(e.getSource())) {
-			JMenuItem source = (JMenuItem) e.getSource();
-			source.setBackground(menuHoverColor);
-		}
-	}
-
-	/**
-	 * mouesEntered and mouseExited are used to gain a roll over effect to
-	 * top_buttons and JMenuItems.
-	 */
-	public void mouseExited(MouseEvent e) {
-		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2)
-			lbl_buttonLeft.setIcon(new ImageIcon("images\\Buttons\\buttonLeft.png"));
-		else if (e.getSource() == rightButtonFormer1 || e.getSource() == rightButtonFormer2)
-			lbl_buttonRight.setIcon(new ImageIcon("images\\Buttons\\buttonRight.png"));
-		else if (e.getSource() == exit) {
-			exit.setBounds(exit.getBounds().x + 30, exit.getBounds().y + 30, exit.getWidth(), exit.getHeight());
-			// -------------------- JMenuItems ---------------------------
-		} else if (menuIList.contains(e.getSource())) {
-			JMenuItem source = (JMenuItem) e.getSource();
-			source.setBackground(menuDefaultColor);
-		}
-	}
-
-	/**
-	 * 
-	 */
-	public void actionPerformed(ActionEvent e) {
-		if (menuIList.contains(e.getSource())) {
-			// set default color to JMenuItem when its pressed
-			JMenuItem source = (JMenuItem) e.getSource();
-			source.setBackground(menuDefaultColor);
-		}
-		if (e.getSource() == soundTimer) {
-			runSoundTimer(); // soundTimer event
-		} else if (e.getSource() == welcomeTimer) { // welcomeTimers controls welcome animation
-			runWelcomeTimer();
-		} else if (e.getSource() == welcomeTimerTwo) { // when this timer is called, end the animation
-			welcomeMessage.setVisible(false);
-			welcomeTimerTwo.stop();
-			// JMenuItems unique behavior ------------------------------------
-		} else if (e.getSource() == mNew_new) { // New -> new
-			emptyFields();
-			setReadyToEdit();
-		} else if (e.getSource() == mNew_save) { // New -> save
-
-		} else if (e.getSource() == mNew_discard) { // New -> discard
-			setReadyToShow();
-		} else if (e.getSource() == mEdit_on) { // Edit -> on
-			setReadyToEdit();
-		} else if (e.getSource() == mEdit_save) { // Edit -> save
-
-		} else if (e.getSource() == mEdit_discard) { // Edit -> discard
-
-		}
-	}
-
-	/**
-	 * This method is called by welcomeTimer. It controls welcome Animation. Note
-	 * that welcomeTimer is called by welcome(). - First call: it's committed 4000ms
-	 * after welcomeTimer is started, at this point firstLoop of animation will be
-	 * over, so secondLoop (animTwo()) is called. - Second call: It's committed
-	 * 4000ms after secondLoop is over. This timer is no longer necessary, so it's
-	 * stopped.
-	 */
-	private void runWelcomeTimer() {
-		if (!welcomeMessage.isVisible())
-			welcomeTimer.stop(); // Second call: stop timer
-		else {
-			animTwo(); // First call: starts second loop
-		}
-	}
-
-	/**
-	 * This method is called by soundTimer. It just turn isSoundEnable into false
-	 * for 2050ms, enough to avoid sound slap / overlap.
-	 * 
-	 * It makes soundTimer stops at second loop: - First event: after soundTimer
-	 * first loop it sends first event. As isSoundEnable = true at the beginning,
-	 * first event will turn isSoundEnable into false. Look if conditional. - Second
-	 * event: As isSoundEnable = false at this time (only manipulated by
-	 * soundTimer), second event will turn isSoundEnable into true and
-	 * soundTimer.stop() will be called. So there's never a third event.
-	 */
-	private void runSoundTimer() {
-		if (isSoundEnable)
-			isSoundEnable = false;
-		else {
-			isSoundEnable = true;
-			soundTimer.stop();
-		}
-	}
-
-	/**
-	 * KeyRealeased controls field verification.
-	 */
-	public void keyReleased(KeyEvent e) {
-		if (attIntputList.contains(e.getSource())) {
-			verifyAttFields(e);
-		} else if (e.getSource() == prop_heightV || e.getSource() == prop_weightV) {
-			verifyDoubleFields(e);
-		} else if (e.getSource() == currentNumber) {
-			verifyCurrentNumber();
-		} else if (e.getSource() == description) {
-			verifyDescription();
-		} else if (strFields.contains(e.getSource())) {
-			verifyStrFields(e);
-		} else if (e.getSource() == currentName) {
-			verifyCurrentName();
-		}
-	}
-	
-	/**
-	 * This method verifies if attIntputList fields contain only
-	 * Integer characters.
-	 * It warn user by changing its background.
-	 * @param e
-	 */
-	private void verifyAttFields(KeyEvent e) {
-		JTextField source = (JTextField) e.getSource();
-		boolean isValid = StringUtils.checkInt(source.getText());
-		if (!isValid) {
-			source.setBackground(new Color(202, 129, 129));
-			readyFields.remove(source);
-		} else {
-			int newInt = Integer.parseInt(source.getText());
-			if (newInt < 1) {
-				newInt = 1;
-				source.setText(Integer.toString(newInt));
-			} else if (newInt > 15) {
-				newInt = 15;
-				source.setText(Integer.toString(newInt));
-			}
-			source.setBackground(new Color(179, 179, 179));
-			if (!readyFields.contains(source))
-				readyFields.add(source);
-		}
-	}
-
-	/**
-	 * This method verifies height and weight to be Double.
-	 * It warns user by changing its background if it's blank or its foreground if it's not Double.
-	 * 
-	 * @param e Height or Weight.
-	 */
-	private void verifyDoubleFields(KeyEvent e) {
-		JTextField source = (JTextField) e.getSource();
-		if (!source.getText().isBlank()) {
-			source.setBackground(new Color(48, 167, 215));
-			boolean isValid = StringUtils.checkDouble(source.getText());
-			if (!isValid) {
-				source.setForeground(Color.red);
-				readyFields.remove(source);
-			} else {
-				source.setForeground(foreground);
-				if (!readyFields.contains(source))
-					readyFields.add(source);
-			}
-		} else {
-			source.setBackground(new Color(202, 129, 129));
-		}
-	}
-
-	/**
-	 * This method verifies currentNumber. It should not be blank or contain no
-	 * Integer characters.
-	 */
-	private void verifyCurrentNumber() {
-		if (!currentNumber.getText().isBlank()) {
-			currentNumber.setBackground(Color.white);
-			boolean isValid = StringUtils.checkInt(currentNumber.getText());
-			if (!isValid) {
-				currentNumber.setForeground(Color.red);
-				readyFields.remove(currentNumber);
-			} else {
-				currentNumber.setForeground(new Color(103, 107, 107));
-				if (!readyFields.contains(currentNumber))
-					readyFields.add(currentNumber);
-			}
-		} else {
-			currentNumber.setBackground(new Color(202, 129, 129));
-		}
-	}
-
-	/**
-	 * This method verifies description. Description must be at least 30 character
-	 * length.
-	 * 
-	 * It warns the user to fulfill rules.
-	 */
-	private void verifyDescription() {
-		int length = description.getText().length();
-		System.out.println(length);
-		if (length < 30) {
-			if (length <= 1) {
-				description.setBackground(new Color(202, 129, 129));
-			} else {
-				description.setBackground(Color.white);
-			}
-			description.setForeground(Color.red);
-			isDescriptionReady = false;
-			descRules.setVisible(true);
-		} else {
-			description.setForeground(Color.black);
-			isDescriptionReady = true;
-			descRules.setVisible(false);
-		}
-	}
-
-	/**
-	 * This method verifies strFields are not blank. It warns the user to fill this
-	 * fields.
-	 * 
-	 * @param e any of "strFields" list textField.
-	 */
-	private void verifyStrFields(KeyEvent e) {
-
-		JTextField source = (JTextField) e.getSource();
-		if (source.getText().isBlank()) {
-			source.setBackground(new Color(202, 129, 129));
-			readyFields.remove(source);
-		} else {
-			if (!readyFields.contains(source)) {
-				readyFields.add(source);
-			}
-			source.setBackground(new Color(48, 167, 215));
-		}
-	}
-
-	/**
-	 * This method verifies currentName is not blank. It warns the user to fill this
-	 * field.
-	 */
-	private void verifyCurrentName() {
-		if (currentName.getText().isBlank()) {
-			currentName.setBackground(new Color(202, 129, 129));
-			readyFields.remove(currentName);
-		} else {
-			currentName.setBackground(Color.white);
-			if (!readyFields.contains(currentName)) {
-				readyFields.add(currentName);
-			}
-			currentName.setBackground(Color.white);
-		}
-	}
-
 	// Unused Overridden methods
-	public void mousePressed(MouseEvent e) {}
-	public void mouseReleased(MouseEvent e) {}
-	public void keyTyped(KeyEvent e) {}
-	public void keyPressed(KeyEvent e) {}
+	public void mousePressed(MouseEvent e) {
+	}
+
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	public void keyTyped(KeyEvent e) {
+	}
+
+	public void keyPressed(KeyEvent e) {
+	}
 }
