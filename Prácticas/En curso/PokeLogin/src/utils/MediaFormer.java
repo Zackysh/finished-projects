@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -66,7 +65,7 @@ public class MediaFormer {
 		ImageIcon imageIcon = new ImageIcon(redimensionedImg);
 		return imageIcon;
 	}
-	
+
 	public static void downloadToFile(String url, File dest) {
 		URL urlU = null;
 		try {
