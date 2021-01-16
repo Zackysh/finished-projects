@@ -9,7 +9,7 @@ _**Pokedex** 🛠️ Work in progess_
 
 <h1 align="center"> Pokedex</h1>
 <p align="center"> Just a screenshot</p>
-<p align="center"><img src="https://i.imgur.com/UJnwtim.png"/></p> 
+<p align="center"><img src="https://i.imgur.com/cuis5Cg.png"/></p> 
 
 ## Review index:
 ---
