@@ -8,7 +8,7 @@ import java.awt.Color;
  * @author AdriGB
  *
  */
-public class PokeType {
+public class PokeType implements Comparable<PokeType> {
 	
 	// Attributes
 	private int idT;
@@ -38,6 +38,15 @@ public class PokeType {
 	public String toString() {
 		return "PokeType [idT=" + idT + ", name=" + name + "]";
 	}
-		
-	
+
+	@Override
+	public int compareTo(PokeType o) {
+		int result = this.getName().compareTo(o.getName()); 
+		if (result > 0)
+			return 1;
+		else if (result == 0)
+			return 0;
+		return -1;
+	}
+
 }
