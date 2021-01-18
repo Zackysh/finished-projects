@@ -98,19 +98,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JMenuItem mNew_new, mNew_save, mNew_discard;
 	private JMenu menu_edit;
 	private JMenuItem mEdit_on, mEdit_save, mEdit_discard;
-	private Color menuDefaultColor = new Color(51, 51, 51);
-	private Color menuHoverColor = new Color(159, 162, 162);
-	private Color foreground;
-
 	// MENU_CONTROLLERS ----------------------
 	private boolean isEditOn; // limit user interaction when its on
-
 	// WELCOME-ANIMATION components ----------
 	private JButton welcomeMessage;
 	private Timer welcomeTimer;
 	private Timer welcomeTimerTwo;
 	private String userName;
-
 	// LABEL_BUTTONS -------------------------
 	private JLabel lbl_buttonRight;
 	private JLabel rightButtonFormer1;
@@ -118,7 +112,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JLabel lbl_buttonLeft;
 	private JLabel leftButtonFormer1;
 	private JLabel leftButtonFormer2;
-
 	// TOP-LABELS ---------------------------
 	private JLabel editMode;
 	private JLabel previousName;
@@ -134,7 +127,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private String pokeImageDefaultSource;
 	private JLabel speaker;
 	private JLabel restore;
-
 	// BLUE-BOX (T: Title, V: Value) --------
 	private JLabel prop_skillT;
 	private JTextField prop_skillV;
@@ -146,10 +138,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JTextField prop_weightV;
 	private JLabel prop_sexT;
 	private JTextField prop_sexV;
-
 	// UNDER-BLUE-BOX -----------------------
 	private JPanel typeContainer;
-
+	private JLabel changeTypes;
 	// GRAY-BOX ----------------------------
 	// This list is used on keyReleased to control only attribute input TextFields,
 	// its neccesary to
@@ -172,10 +163,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JLabel lbl_speed;
 	private JProgressBar speed;
 	private JTextField speedI;
-
 	// FOOTER ------------------------------
 	private JButton exit;
-
 	// LOGIC HANDLERS ---------------------
 	// DAOs
 	private DAO_Pokemon pokeDAO;
@@ -210,10 +199,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		insertTypes();
 		insertPokemons();
 		initializeUIComponentes();
-		
+
 		setReadyToShow();
 		setVisible(true);
-		new SelectTypes(typeList);
 //		welcome();
 		// Rest of the logic continue on showPokemon() method
 		// and event listener (Action/Mouse listeners)
@@ -401,10 +389,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	public void showPokemon() {
 		Pokemon current = pokeList.get(listController);
-//		pokeDAO.updatePokemon(current.getIdP(), current.getName(), current.getNumber(), current.getDescription(),
-//				current.getSkill(), current.getCategory(), current.getHeight(), current.getWeight(), current.getSex(),
-//				current.getTypes(), current.getBaseAtt());
-		
 		showHeadder(current);
 		description.setText(pokeList.get(listController).getDescription());
 		showBlueBox(current);
@@ -548,7 +532,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		mNew_new.setEnabled(false);
 		mNew_discard.setEnabled(false);
 		mNew_save.setEnabled(false);
-		mEdit_on.setText("Disable edit mode");		
+		mEdit_on.setText("Disable edit mode");
 		mEdit_save.setEnabled(true);
 		mEdit_discard.setEnabled(true);
 		// Setting TOP-COMPONENTS
@@ -572,6 +556,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_weightV.setEditable(true);
 		currentName.setEditable(true);
 		currentNumber.setEditable(true);
+		changeTypes.setVisible(true);
 		// Setting GRAY-BOX
 		psI.setVisible(true);
 		psI.setText(Integer.toString(ps.getValue()));
@@ -590,7 +575,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		 * Set all components into ready state, as current fields will contain
 		 * information about a Pokemon which is obtained directly from PokeDB (all
 		 * fields are correct).
-		 */		
+		 */
 		readyFields.add(currentName);
 		readyFields.add(currentNumber);
 		readyFields.add(prop_heightV);
@@ -605,7 +590,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		readyFields.add(sdefI);
 		readyFields.add(speedI);
 		isDescriptionReady = true;
-		
+
 		editMode.setVisible(true);
 	}
 
@@ -651,7 +636,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// Set isEditOn false
 		showPokemon(); // reset fields with current pokemon info
 		isEditOn = false; // used to limit user interaction
-		
+		changeTypes.setVisible(false);
 		for (JTextField jTextField : strFields)
 			verifyStrFields(jTextField);
 		for (JTextField jTextField : attIntputList)
@@ -884,9 +869,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			if (n == 0) {
 				System.out.println("Bien 1");
 				File newFile = choseFileFrom();
-				if(newFile != null) {
+				if (newFile != null) {
 					setCurrentImage(newFile);
-					showPokeImage();					
+					showPokeImage();
 				}
 			}
 		} else if (e.getSource() == restore) { // Restore defaultImage
@@ -926,15 +911,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 					setDefaultToCurrent();
 					showPokeImage();
 				}
-
-				// String msg = "This pokemon doesn't have default image. Would you like to add
-				// one?";
-//				int n = JOptionPane.showConfirmDialog(null, msg, "Pokemon default image missing",
-//						JOptionPane.OK_CANCEL_OPTION);
-//				if (n == 0) {
-//					setDefaultImage();
-//				}
 			}
+		} else if (e.getSource() == changeTypes) {
+			new SelectTypes(typeList, pokeList.get(listController).getTypes(), this);
 		}
 	}
 
@@ -956,7 +935,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		else if (menuIList.contains(e.getSource())) {
 			// -------------------- JMenuItems ---------------------------
 			JMenuItem source = (JMenuItem) e.getSource();
-			source.setBackground(menuHoverColor);
+			source.setBackground(new Color(159, 162, 162));
+		} else if (e.getSource() == changeTypes) {
+			changeTypes
+					.setIcon(MediaFormer.getImageIconFitLabel(changeTypes, "images\\Buttons\\changeButtonIcon2.png"));
 		}
 	}
 
@@ -978,8 +960,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// -------------------- JMenuItems ---------------------------
 		else if (menuIList.contains(e.getSource())) {
 			JMenuItem source = (JMenuItem) e.getSource();
-			source.setBackground(menuDefaultColor);
+			source.setBackground(new Color(51, 51, 51));
+		} else if (e.getSource() == changeTypes) {
+			changeTypes.setIcon(MediaFormer.getImageIconFitLabel(changeTypes, "images\\Buttons\\changeButtonIcon.png"));
 		}
+
 	}
 
 	/**
@@ -989,7 +974,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		if (menuIList.contains(e.getSource())) {
 			// set default color to JMenuItem when its pressed
 			JMenuItem source = (JMenuItem) e.getSource();
-			source.setBackground(menuDefaultColor);
+			source.setBackground(new Color(51, 51, 51));
 		}
 		if (e.getSource() == soundTimer) {
 			runSoundTimer(); // soundTimer event
@@ -1009,7 +994,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			mNew_save.setEnabled(true);
 			mNew_discard.setEnabled(true);
 		} else if (e.getSource() == mNew_save) { // New -> save
-			
+
 		} else if (e.getSource() == mNew_discard) { // New -> discard
 			setReadyToShow();
 		} else if (e.getSource() == mEdit_on) { // Edit -> on
@@ -1020,7 +1005,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		} else if (e.getSource() == mEdit_save) { // Edit -> save
 			System.out.println(verifyAllFields());
 		} else if (e.getSource() == mEdit_discard) { // Edit -> discard
-
+			setReadyToShow();
+			JOptionPane.showMessageDialog(null, "Changes discared");
 		}
 	}
 
@@ -1043,7 +1029,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			verifyCurrentName();
 		}
 	}
-	
+
 	/**
 	 * This method check if all input fields are stored in redyFields (this mean all
 	 * fields are ready to process).
@@ -1066,10 +1052,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			return false;
 		return true;
 	}
-	
+
 	/**
-	 * This method verifies if <strong>attIntputList</strong> fields contain only Integer characters.
-	 * It warn user by changing its background.
+	 * This method verifies if <strong>attIntputList</strong> fields contain only
+	 * Integer characters. It warn user by changing its background.
 	 * 
 	 * @param e
 	 */
@@ -1095,7 +1081,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 
 	/**
 	 * This method verifies height and weight to be Double. It warns user by
-	 * changing its background if it's blank or its foreground if it's not Double.
+	 * changing its background if it's blank or its new Color(77, 77, 77) if it's
+	 * not Double.
 	 * 
 	 * @param e Height or Weight.
 	 */
@@ -1107,7 +1094,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				source.setForeground(Color.red);
 				readyFields.remove(source);
 			} else {
-				source.setForeground(foreground);
+				source.setForeground(new Color(77, 77, 77));
 				if (!readyFields.contains(source))
 					readyFields.add(source);
 			}
@@ -1226,152 +1213,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * attributes).
 	 */
 	public void initializeUIComponentes() {
-		// Add typeLabels and its container
-		typeContainer = new JPanel();
-		typeContainer.setLayout(new FlowLayout(FlowLayout.LEFT));
-		typeContainer.setBackground(Color.white);
-		typeContainer.setBounds(417, 460, 410, 65);
-		
-		// MenuBar
-		menuBar = new JMenuBar();
-		menuBar.setBackground(menuDefaultColor);
-		// Menu new
-		menu_new = new JMenu("    New    "); // Menu 1
-		menu_new.setForeground(Color.white);
-		// Menu edit
-		menu_edit = new JMenu("   Edit   ");
-		menu_edit.setForeground(Color.white);
-		menuIList = new ArrayList<JMenuItem>();
-		// "NEW" MENU --------------------------------------------------
-		// mNew New
-		mNew_new = new JMenuItem("Add new Pokemon.") { // 1
-			private static final long serialVersionUID = 1L;
-
-			public void setArmed(boolean b) { // Default hover effect is disabled now
-			}
-		};
-		mNew_new.setBackground(menuDefaultColor);
-		mNew_new.setForeground(Color.white);
-		mNew_new.addMouseListener(this);
-		mNew_new.addActionListener(this);
-		menuIList.add(mNew_new);
-		// mNew Save
-		mNew_save = new JMenuItem("Save current new Pokemon.") { // 1
-			private static final long serialVersionUID = 1L;
-
-			public void setArmed(boolean b) { // Default hover effect is disabled now
-			}
-		};
-		mNew_save.setBackground(menuDefaultColor);
-		mNew_save.setForeground(Color.white);
-		mNew_save.addMouseListener(this);
-		mNew_save.addActionListener(this);
-		menuIList.add(mNew_save);
-		// mNew Discard
-		mNew_discard = new JMenuItem("Discard current new Pokemon.") { // 1
-			private static final long serialVersionUID = 1L;
-
-			public void setArmed(boolean b) { // Default hover effect is disabled now
-			}
-		};
-		mNew_discard.setBackground(menuDefaultColor);
-		mNew_discard.setForeground(Color.white);
-		mNew_discard.addMouseListener(this);
-		mNew_discard.addActionListener(this);
-		menuIList.add(mNew_discard);
-		// "EDIT" MENU ---------------------------------------------------
-		// mEdit On
-		mEdit_on = new JMenuItem("Enable edit mode.") { // Item 1
-			private static final long serialVersionUID = 2L;
-
-			public void setArmed(boolean b) {
-			}
-		};
-		mEdit_on.setBackground(menuDefaultColor);
-		mEdit_on.setForeground(Color.white);
-		mEdit_on.addMouseListener(this);
-		mEdit_on.addActionListener(this);
-		menuIList.add(mEdit_on);
-		// mEdit Off
-		// mEdit Save
-		mEdit_save = new JMenuItem("Save changes and disable edit mode.") { // 1
-			private static final long serialVersionUID = 3L;
-
-			public void setArmed(boolean b) {
-			}
-		};
-		mEdit_save.setBackground(menuDefaultColor);
-		mEdit_save.setForeground(Color.white);
-		mEdit_save.addMouseListener(this);
-		mEdit_save.addActionListener(this);
-		menuIList.add(mEdit_save);
-		// mEdit Discard
-		mEdit_discard = new JMenuItem("Discard changes and disable edit mode.") { // 2
-			private static final long serialVersionUID = 4L;
-
-			public void setArmed(boolean b) {
-			}
-		};
-		mEdit_discard.setBackground(menuDefaultColor);
-		mEdit_discard.setForeground(Color.white);
-		mEdit_discard.addMouseListener(this);
-		mEdit_discard.addActionListener(this);
-		menuIList.add(mEdit_discard);
-
-		// MENU CONNECTIONS ---------------------------------------------
-		menuBar.add(menu_new);
-		menuBar.add(menu_edit);
-
-		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-		JSeparator separator2 = new JSeparator(SwingConstants.HORIZONTAL);
-		JSeparator separator3 = new JSeparator(SwingConstants.HORIZONTAL);
-		JSeparator separator4 = new JSeparator(SwingConstants.HORIZONTAL);
-		separator.setBackground(Color.white);
-		separator2.setBackground(Color.white);
-		separator3.setBackground(Color.white);
-		separator4.setBackground(Color.white);
-		menu_new.add(mNew_new);
-		menu_new.add(separator);
-		menu_new.add(mNew_save);
-		menu_new.add(separator2);
-		menu_new.add(mNew_discard);
-		menu_edit.add(mEdit_on);
-		menu_edit.add(separator3);
-		menu_edit.add(mEdit_save);
-		menu_edit.add(separator4);
-		menu_edit.add(mEdit_discard);
-
-		setJMenuBar(menuBar);
-
-		// FOOTER
-		// Quit button - Exit app
-		exit = new JButton("Quit");
-		exit.setBounds(this.getBounds().width - 140, this.getBounds().height - 200, 240, 240);
-		exit.setUI(new MetalButtonUI() {
-			protected Color getDisabledTextColor() {
-				return Color.WHITE;
-			}
-		});
-		exit.setBackground(new Color(0, 0, 0, 0));
-		exit.setBorder(null);
-		exit.setEnabled(false);
-		exit.setFont(new Font("Flexo-Medium", Font.BOLD, 26));
-		exit.setForeground(Color.WHITE);
-		exit.setDisabledIcon(MediaFormer.getImageIconFitLabel(exit, "images\\Other\\welcomeIcon.png"));
-		exit.setIcon(MediaFormer.getImageIconFitLabel(exit, "images\\Other\\welcomeIcon.png"));
-		exit.setVerticalTextPosition(SwingConstants.CENTER);
-		exit.setHorizontalTextPosition(SwingConstants.CENTER);
-		exit.addMouseListener(this);
-		contentPane.add(exit);
-		contentPane.add(typeContainer);
-
-		// WELCOME
-		// welcomeMessage - Invoked when Pokedex (this) is instantiated
+		// WELCOME Animation components
+		// -------------------------------------------------
 		welcomeMessage = new JButton("WELCOME " + userName + "!");
 		welcomeMessage.setBounds(-300, this.getBounds().height / 2 - 250, 400, 400);
 		welcomeMessage.setUI(new MetalButtonUI() {
 			protected Color getDisabledTextColor() {
-				return Color.WHITE;	
+				return Color.WHITE;
 			}
 		});
 		welcomeMessage.setBackground(new Color(0, 0, 0, 0));
@@ -1385,9 +1233,107 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		welcomeMessage.setVerticalTextPosition(SwingConstants.CENTER);
 		welcomeMessage.setHorizontalTextPosition(SwingConstants.CENTER);
 		welcomeMessage.repaint();
-		contentPane.add(welcomeMessage);
+		// HEADDER ---------------------------------------------------------
+		// MenuBar
+		menuBar = new JMenuBar();
+		menuBar.setBackground(new Color(51, 51, 51));
+		// Menu new
+		menu_new = new JMenu("    New    "); // Menu 1
+		menu_new.setForeground(Color.white);
+		// Menu edit
+		menu_edit = new JMenu("   Edit   ");
+		menu_edit.setForeground(Color.white);
+		menuIList = new ArrayList<JMenuItem>();
+		// "NEW" Menu
+		// mNew New
+		mNew_new = new JMenuItem("Add new Pokemon.") { // 1
+			private static final long serialVersionUID = 1L;
 
-		// TOP_LABELS ---------------------------------------------------------
+			public void setArmed(boolean b) { // Default hover effect is disabled now
+			}
+		};
+		mNew_new.setBackground(new Color(51, 51, 51));
+		mNew_new.setForeground(Color.white);
+		mNew_new.addMouseListener(this);
+		mNew_new.addActionListener(this);
+		menuIList.add(mNew_new);
+		// mNew Save
+		mNew_save = new JMenuItem("Save current new Pokemon.") { // 1
+			private static final long serialVersionUID = 1L;
+
+			public void setArmed(boolean b) { // Default hover effect is disabled now
+			}
+		};
+		mNew_save.setBackground(new Color(51, 51, 51));
+		mNew_save.setForeground(Color.white);
+		mNew_save.addMouseListener(this);
+		mNew_save.addActionListener(this);
+		menuIList.add(mNew_save);
+		// mNew Discard
+		mNew_discard = new JMenuItem("Discard current new Pokemon.") { // 1
+			private static final long serialVersionUID = 1L;
+
+			public void setArmed(boolean b) { // Default hover effect is disabled now
+			}
+		};
+		mNew_discard.setBackground(new Color(51, 51, 51));
+		mNew_discard.setForeground(Color.white);
+		mNew_discard.addMouseListener(this);
+		mNew_discard.addActionListener(this);
+		menuIList.add(mNew_discard);
+		// "EDIT" Menu
+		// mEdit On
+		mEdit_on = new JMenuItem("Enable edit mode.") { // Item 1
+			private static final long serialVersionUID = 2L;
+
+			public void setArmed(boolean b) {
+			}
+		};
+		mEdit_on.setBackground(new Color(51, 51, 51));
+		mEdit_on.setForeground(Color.white);
+		mEdit_on.addMouseListener(this);
+		mEdit_on.addActionListener(this);
+		menuIList.add(mEdit_on);
+		// mEdit Off
+		// mEdit Save
+		mEdit_save = new JMenuItem("Save changes and disable edit mode.") { // 1
+			private static final long serialVersionUID = 3L;
+
+			public void setArmed(boolean b) {
+			}
+		};
+		mEdit_save.setBackground(new Color(51, 51, 51));
+		mEdit_save.setForeground(Color.white);
+		mEdit_save.addMouseListener(this);
+		mEdit_save.addActionListener(this);
+		menuIList.add(mEdit_save);
+		// mEdit Discard
+		mEdit_discard = new JMenuItem("Discard changes and disable edit mode.") { // 2
+			private static final long serialVersionUID = 4L;
+
+			public void setArmed(boolean b) {
+			}
+		};
+		mEdit_discard.setBackground(new Color(51, 51, 51));
+		mEdit_discard.setForeground(Color.white);
+		mEdit_discard.addMouseListener(this);
+		mEdit_discard.addActionListener(this);
+		menuIList.add(mEdit_discard);
+		// Menu connections
+		menuBar.add(menu_new);
+		menuBar.add(menu_edit);
+		menu_new.add(mNew_new);
+		menu_new.add(new JSeparator(SwingConstants.HORIZONTAL));
+		menu_new.add(mNew_save);
+		menu_new.add(new JSeparator(SwingConstants.HORIZONTAL));
+		menu_new.add(mNew_discard);
+		menu_edit.add(mEdit_on);
+		menu_edit.add(new JSeparator(SwingConstants.HORIZONTAL));
+		menu_edit.add(mEdit_save);
+		menu_edit.add(new JSeparator(SwingConstants.HORIZONTAL));
+		menu_edit.add(mEdit_discard);
+		setJMenuBar(menuBar);
+		// TOP ---------------------------------------------------------
 		// EditMode
 		editMode = new JLabel("E D I T  M O D E  O N");
 		editMode.setBounds(getBounds().width / 2 - 155, 15, 330, 50);
@@ -1467,53 +1413,27 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		restore.setIcon(MediaFormer.getImageIconFitLabel(speaker, "images\\Other\\restoreIcon.png"));
 		restore.setToolTipText("Restore default pokeImage");
 		restore.addMouseListener(this);
-		// Add previous components
-		contentPane.add(numberSign);
-		contentPane.add(editMode);
-		contentPane.add(previousName);
-		contentPane.add(previousNumber);
-		contentPane.add(nextName);
-		contentPane.add(nextNumber);
-		contentPane.add(currentName);
-		contentPane.add(currentNumber);
-		contentPane.add(description);
-		contentPane.add(descRules);
-		contentPane.add(speaker);
-		contentPane.add(restore);
-		contentPane.add(pokeImage);
 		// lbl_buttonLeft
 		lbl_buttonLeft = new JLabel(new ImageIcon("images\\Buttons\\buttonLeft.png"));
 		lbl_buttonLeft.setBounds(107, 0, 372, 79);
-		// lbl_buttonLeft formers (for custom listen-event shape, compund by two
-		// rectangles)
+		// lbl_buttonLeft formers
 		leftButtonFormer1 = new JLabel(); // Rectangle 1
 		leftButtonFormer1.setBounds(107, 0, 372, 50);
 		leftButtonFormer1.addMouseListener(this);
 		leftButtonFormer2 = new JLabel(); // Rectangle 2
 		leftButtonFormer2.setBounds(107, 50, 125, 30);
 		leftButtonFormer2.addMouseListener(this);
-
 		// lbl_buttonRight
 		lbl_buttonRight = new JLabel(new ImageIcon("images\\Buttons\\buttonRight.png"));
 		lbl_buttonRight.setBounds(479, 0, 372, 79);
-		// lbl_buttonRight formers (for custom listen-event shape, compound by two
-		// rectangles)
+		// lbl_buttonRight formers
 		rightButtonFormer1 = new JLabel(); // Rectangle 1
 		rightButtonFormer1.setBounds(479, 0, 372, 50);
 		rightButtonFormer1.addMouseListener(this);
 		rightButtonFormer2 = new JLabel(); // Rectangle 2
 		rightButtonFormer2.setBounds(726, 50, 125, 30);
 		rightButtonFormer2.addMouseListener(this);
-		// Add previous components
-		contentPane.add(lbl_buttonLeft);
-		contentPane.add(leftButtonFormer1);
-		contentPane.add(leftButtonFormer2);
-		contentPane.add(lbl_buttonRight);
-		contentPane.add(rightButtonFormer1);
-		contentPane.add(rightButtonFormer2);
-
-		// BLUE_BOX LABELS -------------------------------------------------------
-		foreground = new Color(77, 77, 77);
+		// BLUE_BOX -------------------------------------------------------
 		prop_heightT = new JLabel("Height (m)");
 		prop_heightT.setBounds(438, 265, 120, 20);
 		prop_heightT.setFont(new Font("Flexo-Light", Font.BOLD, 14));
@@ -1523,8 +1443,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_heightV.setBounds(438, 290, 150, 20);
 		prop_heightV.setBorder(null);
 		prop_heightV.setBackground(new Color(48, 167, 215));
-		prop_heightV.setForeground(foreground);
-		prop_heightV.setDisabledTextColor(foreground);
+		prop_heightV.setForeground(new Color(77, 77, 77));
+		prop_heightV.setDisabledTextColor(new Color(77, 77, 77));
 		prop_heightV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_heightV.addKeyListener(this);
 		prop_heightV.setEditable(false);
@@ -1533,13 +1453,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_weightT.setBounds(438, 323, 120, 20);
 		prop_weightT.setFont(new Font("Flexo-Light", Font.BOLD, 14));
 		prop_weightT.setForeground(Color.white);
-		
+
 		prop_weightV = new JTextField();
 		prop_weightV.setBounds(438, 348, 150, 20);
 		prop_weightV.setBorder(null);
 		prop_weightV.setBackground(new Color(48, 167, 215));
-		prop_weightV.setForeground(foreground);
-		prop_weightV.setDisabledTextColor(foreground);
+		prop_weightV.setForeground(new Color(77, 77, 77));
+		prop_weightV.setDisabledTextColor(new Color(77, 77, 77));
 		prop_weightV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_weightV.addKeyListener(this);
 		prop_weightV.setEditable(false);
@@ -1553,8 +1473,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_sexV.setBounds(438, 401, 150, 20);
 		prop_sexV.setBorder(null);
 		prop_sexV.setBackground(new Color(48, 167, 215));
-		prop_sexV.setForeground(foreground);
-		prop_sexV.setDisabledTextColor(foreground);
+		prop_sexV.setForeground(new Color(77, 77, 77));
+		prop_sexV.setDisabledTextColor(new Color(77, 77, 77));
 		prop_sexV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_sexV.setEditable(false);
 		prop_sexV.addKeyListener(this);
@@ -1569,8 +1489,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_categoryV.setBounds(638, 290, 150, 20);
 		prop_categoryV.setBorder(null);
 		prop_categoryV.setBackground(new Color(48, 167, 215));
-		prop_categoryV.setForeground(foreground);
-		prop_categoryV.setDisabledTextColor(foreground);
+		prop_categoryV.setForeground(new Color(77, 77, 77));
+		prop_categoryV.setDisabledTextColor(new Color(77, 77, 77));
 		prop_categoryV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_categoryV.setEditable(false);
 		prop_categoryV.addKeyListener(this);
@@ -1585,26 +1505,30 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		prop_skillV.setBounds(638, 348, 150, 20);
 		prop_skillV.setBackground(new Color(48, 167, 215));
 		prop_skillV.setBorder(null);
-		prop_skillV.setForeground(foreground);
-		prop_skillV.setDisabledTextColor(foreground);
+		prop_skillV.setForeground(new Color(77, 77, 77));
+		prop_skillV.setDisabledTextColor(new Color(77, 77, 77));
 		prop_skillV.setFont(new Font("Flexo-Light", 1, 18));
 		prop_skillV.setEditable(false);
 		prop_skillV.addKeyListener(this);
 		strFields.add(prop_skillV);
-		// Add previous characteristics labels
-		contentPane.add(prop_heightT);
-		contentPane.add(prop_heightV);
-		contentPane.add(prop_weightT);
-		contentPane.add(prop_weightV);
-		contentPane.add(prop_sexT);
-		contentPane.add(prop_sexV);
-		contentPane.add(prop_categoryT);
-		contentPane.add(prop_categoryV);
-		contentPane.add(prop_skillT);
-		contentPane.add(prop_skillV);
+		// UNDER BLUE-BOX --------------------------------------------------
+		typeContainer = new JPanel();
+		typeContainer.setLayout(new FlowLayout(FlowLayout.LEFT));
+		typeContainer.setBackground(Color.white);
+		typeContainer.setBounds(417, 460, 410, 65);
 
-		// UNDER-BLUE-BOX BUTTONS --------------------------------------
-		// GRAY-BOX LABELS ---------------------------------------------------------
+		changeTypes = new JLabel();
+		changeTypes.setBounds(417, 527, 40, 40);
+		changeTypes.setBackground(new Color(0, 0, 0, 0));
+		changeTypes.setBorder(null);
+		changeTypes.setFont(new Font("Flexo-Medium", Font.BOLD, 26));
+		changeTypes.setForeground(Color.WHITE);
+		changeTypes.setIcon(MediaFormer.getImageIconFitLabel(changeTypes, "images\\Buttons\\changeButtonIcon.png"));
+		changeTypes.setVerticalTextPosition(SwingConstants.CENTER);
+		changeTypes.setHorizontalTextPosition(SwingConstants.CENTER);
+		changeTypes.addMouseListener(this);
+		changeTypes.setVisible(false);
+		// GRAY-BOX ---------------------------------------------------------
 		attIntputList = new ArrayList<JTextField>();
 
 		lbl_ps = new JLabel("PS");
@@ -1746,7 +1670,57 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		speedI.addKeyListener(this);
 		speedI.setVisible(false);
 		attIntputList.add(speedI);
-		// Add previuos attribute labels and its progressBar (no value yet)
+		// FOOTER ----------------------------------------------------------
+		// Quit button - Exit app
+		exit = new JButton("Quit");
+		exit.setBounds(this.getBounds().width - 140, this.getBounds().height - 200, 240, 240);
+		exit.setUI(new MetalButtonUI() {
+			protected Color getDisabledTextColor() {
+				return Color.WHITE;
+			}
+		});
+		exit.setBackground(new Color(0, 0, 0, 0));
+		exit.setBorder(null);
+		exit.setEnabled(false);
+		exit.setFont(new Font("Flexo-Medium", Font.BOLD, 26));
+		exit.setForeground(Color.WHITE);
+		exit.setDisabledIcon(MediaFormer.getImageIconFitLabel(exit, "images\\Other\\welcomeIcon.png"));
+		exit.setIcon(MediaFormer.getImageIconFitLabel(exit, "images\\Other\\welcomeIcon.png"));
+		exit.setVerticalTextPosition(SwingConstants.CENTER);
+		exit.setHorizontalTextPosition(SwingConstants.CENTER);
+		exit.addMouseListener(this);
+		// ADD COMPONENTS
+		contentPane.add(changeTypes);
+		contentPane.add(welcomeMessage);
+		contentPane.add(numberSign);
+		contentPane.add(editMode);
+		contentPane.add(previousName);
+		contentPane.add(previousNumber);
+		contentPane.add(nextName);
+		contentPane.add(nextNumber);
+		contentPane.add(currentName);
+		contentPane.add(currentNumber);
+		contentPane.add(description);
+		contentPane.add(descRules);
+		contentPane.add(speaker);
+		contentPane.add(restore);
+		contentPane.add(pokeImage);
+		contentPane.add(lbl_buttonLeft);
+		contentPane.add(leftButtonFormer1);
+		contentPane.add(leftButtonFormer2);
+		contentPane.add(lbl_buttonRight);
+		contentPane.add(rightButtonFormer1);
+		contentPane.add(rightButtonFormer2);
+		contentPane.add(prop_heightT);
+		contentPane.add(prop_heightV);
+		contentPane.add(prop_weightT);
+		contentPane.add(prop_weightV);
+		contentPane.add(prop_sexT);
+		contentPane.add(prop_sexV);
+		contentPane.add(prop_categoryT);
+		contentPane.add(prop_categoryV);
+		contentPane.add(prop_skillT);
+		contentPane.add(prop_skillV);
 		contentPane.add(lbl_ps);
 		contentPane.add(psI);
 		contentPane.add(ps);
@@ -1765,6 +1739,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(lbl_speed);
 		contentPane.add(speedI);
 		contentPane.add(speed);
+		contentPane.add(exit);
+		contentPane.add(typeContainer);
 
 		// BACKGROUND -----------------------------------------------------------
 		background = new JLabel(new ImageIcon("images\\Background\\pokedexBackground.png"));
