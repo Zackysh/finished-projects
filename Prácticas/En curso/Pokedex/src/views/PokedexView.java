@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
@@ -172,10 +173,12 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	// Lists
 	private ArrayList<Pokemon> pokeList = new ArrayList<Pokemon>();
 	private ArrayList<PokeType> typeList = new ArrayList<PokeType>();
+	private ArrayList<PokeType> backupTypeList = new ArrayList<PokeType>();
 	private int listController = 0;
 	// Add/Edit control
 	private List<JTextField> readyFields;
 	private List<JTextField> strFields;
+	private List<JTextField> doubleFields;
 	private JLabel descRules;
 	private boolean isDescriptionReady;
 	// Sound Control
@@ -231,6 +234,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// Lists
 		readyFields = new ArrayList<JTextField>();
 		strFields = new ArrayList<JTextField>();
+		attIntputList = new ArrayList<JTextField>();
+		doubleFields = new ArrayList<JTextField>();
 
 		// Frame initialization
 		setTitle("Pokedex");
@@ -393,7 +398,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		description.setText(pokeList.get(listController).getDescription());
 		showBlueBox(current);
 		showGrayBox(current);
-		showTypes(current);
+		showTypes();
 		pokeImageSource = "images\\Pokemons\\" + pokeList.get(listController).getName() + ".png";
 		pokeImageDefaultSource = "images\\Pokemons_restore_default\\" + pokeList.get(listController).getName() + ".png";
 		showPokeImage();
@@ -409,13 +414,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * 
 	 * @param current Current Pokemon reference.
 	 */
-	private void showTypes(Pokemon current) {
-		ScrollPaneGenerator.scrollablePanelForTypes(current.getTypes(), typeContainer);
+	public void showTypes() {
+		ScrollPaneGenerator.scrollablePanelForTypes(pokeList.get(listController).getTypes(), typeContainer);
 		typeContainer.repaint();
-		for (PokeType type : current.getTypes()) {
-			System.out.println(type);
-		}
-		System.out.println();
+		typeContainer.setVisible(false);
+		typeContainer.setVisible(true);
 	}
 
 	/**
@@ -430,7 +433,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private void showGrayBox(Pokemon current) {
 
 		int[] baseAtt = current.getBaseAtt();
-
 		ps.setValue(baseAtt[0]);
 		att.setValue(baseAtt[1]);
 		def.setValue(baseAtt[2]);
@@ -551,9 +553,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// Setting BLUE-BOX
 		prop_categoryV.setEditable(true);
 		prop_heightV.setEditable(true);
+		doubleFields.add(prop_heightV);
 		prop_sexV.setEditable(true);
 		prop_skillV.setEditable(true);
 		prop_weightV.setEditable(true);
+		doubleFields.add(prop_weightV);
 		currentName.setEditable(true);
 		currentNumber.setEditable(true);
 		changeTypes.setVisible(true);
@@ -599,6 +603,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	private void setReadyToShow() {
 		// Setting JMenuBar
+		mEdit_on.setEnabled(true);
 		mEdit_save.setEnabled(false);
 		mEdit_discard.setEnabled(false);
 		mNew_save.setEnabled(false);
@@ -637,12 +642,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		showPokemon(); // reset fields with current pokemon info
 		isEditOn = false; // used to limit user interaction
 		changeTypes.setVisible(false);
-		for (JTextField jTextField : strFields)
-			verifyStrFields(jTextField);
+		verifyStrFields();
 		for (JTextField jTextField : attIntputList)
 			jTextField.setBackground(new Color(139, 139, 139));
-		verifyDoubleFields(prop_weightV);
-		verifyDoubleFields(prop_heightV);
+		verifyDoubleFields();
 		verifyCurrentName();
 		verifyCurrentNumber();
 		verifyDescription();
@@ -838,6 +841,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	/**
 	 * Logic of main buttons.
 	 */
+	@SuppressWarnings("unchecked")
 	public void mouseClicked(MouseEvent e) {
 		if (e.getSource() == leftButtonFormer1 || e.getSource() == leftButtonFormer2) {
 			// leftButton
@@ -867,7 +871,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			String msg = "You are about to change " + pokeList.get(listController).getName() + "s image.";
 			int n = JOptionPane.showConfirmDialog(null, msg, "Pokemon image selector", JOptionPane.OK_CANCEL_OPTION);
 			if (n == 0) {
-				System.out.println("Bien 1");
 				File newFile = choseFileFrom();
 				if (newFile != null) {
 					setCurrentImage(newFile);
@@ -913,6 +916,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				}
 			}
 		} else if (e.getSource() == changeTypes) {
+			backupTypeList = (ArrayList<PokeType>) pokeList.get(listController).getTypes().clone();
 			new SelectTypes(typeList, pokeList.get(listController).getTypes(), this);
 		}
 	}
@@ -1000,14 +1004,51 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		} else if (e.getSource() == mEdit_on) { // Edit -> on
 			if (!isEditOn)
 				setReadyToEdit();
-			else
+			else {
+				pokeList.get(listController).setTypes(backupTypeList);
+				JOptionPane.showMessageDialog(null, "Changes discared");
 				setReadyToShow();
+			}
 		} else if (e.getSource() == mEdit_save) { // Edit -> save
-			System.out.println(verifyAllFields());
+			if (!verifyAllFields()) {
+				JOptionPane.showMessageDialog(null, "You must fill all fields correctly.", "Warning",
+						JOptionPane.WARNING_MESSAGE);
+			} else {
+				updatePokemon();
+				pokeDAO.updatePokemon(pokeList.get(listController));
+				setReadyToShow();
+			}
 		} else if (e.getSource() == mEdit_discard) { // Edit -> discard
+			pokeList.get(listController).setTypes(backupTypeList);
 			setReadyToShow();
 			JOptionPane.showMessageDialog(null, "Changes discared");
 		}
+	}
+
+	private void updatePokemon() {
+		Pokemon current = pokeList.get(listController);
+		if (!current.getName().equals(currentName.getText())) {
+			updatePokemonMedia(current.getName(), StringUtils.normalizarString(currentName.getText()));
+			current.setName(currentName.getText());
+		}
+		current.setNumber(Integer.parseInt(currentNumber.getText()));
+		current.setDescription(description.getText());
+		current.setSkill(prop_skillV.getText());
+		current.setCategory(prop_categoryV.getText());
+		current.setHeight(Double.parseDouble(prop_heightV.getText()));
+		current.setWeight(Double.parseDouble(prop_weightV.getText()));
+		current.setSex(prop_sexV.getText());
+		int[] baseAtt = new int[6];
+		for (int i = 0; i < baseAtt.length; i++)
+			baseAtt[i] = Integer.parseInt(attIntputList.get(i).getText());
+		current.setBaseAtt(baseAtt);
+		backupTypeList = current.getTypes();
+	}
+
+	private void updatePokemonMedia(String oldName, String newName) {
+		File oldFile = new File("images\\Pokemons\\" + oldName + ".png");
+		File newFile = new File("images\\Pokemons\\" + newName + ".png");
+		oldFile.renameTo(newFile);
 	}
 
 	// TODO KeyEvents
@@ -1016,15 +1057,15 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	public void keyReleased(KeyEvent e) {
 		if (attIntputList.contains(e.getSource())) {
-			verifyAttFields((JTextField) e.getSource());
+			verifyAttFields();
 		} else if (e.getSource() == prop_heightV || e.getSource() == prop_weightV) {
-			verifyDoubleFields((JTextField) e.getSource());
+			verifyDoubleFields();
 		} else if (e.getSource() == currentNumber) {
 			verifyCurrentNumber();
 		} else if (e.getSource() == description) {
 			verifyDescription();
 		} else if (strFields.contains(e.getSource())) {
-			verifyStrFields((JTextField) e.getSource());
+			verifyStrFields();
 		} else if (e.getSource() == currentName) {
 			verifyCurrentName();
 		}
@@ -1038,6 +1079,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * @returns false If any field is not stored in readyFields
 	 */
 	public boolean verifyAllFields() {
+		verifyAttFields();
+		verifyCurrentName();
+		verifyCurrentNumber();
+		verifyStrFields();
 		if (!readyFields.contains(currentName))
 			return false;
 		if (!readyFields.contains(currentNumber))
@@ -1046,9 +1091,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			return false;
 		if (!readyFields.containsAll(strFields))
 			return false;
-		if (!readyFields.contains(prop_heightV))
+		if (!readyFields.containsAll(doubleFields))
 			return false;
-		if (!readyFields.contains(prop_weightV))
+		if (!isDescriptionReady)
 			return false;
 		return true;
 	}
@@ -1059,23 +1104,25 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * 
 	 * @param e
 	 */
-	private void verifyAttFields(JTextField source) {
-		boolean isValid = StringUtils.checkInt(source.getText());
-		if (!isValid) {
-			source.setBackground(new Color(202, 129, 129));
-			readyFields.remove(source);
-		} else {
-			int newInt = Integer.parseInt(source.getText());
-			if (newInt < 1) {
-				newInt = 1;
-				source.setText(Integer.toString(newInt));
-			} else if (newInt > 15) {
-				newInt = 15;
-				source.setText(Integer.toString(newInt));
+	private void verifyAttFields() {
+		for (JTextField source : attIntputList) {
+			boolean isValid = StringUtils.checkInt(source.getText());
+			if (!isValid) {
+				source.setBackground(new Color(202, 129, 129));
+				readyFields.remove(source);
+			} else {
+				int newInt = Integer.parseInt(source.getText());
+				if (newInt < 1) {
+					newInt = 1;
+					source.setText(Integer.toString(newInt));
+				} else if (newInt > 15) {
+					newInt = 15;
+					source.setText(Integer.toString(newInt));
+				}
+				source.setBackground(new Color(139, 139, 139));
+				if (!readyFields.contains(source))
+					readyFields.add(source);
 			}
-			source.setBackground(new Color(139, 139, 139));
-			if (!readyFields.contains(source))
-				readyFields.add(source);
 		}
 	}
 
@@ -1086,21 +1133,23 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * 
 	 * @param e Height or Weight.
 	 */
-	private void verifyDoubleFields(JTextField source) {
-		if (!source.getText().trim().isBlank()) {
-			source.setBackground(new Color(48, 167, 215));
-			boolean isValid = StringUtils.checkDouble(source.getText());
-			if (!isValid) {
-				source.setForeground(Color.red);
-				readyFields.remove(source);
+	private void verifyDoubleFields() {
+		for (JTextField source : doubleFields) {
+			if (!source.getText().trim().isBlank()) {
+				source.setBackground(new Color(48, 167, 215));
+				boolean isValid = StringUtils.checkDouble(source.getText());
+				if (!isValid) {
+					source.setForeground(Color.red);
+					readyFields.remove(source);
+				} else {
+					source.setForeground(new Color(77, 77, 77));
+					if (!readyFields.contains(source))
+						readyFields.add(source);
+				}
 			} else {
-				source.setForeground(new Color(77, 77, 77));
-				if (!readyFields.contains(source))
-					readyFields.add(source);
+				readyFields.remove(source);
+				source.setBackground(new Color(202, 129, 129));
 			}
-		} else {
-			readyFields.remove(source);
-			source.setBackground(new Color(202, 129, 129));
 		}
 	}
 
@@ -1122,6 +1171,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			}
 		} else {
 			currentNumber.setBackground(new Color(202, 129, 129));
+			readyFields.remove(currentNumber);
 		}
 	}
 
@@ -1132,24 +1182,50 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * It warns the user to fulfill rules.
 	 */
 	private void verifyDescription() {
+		description.setText(containsQuotes(description.getText()));
+
 		int length = description.getText().trim().length();
 		System.out.println(length);
 		if (length < 30) {
-			if (length <= 1) {
+			if (description.getText().isBlank()) {
 				description.setBackground(new Color(202, 129, 129));
 			} else {
 				description.setBackground(Color.white);
 			}
 			description.setForeground(Color.red);
 			isDescriptionReady = false;
-			System.out.println(isDescriptionReady);
 			descRules.setVisible(true);
+		} else if (length > 200) {
+			description.setBackground(new Color(202, 129, 129));
+			description.setText(description.getText().substring(0, 200));
 		} else {
 			description.setBackground(Color.white);
 			description.setForeground(Color.black);
 			isDescriptionReady = true;
 			descRules.setVisible(false);
 		}
+
+	}
+
+	private String containsQuotes(String strToCheck) {
+		boolean isValid = true;
+		do {
+			for (int i = 0; i < strToCheck.length(); i++) {
+				isValid = true;
+				if (strToCheck.charAt(i) == '\'') {
+					if(strToCheck.length() < 2) 
+						strToCheck = "";
+					else {
+						String left = strToCheck.substring(0, i);
+						String right = strToCheck.substring(i + 1, strToCheck.length());
+						strToCheck = left + right;
+						isValid = false;
+					}
+					break;
+				}
+			}
+		} while (!isValid);
+		return strToCheck;
 	}
 
 	/**
@@ -1158,16 +1234,17 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * 
 	 * @param e any of "strFields" list textField.
 	 */
-	private void verifyStrFields(JTextField source) {
-
-		if (source.getText().trim().isBlank()) {
-			source.setBackground(new Color(202, 129, 129));
-			readyFields.remove(source);
-		} else {
-			if (!readyFields.contains(source)) {
-				readyFields.add(source);
+	private void verifyStrFields() {
+		for (JTextField source : strFields) {
+			source.setText(containsQuotes(source.getText()));
+			if (source.getText().trim().isBlank()) {
+				source.setBackground(new Color(202, 129, 129));
+				readyFields.remove(source);
+			} else {
+				source.setBackground(new Color(48, 167, 215));
+				if (!readyFields.contains(source))
+					readyFields.add(source);
 			}
-			source.setBackground(new Color(48, 167, 215));
 		}
 	}
 
@@ -1176,6 +1253,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * field.
 	 */
 	private void verifyCurrentName() {
+		currentName.setText(containsQuotes(currentName.getText()));
 		if (currentName.getText().trim().isBlank()) {
 			currentName.setBackground(new Color(202, 129, 129));
 			readyFields.remove(currentName);
@@ -1529,8 +1607,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		changeTypes.addMouseListener(this);
 		changeTypes.setVisible(false);
 		// GRAY-BOX ---------------------------------------------------------
-		attIntputList = new ArrayList<JTextField>();
-
 		lbl_ps = new JLabel("PS");
 		lbl_ps.setBounds(130, 385, 50, 20);
 		lbl_ps.setFont(new Font("Flexo-Light", Font.BOLD, 11));
@@ -1747,7 +1823,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		background.setBounds(-5, -13, 953, 659);
 		contentPane.add(background);
 
-		showPokemon(); // Show first Pokemon (avoid blank default state)
+//		showPokemon(); // Show first Pokemon (avoid blank default state)
 	}
 
 	// Unused Overridden methods

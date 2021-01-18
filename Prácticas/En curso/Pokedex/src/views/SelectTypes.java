@@ -131,7 +131,7 @@ public class SelectTypes extends JFrame implements MouseListener, ActionListener
 						JOptionPane.WARNING_MESSAGE);
 			else {
 				updatePokemonTypes();
-				parent.showPokemon();
+				parent.showTypes();
 				dispose();
 			}
 		}

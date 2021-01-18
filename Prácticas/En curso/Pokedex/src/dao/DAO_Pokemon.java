@@ -42,9 +42,19 @@ public class DAO_Pokemon extends AbstractDAO {
 		return null;
 	}
 
-	public void updatePokemon(int idP, String name, int number, String description, String skill, String category, double height,
-			double weight, String sex, ArrayList<PokeType> types, int[] baseAtt) {
+	public void updatePokemon(Pokemon pokemonToUpdate) {
 		
+		int idP = pokemonToUpdate.getIdP();
+		String name = pokemonToUpdate.getName();
+		int number = pokemonToUpdate.getNumber();
+		String description = pokemonToUpdate.getDescription();
+		String skill = pokemonToUpdate.getSkill();
+		String category = pokemonToUpdate.getCategory();
+		double height = pokemonToUpdate.getHeight();
+		double weight = pokemonToUpdate.getWeight();
+		String sex = pokemonToUpdate.getSex();
+		ArrayList<PokeType> types = pokemonToUpdate.getTypes();
+		int[] baseAtt = pokemonToUpdate.getBaseAtt();
 		PreparedStatement stmt;
 		
     	String strBaseAtt = ""; // '2/1/2/1/4/5'
@@ -52,20 +62,20 @@ public class DAO_Pokemon extends AbstractDAO {
     		strBaseAtt += baseAtt[i];
     		if(i != baseAtt.length - 1)
     			strBaseAtt += "/";
-		}    	
+		}
     	
     	String sql = "UPDATE `pokedb`.`pokemon` "
     			+ "SET "
-    			+ "`idpoke` = " + idP + ", "
-    			+ "`Name` = " + name + ", "
+    			+ "`Name` = '" + name + "', "
     			+ "`Number` = " + number + ", "
-    			+ "`Description` = " + description + ", "
-    			+ "`Skill` = " + skill + ", "
-    			+ "`Category` = " + category + ", "
-    			+ "`Height` = " + height +", "
+    			+ "`Description` = '" + description + "', "
+    			+ "`Skill` = '" + skill + "', "
+    			+ "`Category` = '" + category + "', "
+    			+ "`Height` = " + height + ", "
     			+ "`Weight` = " + weight + ", "
-    			+ "`Sex` = " + sex + ", "
-    			+ "`BaseAttributes` = " + strBaseAtt + ";";
+    			+ "`Sex` = '" + sex + "', "
+    			+ "`BaseAttributes` = '" + strBaseAtt + "' "
+				+ "WHERE idpoke = " + idP + ";";
     	
     	try {
 			stmt = conn.prepareStatement(sql);
@@ -83,9 +93,10 @@ public class DAO_Pokemon extends AbstractDAO {
     	for (PokeType type : types) {
     		sql3 = "INSERT INTO `pokedb`.`poketype` (`idpoke`,`idtype`) VALUES (" + idP + ", " + type.getIdT() + ");";
     		try {
-				stmt = conn.prepareStatement(sql2);
+				stmt = conn.prepareStatement(sql3);
 				stmt.executeUpdate();
 			} catch (SQLException e) {}
+    		System.out.println(type.getName());
 		}    	
     }
 }

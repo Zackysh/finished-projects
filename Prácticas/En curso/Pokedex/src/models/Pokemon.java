@@ -90,6 +90,50 @@ public class Pokemon {
 	public ArrayList<PokeType> getTypes() {
 		return types;
 	}
+	
+	public void setIdP(int idP) {
+		this.idP = idP;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setNumber(int number) {
+		this.number = number;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setSkill(String skill) {
+		this.skill = skill;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public void setHeight(double height) {
+		this.height = height;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	public void setTypes(ArrayList<PokeType> types) {
+		this.types = types;
+	}
+
+	public void setBaseAtt(int[] baseAtt) {
+		this.baseAtt = baseAtt;
+	}
 
 	@Override
 	public String toString() {
