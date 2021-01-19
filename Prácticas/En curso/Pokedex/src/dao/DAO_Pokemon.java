@@ -63,6 +63,7 @@ public class DAO_Pokemon extends AbstractDAO {
     		if(i != baseAtt.length - 1)
     			strBaseAtt += "/";
 		}
+    	System.out.println(strBaseAtt);
     	
     	String sql = "UPDATE `pokedb`.`pokemon` "
     			+ "SET "

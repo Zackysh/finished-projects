@@ -7,7 +7,6 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.TextField;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
@@ -101,6 +99,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JMenuItem mEdit_on, mEdit_save, mEdit_discard;
 	// MENU_CONTROLLERS ----------------------
 	private boolean isEditOn; // limit user interaction when its on
+	private boolean isPokeImageEdited;
 	// WELCOME-ANIMATION components ----------
 	private JButton welcomeMessage;
 	private Timer welcomeTimer;
@@ -181,6 +180,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private List<JTextField> doubleFields;
 	private JLabel descRules;
 	private boolean isDescriptionReady;
+	private Pokemon newPokemon;
 	// Sound Control
 	private boolean isSoundEnable = true;
 	Timer soundTimer;
@@ -298,11 +298,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 
 					// We obtain appropriate pokeType from typeList according
 					// to types stored in ResultSet
-					for (PokeType pokeType : typeList) {
+					for (PokeType type : typeList) {
 
-						if (pokeType.getName().equals(rsTypes.getString("name"))) {
+						if (type.getName().equals(rsTypes.getString("name"))) {
 
-							types.add(pokeType);
+							types.add(type);
 
 						}
 
@@ -639,7 +639,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		sdefI.setVisible(false);
 		speedI.setVisible(false);
 		// Set isEditOn false
+		isPokeImageEdited = false;
 		showPokemon(); // reset fields with current pokemon info
+		
 		isEditOn = false; // used to limit user interaction
 		changeTypes.setVisible(false);
 		verifyStrFields();
@@ -652,20 +654,20 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	private void emptyFields() {
-		prop_categoryV.setText("...");
-		prop_heightV.setText("...");
-		prop_sexV.setText("...");
-		prop_skillV.setText("...");
-		prop_weightV.setText("...");
-		description.setText("...");
-		currentName.setText("...");
-		currentNumber.setText("...");
-		ps.setValue(0);
-		att.setValue(0);
-		satt.setValue(0);
-		def.setValue(0);
-		sdef.setValue(0);
-		speed.setValue(0);
+		prop_categoryV.setText("Category");
+		prop_heightV.setText("Height");
+		prop_sexV.setText("Sex");
+		prop_skillV.setText("Skill");
+		prop_weightV.setText("Weight");
+		description.setText("Description here, must be > 30 character lenght.");
+		currentName.setText("Name");
+		currentNumber.setText("Number");
+		ps.setValue(3);
+		att.setValue(3);
+		satt.setValue(3);
+		def.setValue(3);
+		sdef.setValue(3);
+		speed.setValue(3);
 		pokeImage.setIcon(MediaFormer.getImageIconFitLabel(pokeImage, "images\\Other\\clip.png"));
 	}
 
@@ -719,9 +721,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		dest = new File(pokeImageSource);
 		try {
 			MediaFormer.copyFile(origin, dest);
-		} catch (IOException e1) {
-		}
+		} catch (IOException e1) {}
 		origin.delete();
+		
 	}
 
 	/**
@@ -874,6 +876,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				File newFile = choseFileFrom();
 				if (newFile != null) {
 					setCurrentImage(newFile);
+					System.out.println("Has been edited");
+					isPokeImageEdited = true;
 					showPokeImage();
 				}
 			}
@@ -989,6 +993,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			welcomeTimerTwo.stop();
 			// JMenuItems unique behavior ------------------------------------
 		} else if (e.getSource() == mNew_new) { // New -> new
+			
 			emptyFields();
 			setReadyToEdit();
 			mEdit_on.setEnabled(false);
@@ -997,10 +1002,57 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			mEdit_discard.setEnabled(false);
 			mNew_save.setEnabled(true);
 			mNew_discard.setEnabled(true);
+			restore.setVisible(false);
+			ArrayList<PokeType> newPokemonTypes = new ArrayList<PokeType>();
+			for (PokeType type : typeList) {
+				if(type.getName().equals("Normal")) // TODO imagen del nuevo tipo se inserta en el último o primero en la lista
+					newPokemonTypes.add(type);
+			}
+			newPokemon = new Pokemon(pokeList.size(), "NewPokemon", 0, "", "", "", 0, 0, "", newPokemonTypes, new int[6]);
+			pokeList.add(newPokemon);
+			listController = pokeList.size() - 1;
+			pokeImageSource = "images\\Pokemons\\" + pokeList.get(listController).getName() + ".png";
+			pokeImageDefaultSource = "images\\Pokemons_restore_default\\" + pokeList.get(listController).getName() + ".png";
+			showTypes();
+			
 		} else if (e.getSource() == mNew_save) { // New -> save
-
+			verifyAllFields();
+			verifyDescription();
+			verifyPokeImage();
+			verifyDoubleFields();
+			if (!verifyAllFields()) {
+				JOptionPane.showMessageDialog(null, "You must fill all fields correctly.", "Warning",
+						JOptionPane.WARNING_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(null, "All ok.", "Warning",
+						JOptionPane.DEFAULT_OPTION);
+				updatePokemon();
+				pokeImageSource = "images\\Pokemons\\" + pokeList.get(listController).getName() + ".png";
+				pokeImageDefaultSource = "images\\Pokemons_restore_default\\" + pokeList.get(listController).getName() + ".png";
+				File dest = new File(pokeImageSource);
+				File dest2 = new File(pokeImageDefaultSource);
+				File origin;
+				if(!isPokeImageEdited) {
+					origin = new File("images\\Other\\unknown.png");
+				} else {
+					System.out.println(pokeImageSource);
+					origin = new File(pokeImageSource);
+				}
+				try {
+					MediaFormer.copyFile(origin, dest);
+					MediaFormer.copyFile(origin, dest2);
+				} catch (IOException e1) {}
+				
+				File toDelete = new File("images\\Pokemons\\NewPokemon.png");
+				toDelete.delete();
+				setReadyToShow();
+			}
 		} else if (e.getSource() == mNew_discard) { // New -> discard
+			listController--;
+			pokeList.remove(newPokemon);
 			setReadyToShow();
+			File toDelete = new File("images\\Pokemons\\NewPokemon.png");
+			toDelete.delete();
 		} else if (e.getSource() == mEdit_on) { // Edit -> on
 			if (!isEditOn)
 				setReadyToEdit();
@@ -1025,6 +1077,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		}
 	}
 
+	private boolean verifyPokeImage() {
+		
+		return false;
+	}
+	
 	private void updatePokemon() {
 		Pokemon current = pokeList.get(listController);
 		if (!current.getName().equals(currentName.getText())) {
@@ -1050,12 +1107,15 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		File newFile = new File("images\\Pokemons\\" + newName + ".png");
 		oldFile.renameTo(newFile);
 	}
-
+	
 	// TODO KeyEvents
 	/**
 	 * KeyRealeased controls field verification.
 	 */
 	public void keyReleased(KeyEvent e) {
+		int code = e.getKeyCode();
+		if(code != KeyEvent.VK_RIGHT && code != KeyEvent.VK_LEFT && code != KeyEvent.VK_UP && code != KeyEvent.VK_DOWN && code != KeyEvent.VK_CAPS_LOCK
+				&& code != KeyEvent.SHIFT_DOWN_MASK && code != KeyEvent.VK_SHIFT)
 		if (attIntputList.contains(e.getSource())) {
 			verifyAttFields();
 		} else if (e.getSource() == prop_heightV || e.getSource() == prop_weightV) {
@@ -1185,7 +1245,6 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		description.setText(containsQuotes(description.getText()));
 
 		int length = description.getText().trim().length();
-		System.out.println(length);
 		if (length < 30) {
 			if (description.getText().isBlank()) {
 				description.setBackground(new Color(202, 129, 129));
@@ -1212,16 +1271,19 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		do {
 			for (int i = 0; i < strToCheck.length(); i++) {
 				isValid = true;
-				if (strToCheck.charAt(i) == '\'') {
-					if(strToCheck.length() < 2) 
-						strToCheck = "";
-					else {
-						String left = strToCheck.substring(0, i);
-						String right = strToCheck.substring(i + 1, strToCheck.length());
-						strToCheck = left + right;
-						isValid = false;
+				char[] avoid = {'!','\'','"','^','`','`','¨','\\','¿','¡','?','%','$'};
+				for (int j = 0; j < avoid.length; j++) {
+					if (strToCheck.charAt(i) == avoid[j]) {
+						if (strToCheck.length() < 2)
+							strToCheck = "";
+						else {
+							String left = strToCheck.substring(0, i);
+							String right = strToCheck.substring(i + 1, strToCheck.length());
+							strToCheck = left + right;
+							isValid = false;
+						}
+						break;
 					}
-					break;
 				}
 			}
 		} while (!isValid);
@@ -1822,7 +1884,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		background = new JLabel(new ImageIcon("images\\Background\\pokedexBackground.png"));
 		background.setBounds(-5, -13, 953, 659);
 		contentPane.add(background);
-
+		
 //		showPokemon(); // Show first Pokemon (avoid blank default state)
 	}
 
