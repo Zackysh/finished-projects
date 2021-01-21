@@ -2,7 +2,6 @@ package utils;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -17,25 +16,50 @@ import javax.swing.plaf.metal.MetalButtonUI;
 import models.PokeType;
 
 /**
- * TODO
- * @author adrig
+ * The objective of this class is to generate content sub-panels with different
+ * purposes. For now only one. The generation of these panels will be static and
+ * will be carried out within the panel that is passed as a parameter in the
+ * methods.
+ * 
+ * @author AdriGB
  *
  */
 public class ScrollPaneGenerator {
 	
-	public static void scrollablePanelForTypes(ArrayList<PokeType> list, JPanel pane) {
+	/**
+	 * This method makes use of createTypesPanel. It just add returned JPanel
+	 * to an JScrollPane to complete its behavior correctly.
+	 * 
+	 * With this JScrollPane is possible to display a ton of labels horizontally
+	 * in a smart way.
+	 * 
+	 * @param list list to display
+	 * @param pane pane in which JScrollPane will be embedded
+	 */
+	public static void scrollableTypesPanel(ArrayList<PokeType> list, JPanel pane) {
 		
-		JPanel typeContainer = createPanel(list);
+		JPanel typeContainer = createTypesPanel(list);
 		JScrollPane scroll = new JScrollPane();
 		
-		scroll.setPreferredSize(new Dimension(400, 56));
+		scroll.setPreferredSize(new Dimension(pane.getWidth(), pane.getHeight()));
 		scroll.getViewport().add(typeContainer);
-		scroll.setLocation(102, 200);
 		pane.removeAll();
 		pane.add(scroll);
 	}
-
-	public static JPanel createPanel(ArrayList<PokeType> typeArr) {
+	
+	/**
+	 * This method fills and return a JPanel with given ArrayList<PokeType>.
+	 * A GridLayout will be used. JButtons will be inserted on the JPanel one by one
+	 * (which will act as JLabel). These will contain the name and color of the type
+	 * that corresponds to it.
+	 * GridLayout offers an Dynamic adaptation of its content.
+	 * If there're more than 7 JButtons inside, there will be neccesary a JScrollPane
+	 * that's why this pane is added to a JScrollPane at scrollableTypesPanel().
+	 * 
+	 * @param typeArr types to display as labels
+	 * @return panel with desired labels
+	 */
+	private static JPanel createTypesPanel(ArrayList<PokeType> typeArr) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout());
 		for (PokeType type : typeArr) {

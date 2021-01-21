@@ -1,8 +1,6 @@
 package utils;
 
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -23,6 +21,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/**
+ * The purpose of this class is to provide useful methods to manage files from
+ * front end with Java Swing applications.
+ * 
+ * @author AdriGB
+ *
+ */
 public class MediaFormer {
 
 	/**
@@ -44,41 +49,12 @@ public class MediaFormer {
 		return imageIcon;
 	}
 	
-	public static Image getScaledImage(Image srcImg, int w, int h){
-	    BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-	    Graphics2D g2 = resizedImg.createGraphics();
-
-	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-	    g2.drawImage(srcImg, 0, 0, w, h, null);
-	    g2.dispose();
-
-	    return resizedImg;
-	}
-
-	public static ImageIcon getImageIconFitLabelURL(JLabel label, String url) {
-
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(new URL(url));
-		} catch (MalformedURLException e) {
-			System.err
-					.println("URL error with image: line " + Thread.currentThread().getStackTrace()[2].getLineNumber());
-		} catch (IOException e) {
-			System.err
-					.println("URL error with image: line " + Thread.currentThread().getStackTrace()[2].getLineNumber());
-		}
-
-		Image redimensionedImg = image.getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
-		ImageIcon imageIcon = new ImageIcon(redimensionedImg);
-		return imageIcon;
-	}
-
-	public static ImageIcon getImageIconFitLabelImage(JLabel label, Image image) {
-		Image redimensionedImg = image.getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
-		ImageIcon imageIcon = new ImageIcon(redimensionedImg);
-		return imageIcon;
-	}
-
+	/**
+	 * Given an image URL, downloads it to the destination file.
+	 * 
+	 * @param url image URL
+	 * @param dest destination file
+	 */
 	public static void downloadToFile(String url, File dest) {
 		URL urlU = null;
 		try {
@@ -90,6 +66,13 @@ public class MediaFormer {
 		}
 	}
 
+	/**
+	 * Method that checks if given URL leads to an image.
+	 * 
+	 * @param url given URL
+	 * @returns true if it leads to an image
+	 * @returns false it don't lead to an image
+	 */
 	public static Boolean testImage(String url) {
 		try {
 			BufferedImage image = ImageIO.read(new URL(url));
@@ -98,11 +81,10 @@ public class MediaFormer {
 			else
 				return false;
 		} catch (MalformedURLException e) {
-			System.err
-					.println("URL error with image: line " + Thread.currentThread().getStackTrace()[2].getLineNumber());
+			e.fillInStackTrace();
 			return false;
 		} catch (IOException e) {
-			System.err.println("IO error with image");
+			e.fillInStackTrace();
 			return false;
 		}
 	}
@@ -124,7 +106,6 @@ public class MediaFormer {
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("Images", extensions);
 			fc.setFileFilter(filter);
 			int returnVal = fc.showOpenDialog(null);
-
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File origin = fc.getSelectedFile(); // Selected origin file
 				return origin;

@@ -127,8 +127,9 @@ public class Pokemon {
 		this.sex = sex;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setTypes(ArrayList<PokeType> types) {
-		this.types = types;
+		this.types = (ArrayList<PokeType>) types.clone();
 	}
 
 	public void setBaseAtt(int[] baseAtt) {

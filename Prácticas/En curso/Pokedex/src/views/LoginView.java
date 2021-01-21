@@ -47,23 +47,17 @@ import utils.TextPrompt;
 public class LoginView extends JFrame implements ActionListener, MouseListener {
 		
 	private static final long serialVersionUID = 1L;
-
 	private JPanel contentPane;
-	
 	private JLabel background;
 	private JLabel lbl_PokeLogin;
 	private JLabel lbl_PokeRegister;
-
 	private JTextField tF_Username;
 	private TextPrompt tP_Username;
 	private JPasswordField pF_Password;
 	private TextPrompt tP_Password;
-
 	private JButton jB_Register;
 	private JButton jB_Login;
-	
 	private DAO_Login ld;
-	
 
 	/**
 	 * Constructor of this view, it just call initialize().
@@ -81,13 +75,10 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 	 * Method that "launch" the frame and its components.
 	 */
 	private void initialize() {
-		
 		importFonts();
-
 		// Pane initialization
 		contentPane = new JPanel();
 		contentPane.setLayout(null);
-		
 		// Frame initialization
 		setTitle("Pokedex Login");
 		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\Other\\icon.png"));
@@ -97,8 +88,6 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setContentPane(contentPane);
 		initializeUIComponentes();
-		
-
 	}
 
 	/**
@@ -125,7 +114,6 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 	 *  - Labels.	
 	 */
 	public void initializeUIComponentes() {
-
 		// FIELDS ---------------------------------------------------------------------
 		// Username textField
 		tF_Username = new JTextField();
@@ -137,7 +125,7 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 		tF_Username
 				.setBorder(new CompoundBorder(new LineBorder(new Color(171, 173, 179)), new EmptyBorder(5, 10, 5, 5)));
 		getContentPane().add(tF_Username);
-		// Username Prompt
+		// User name Prompt
 		tP_Username = new TextPrompt("Username", tF_Username);
 		tP_Username.setFont(new Font("Flexo-Regular", WIDTH, 18));
 		tP_Username.setHorizontalAlignment(SwingConstants.LEADING);
@@ -163,7 +151,6 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 		tP_Password.changeAlpha(0.75f);
 		tP_Password.setForeground(new Color(150, 0, 0, 180));
 		tP_Password.changeStyle(Font.ITALIC);
-		
 		// BUTTONS -----------------------------------------------------------------------
 		// Login
 		jB_Register = new JButton("SIGN UP");
@@ -187,7 +174,6 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 		jB_Login.addActionListener(this); // ActionListener
 		jB_Login.addMouseListener(this); // MouseListener
 		contentPane.add(jB_Login);
-		
 		// LABELS ------------------------------------------------------------------------
 		// lbl_PokeLogin
 		lbl_PokeLogin = new JLabel();
@@ -199,24 +185,18 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 		lbl_PokeRegister.setBounds(81, 320, 117, 107);
 		lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\pokeButton_1.png"));
 		contentPane.add(lbl_PokeRegister);
-		
 		// Set JLabel as background to the contentPane
 		// It must be done the latter, otherwise it would be proposed and cover other elements
 		background = new JLabel(new ImageIcon("images\\Background\\loginBackground.png"));
 		background.setBounds(-10, -13, 440, 540);
 		contentPane.add(background);
 	}
-
-
-
+	
 	// Event Handler methods
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
 		UIManager.put("OptionPane.messageFont", new Font("Flexo-Regular", Font.BOLD, 14));
-		
-		if(e.getSource() == jB_Login) {
-			
+		if(e.getSource() == jB_Login) {			
 			if(tF_Username.getText().isBlank() || String.valueOf(pF_Password.getPassword()).isBlank())				
 				JOptionPane.showMessageDialog(null, "Please, dont leave empty fields.", getTitle(), JOptionPane.INFORMATION_MESSAGE);			
 			else if(ld.login(tF_Username.getText(), String.valueOf(pF_Password.getPassword()))) { // If successful login				
@@ -229,15 +209,15 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 				else
 					JOptionPane.showMessageDialog(null, "Wrong password.", getTitle(), JOptionPane.WARNING_MESSAGE);
 			}
-			
 		} else if(e.getSource() == jB_Register) {
-			
 			this.setVisible(false);
 			new SignupView(this);
-			
 		}
 	}
-
+	
+	/**
+	 * Mouse entered/exited are user to get a roll-over effect.
+	 */
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		if (e.getSource() == jB_Register)
@@ -255,27 +235,9 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 			lbl_PokeRegister.setIcon(MediaFormer.getImageIconFitLabel(lbl_PokeRegister, "images\\Buttons\\\\pokeButton_1.png"));
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-	
-	public void main(String[] args) {
-		
-	}
-	
-	
+	// Unused overridden methods
+	public void mouseClicked(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
+	public void main(String[] args) {}
 }

@@ -11,7 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
 public class FancyProgressBar extends BasicProgressBarUI {
-
+	// no lo comento porque no es mía :p
         @Override
         protected Dimension getPreferredInnerVertical() {
             return new Dimension(20, 146);

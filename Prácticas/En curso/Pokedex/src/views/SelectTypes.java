@@ -24,26 +24,37 @@ import javax.swing.JPanel;
 import models.PokeType;
 import utils.MediaFormer;
 
+/**
+ * The goal of this class is to fill in or select multiple types and enter them
+ * in pokemonTypes. The ArrayList pokemonTypes will be populated with object
+ * references from availableTypes. To do this, it will use UI components and it
+ * will be the user who makes the selection.
+ * 
+ * Main Features:
+ *  - Dynamic organization of the types contained in available Types into graphic components.
+ *  - Each CheckBox is related to a type.
+ *  - ArrayList pokemonTypes will be filled with selected types.
+ * 
+ * @author AdriGB
+ *
+ */
 public class SelectTypes extends JFrame implements MouseListener, ActionListener {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-
 	private JLabel lbl_headder;
-
 	private JLabel lbl_selectAll;
 	private JButton btn_selectAll;
 	private JLabel lbl_Accept;
 	private JButton btn_Accept;
 	private JLabel lbl_Back;
 	private JButton btn_Back;
-
 	private JLabel background;
-
 	private ArrayList<JCheckBox> chTypes;
 	private ArrayList<PokeType> availableTypes;
 	private ArrayList<PokeType> pokemonTypes;
-	
-	private PokedexView parent;
+	private PokedexView parentP;
+	private SearchView parentS;
 
 	/**
 	 * Constructor of the class.
@@ -54,7 +65,7 @@ public class SelectTypes extends JFrame implements MouseListener, ActionListener
 	public SelectTypes(ArrayList<PokeType> availableTypes, ArrayList<PokeType> pokemonTypes, PokedexView parent) {
 		this.availableTypes = availableTypes;
 		this.pokemonTypes = pokemonTypes;
-		this.parent = parent;
+		this.parentP = parent;
 		Collections.sort(availableTypes);
 		initialize();
 		importFonts();
@@ -62,6 +73,23 @@ public class SelectTypes extends JFrame implements MouseListener, ActionListener
 		setVisible(true);
 	}
 
+	/**
+	 * 
+	 * @param availableTypes
+	 * @param pokemonTypes
+	 * @param parent
+	 */
+	public SelectTypes(ArrayList<PokeType> availableTypes, ArrayList<PokeType> pokemonTypes, SearchView parent) {
+		this.availableTypes = availableTypes;
+		this.pokemonTypes = pokemonTypes;
+		this.parentS = parent;
+		Collections.sort(availableTypes);
+		initialize();
+		importFonts();
+		initializeUI();
+		setVisible(true);
+	}
+	
 	/**
 	 * Import fonts from .ttf files. First a new Font is initialized, it receives an
 	 * input stream that brings desired font. Later its registered into the current
@@ -131,7 +159,10 @@ public class SelectTypes extends JFrame implements MouseListener, ActionListener
 						JOptionPane.WARNING_MESSAGE);
 			else {
 				updatePokemonTypes();
-				parent.showTypes();
+				if(parentP != null)
+					parentP.showTypes();
+				else
+					parentS.showTypes();
 				dispose();
 			}
 		}
@@ -345,12 +376,7 @@ public class SelectTypes extends JFrame implements MouseListener, ActionListener
 	}
 
 	// Unused overriden methods
-	public void mouseClicked(MouseEvent e) {
-	}
-
-	public void mousePressed(MouseEvent e) {
-	}
-
-	public void mouseReleased(MouseEvent e) {
-	}
+	public void mouseClicked(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {}
 }

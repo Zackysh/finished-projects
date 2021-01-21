@@ -3,36 +3,37 @@ package utils;
 public class StringUtils {
 
 	/**
-	 * Método que recibe un String cualquiera y lo devuelve con el siguiente
-	 * "formato": (charAt(0).toUppercase-charAt(>0):LowerCase...). Tiene en cuenta
-	 * si está vacío antes de procesar, devolverá el propio string.
+	 * Method that receives any String and returns it with the following "format":
+	 * (charAt (0) .toUppercase-charAt (> 0): LowerCase ...). Take into account if
+	 * empty before processing it will return the string itself.
 	 * 
-	 * No he encontrado ninguna librería que lo haga por mi, estoy triste.
-	 * 
-	 * @param cadena
-	 * @return temp String procesado.
+	 * @param string
+	 * @return temp Processed string.
 	 */
-	public static String normalizarString(String cadena) {
+	public static String normalizarString(String chain) {
 		String temp = "";
-		if (cadena.length() == 0)
-			return cadena;
-		if (cadena.length() == 1)
-			return cadena.toUpperCase();
-		if (cadena.length() > 1) {
-			for (int i = 0; i < cadena.length(); i++) {
+		if (chain.length() == 0)
+			return chain;
+		if (chain.length() == 1)
+			return chain.toUpperCase();
+		if (chain.length() > 1) {
+			for (int i = 0; i < chain.length(); i++) {
 				if (i == 0)
-					temp += cadena.toUpperCase().charAt(i);
+					temp += chain.toUpperCase().charAt(i);
 				else
-					temp += cadena.toLowerCase().charAt(i);
+					temp += chain.toLowerCase().charAt(i);
 			}
 		}
 		return temp;
 	}
 
-	public static void br() {
-		System.out.println();
-	}
-
+	/**
+	 * Checks if given string can be parsed to integer.
+	 * 
+	 * @param str
+	 * @returns true if its possible
+	 * @returns false if its not possible
+	 */
 	public static boolean checkInt(String str) {
 		try {
 			Integer.parseInt(str);
@@ -42,6 +43,13 @@ public class StringUtils {
 		}
 	}
 	
+	/**
+	 * Checks if given string can be parsed to double.
+	 * 
+	 * @param str
+	 * @returns true if its possible
+	 * @returns false if its not possible
+	 */
 	public static boolean checkDouble(String str) {
 		try {
 			Double.parseDouble(str);
@@ -51,6 +59,11 @@ public class StringUtils {
 		}
 	}
 
+	/**
+	 * Generate a random name.
+	 * 
+	 * @return string with a random name
+	 */
 	public static String nombreAleatorio() {
 		String[] nombres = { "Pipo", "Bowser", "GLaDOS", "The Joker", "Ganon", "Gary Oak", "Sephiroth", "Inky" };
 		return nombres[(int) (Math.random() * (nombres.length))];

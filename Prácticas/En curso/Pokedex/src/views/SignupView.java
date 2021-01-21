@@ -31,7 +31,7 @@ import utils.TextPrompt;
  * Class that extends JFrame which controls sin-up functionality of
  * this application.
  * 
- * Features added:
+ * Main Features:
  * 	- Avoid blank fields.
  *  - Clear fields button (progressive).
  *  - Repeat password system.
