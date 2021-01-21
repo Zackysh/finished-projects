@@ -483,13 +483,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				prevNumber = Integer.toString(pokeList.get(listController - 1).getNumber());
 
 				previousName.setText(prevName);
-				previousNumber.setText("N.บ" + prevNumber);
+				previousNumber.setText("N.ยบ" + prevNumber);
 			} else {
 				prevName = pokeList.get(pokeList.size() - 1).getName();
 				prevNumber = Integer.toString(pokeList.get(pokeList.size() - 1).getNumber());
 
 				previousName.setText(prevName);
-				previousNumber.setText("N.บ" + prevNumber);
+				previousNumber.setText("N.ยบ" + prevNumber);
 			}
 			// NEXT INFO
 			String nexName;
@@ -499,13 +499,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				nexNumber = Integer.toString(pokeList.get(listController + 1).getNumber());
 
 				nextName.setText(nexName);
-				nextNumber.setText("N.บ" + nexNumber);
+				nextNumber.setText("N.ยบ" + nexNumber);
 			} else {
 				nexName = pokeList.get(0).getName();
 				nexNumber = Integer.toString(pokeList.get(0).getNumber());
 
 				nextName.setText(nexName);
-				nextNumber.setText("N.บ" + nexNumber);
+				nextNumber.setText("N.ยบ" + nexNumber);
 			}
 		} else {
 			previousName.setText("");
@@ -847,7 +847,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	private void changePokeSound() {
 		File newFile = new File("Sounds\\" + pokeList.get(listController).getName() + ".wav");
-		String msg = "You are about to change current Pokemon sound\nPLEASE dont't chose tranks longer than 4-6 seconds,\n "
+		String msg = "You are about to change current Pokemon sound(.wav)\nPLEASE dont't chose tranks longer than 4-6 seconds,\n "
 				+ "this kind of tranks are not supported / this implementation only can handle short traks.";
 		Object[] msgContent = { msg };
 		// User chose upload new image via URL or via file
@@ -1678,7 +1678,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		currentName.setEditable(false);
 		currentName.addKeyListener(this);
 		// NumberSign
-		numberSign = new JLabel("Nบ.");
+		numberSign = new JLabel("Nยบ.");
 		numberSign.setBounds(500, 55, 50, 50);
 		numberSign.setFont(new Font("Flexo-Regular", WIDTH, 26));
 		numberSign.setForeground(new Color(103, 107, 107));
