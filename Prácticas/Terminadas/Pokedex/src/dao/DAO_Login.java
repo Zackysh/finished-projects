@@ -27,7 +27,6 @@ public class DAO_Login extends AbstractDAO {
 			String sql = "SELECT * FROM pokedb.user WHERE username = '" + username + "' AND password = '" + password
 					+ "'";
 			ResultSet rs = stmt.executeQuery(sql);
-
 			return rs.next();
 		} catch (SQLException ex) {
 			System.err.println(ex.getMessage());
@@ -36,6 +35,13 @@ public class DAO_Login extends AbstractDAO {
 		return false;
 	}
 	
+	/**
+	 * Method that given an user name, returns its userId.
+	 * 
+	 * @param userName
+	 * @returns userId if exist
+	 * @returns 0 if doesn't exist
+	 */
 	public int getUserId(String userName) {
 		try {
 			String sql = "SELECT idUser FROM pokedb.user WHERE userName like '" + userName + "'";

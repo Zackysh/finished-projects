@@ -114,10 +114,17 @@ public class MediaFormer {
 		return null;
 	}
 
+	/**
+	 * Method that copies origin file into dest file.
+	 * 
+	 * @param origin
+	 * @param dest
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public static void copyFile(File origin, File dest) throws FileNotFoundException, IOException {
 		try (InputStream in = new BufferedInputStream(new FileInputStream(origin));
 				OutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
-
 			byte[] buffer = new byte[1024];
 			int lengthRead;
 			while ((lengthRead = in.read(buffer)) > 0) {
@@ -125,7 +132,6 @@ public class MediaFormer {
 				out.flush();
 			}
 		}
-
 	}
 
 	/**

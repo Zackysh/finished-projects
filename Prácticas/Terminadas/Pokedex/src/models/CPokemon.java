@@ -1,5 +1,15 @@
 package models;
 
+/**
+ * This class is used to provide users their own Pokemon team. This application
+ * behave like a Pokedex, so its necessary to create specific/independent instances of each pokemon
+ * to "fill" user teams.
+ * 
+ * CPokemon = Caught Pokemon.
+ * 
+ * @author AdriGB
+ *
+ */
 public class CPokemon {
 
 	private int idCPoke;
@@ -8,6 +18,7 @@ public class CPokemon {
 	private String nickName;
 
 	/**
+	 * Constructor of the class. It just receive its attributes.
 	 * 
 	 * @param idCPoke
 	 * @param pokemon
@@ -21,6 +32,7 @@ public class CPokemon {
 		this.nickName = nickName;
 	}
 	
+	/** getters and setters */ 
 	public int getIdCPoke() {
 		return idCPoke;
 	}
@@ -50,7 +62,4 @@ public class CPokemon {
 		return "CPokemon [idCPoke=" + idCPoke + ", pokemon=" + pokemon + ", level=" + level + ", nickName=" + nickName
 				+ "]";
 	}
-	
-	
-	
 }

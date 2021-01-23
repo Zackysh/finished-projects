@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * A simple pokemon implementation, it stores necessary information to be able
- * to store the object into a Pokedex.
+ * to store Pokemons into a Pokedex.
  * 
  * @author AdriGB
  *
@@ -24,9 +24,23 @@ public class Pokemon {
 	private ArrayList<PokeType> types;
 	private int[] baseAtt;
 
+	/**
+	 * Constructor of the class, it just receives main main attributes.
+	 * 
+	 * @param idP (its not necessary at all, its independent from its id on DB and its not shown).
+	 * @param name
+	 * @param number
+	 * @param description
+	 * @param skill
+	 * @param category
+	 * @param height
+	 * @param weight
+	 * @param sex
+	 * @param types2
+	 * @param baseAtt
+	 */
 	public Pokemon(int idP, String name, int number, String description, String skill, String category, double height,
 			double weight, String sex, ArrayList<PokeType> types2, int[] baseAtt) {
-
 		this.idP = idP;
 		this.name = name;
 		this.number = number;
@@ -41,7 +55,7 @@ public class Pokemon {
 
 	}
 
-	// GETTERS AND SETTERS
+	/** GETTERS AND SETTERS */
 	public int[] getBaseAtt() {
 		return baseAtt;
 	}
@@ -81,12 +95,7 @@ public class Pokemon {
 	public String getSex() {
 		return sex;
 	}
-
-	/**
-	 * Method that returns an arrayList of PokeType objects.
-	 * 
-	 * @return types.
-	 */
+	
 	public ArrayList<PokeType> getTypes() {
 		return types;
 	}

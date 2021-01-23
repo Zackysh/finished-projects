@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 21-01-2021 a las 20:06:29
+-- Tiempo de generación: 23-01-2021 a las 21:45:54
 -- Versión del servidor: 5.7.31
 -- Versión de PHP: 7.3.21
 
@@ -20,6 +20,37 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `pokedb`
 --
+
+CREATE DATABASE pokedb;
+USE pokedb;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `cpokemon`
+--
+
+DROP TABLE IF EXISTS `cpokemon`;
+CREATE TABLE IF NOT EXISTS `cpokemon` (
+  `idCPoke` int(11) NOT NULL AUTO_INCREMENT,
+  `nickname` varchar(45) NOT NULL,
+  `level` int(11) NOT NULL,
+  `idPoke` int(11) NOT NULL,
+  `idTeam` int(11) NOT NULL,
+  PRIMARY KEY (`idCPoke`),
+  UNIQUE KEY `nickname_UNIQUE` (`nickname`),
+  KEY `idPoke_idx` (`idPoke`),
+  KEY `idTeam_idx` (`idTeam`)
+) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `cpokemon`
+--
+
+INSERT INTO `cpokemon` (`idCPoke`, `nickname`, `level`, `idPoke`, `idTeam`) VALUES
+(47, 'Rottin', 1, 9, 1),
+(74, 'Articuno', 1, 3, 5),
+(76, 'Arceus', 100, 11, 1);
 
 -- --------------------------------------------------------
 
@@ -42,21 +73,21 @@ CREATE TABLE IF NOT EXISTS `pokemon` (
   PRIMARY KEY (`idpoke`),
   UNIQUE KEY `Name_UNIQUE` (`Name`),
   UNIQUE KEY `Number_UNIQUE` (`Number`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `pokemon`
 --
 
 INSERT INTO `pokemon` (`idpoke`, `Name`, `Number`, `Description`, `Skill`, `Category`, `Height`, `Weight`, `Sex`, `BaseAttributes`) VALUES
-(2, 'Zapdos', 145, 'It has the power to control electricity at will. According to popular belief, it nests hidden in dark storm clouds.', 'Pressure', 'Electric', 1.6, 52.6, 'Unknown', '6/6/5/8/6/6'),
+(2, 'Zapdos', 145, 'It has the power to control electricity at will. According to popular belief it nests hidden in dark storm clouds.', 'Pressure', 'Electric', 1.6, 52.6, 'Unknown', '6/6/5/8/6/6'),
 (3, 'Articuno', 144, 'Its beautiful blue wings are said to be made up of ice. It flies around the snowy mountains with its long tail blowing in the wind.', 'Preasure', 'Freeze', 1.7, 55.4, 'Unknown', '6/5/6/6/8/5'),
 (4, 'Lucario', 448, 'It hunts its prey by manipulating an energy, called aura, whose power is capable of even smashing huge rocks.', 'Impassive', 'Aura', 1.2, 54, 'Male  Female', '5/7/5/7/5/6'),
 (5, 'Togetic', 176, 'They say that he appears to good-hearted people and floods them with happiness.', 'Enthusiasm', 'Happiness', 0.6, 3.2, 'Male / Female', '4/3/5/5/7/3'),
 (6, 'Ditto', 132, 'He redistributes the cells of his body to take on the appearance of what he sees, but returns to normal when he relaxes.', 'Flexibility', 'Transformation', 0.3, 4, 'Unknown', '3/3/3/3/3/3'),
 (7, 'Feebas', 222, 'Its unattractive appearance makes it not very popular, but its great pipo is of great interest to science.', 'Fast swim', 'Fish', 0.6, 7.8, 'Male  Female', '9/9/3/3/9/6'),
 (8, 'Milotic', 350, 'It is said to be the most beautiful Pokémon. It has been the source of inspiration for countless artists.', 'Special scale', 'Soft', 6.2, 162, 'Male / Female', '6/4/5/6/8/5'),
-(9, 'Rotom', 479, 'Thanks to the inventiveness of a certain young man, the manufacture of various gadgets that take advantage of Rotom\'s full potential has been started.', 'Levitation', 'Plasma', 0.3, 0.3, 'Unknown', '3/3/5/6/5/6'),
+(9, 'Rotom', 479, 'Thanks to the inventiveness of a certain young man, the manufacture of various gadgets that take advantage of Rotoms full potential has been started.', 'Levitation', 'Plasma', 0.3, 0.3, 'Unknown', '3/3/5/6/5/6'),
 (10, 'Unown', 201, 'These Pokémon are shaped like ancient characters. It is not known which came first, the old script or the different Unown. This question is still under study, but nothing has yet been found.', 'Levitation', 'Symbol', 0.5, 5, 'Unknown', '3/5/3/5/3/3'),
 (11, 'Arceus', 493, 'According to Sinnoh mythology, Arceus hatched from an egg and then created the entire world.', 'Multitype', 'Alpha', 3.2, 320, 'Unknown', '8/8/8/8/8/8'),
 (12, 'Moltres', 146, 'Its evil aura resembling a burning flame can scorch the soul of the one who touches it.', 'Anger', 'Malignancy', 2, 66, 'Unknown', '6/5/6/6/8/6');
@@ -119,6 +150,32 @@ INSERT INTO `poketype` (`idpoke`, `idtype`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `team`
+--
+
+DROP TABLE IF EXISTS `team`;
+CREATE TABLE IF NOT EXISTS `team` (
+  `idTeam` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(45) NOT NULL,
+  `idUser` int(11) NOT NULL,
+  PRIMARY KEY (`idTeam`),
+  UNIQUE KEY `Name_UNIQUE` (`Name`),
+  UNIQUE KEY `idUser_UNIQUE` (`idUser`),
+  KEY `idUser_idx` (`idUser`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `team`
+--
+
+INSERT INTO `team` (`idTeam`, `Name`, `idUser`) VALUES
+(1, 'PipoTeam', 1),
+(2, 'ZackyTeam', 3),
+(5, 'TestTeam', 10);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `type`
 --
 
@@ -168,23 +225,25 @@ CREATE TABLE IF NOT EXISTS `user` (
   `Password` varchar(45) NOT NULL,
   PRIMARY KEY (`idUser`),
   UNIQUE KEY `Username_UNIQUE` (`Username`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `user`
 --
 
 INSERT INTO `user` (`idUser`, `Username`, `Password`) VALUES
-(2, 'Zacky', '12354'),
-(3, 'Zackysh', '123546'),
 (1, 'Pipo', '1234'),
-(6, 'Pipo2', '1'),
-(7, 'Pollo', '1234'),
-(8, 'Fin', '1234');
+(3, 'Zackysh', '123546');
 
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `cpokemon`
+--
+ALTER TABLE `cpokemon`
+  ADD CONSTRAINT `idTeam` FOREIGN KEY (`idTeam`) REFERENCES `team` (`idTeam`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Filtros para la tabla `poketype`

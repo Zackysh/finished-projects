@@ -23,7 +23,9 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import dao.DAO_Login;
 import dao.DAO_SignUp;
+import dao.DAO_Team;
 import utils.MediaFormer;
 import utils.TextPrompt;
 
@@ -58,13 +60,17 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 	private TextPrompt tP_Password;
 	private JPasswordField pF_PasswordConfirm;
 	private TextPrompt tP_PasswordConfirm;
+	private JTextField tF_Team;
+	private TextPrompt tP_Team;
 
 	private JButton jB_Register;
 	private JButton jB_Clear;
 	private JButton jB_Back;
 	private JLabel lbl_PokeBack;
 
-	private DAO_SignUp sd;
+	private DAO_SignUp signDAO;
+	private DAO_Team teamDAO;
+	private DAO_Login loginDAO;
 	private Timer timer;
 
 	/**
@@ -73,8 +79,10 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 	public SignupView(LoginView lv) {
 
 		this.parent = lv;
-		sd = new DAO_SignUp();
-		if (sd.checkConnection()) {
+		signDAO = new DAO_SignUp();
+		teamDAO = new DAO_Team();
+		loginDAO = new DAO_Login();
+		if (signDAO.checkConnection()) {
 			initialize();
 			setVisible(true);
 		} else
@@ -164,7 +172,22 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 		tP_PasswordConfirm.changeAlpha(0.75f);
 		tP_PasswordConfirm.setForeground(new Color(150, 0, 0, 180));
 		tP_PasswordConfirm.changeStyle(Font.ITALIC);
-
+		// Team field
+		tF_Team = new JTextField();
+		tF_Team.setBounds(206, 108, 150, 34);
+		tF_Team.setFont(new Font("Flexo-Regular", WIDTH, 15));
+		tF_Team.setHorizontalAlignment(SwingConstants.LEFT);
+		tF_Team.setColumns(10);
+		tF_Team.setForeground(new Color(150, 0, 0, 200));
+		tF_Team
+				.setBorder(new CompoundBorder(new LineBorder(new Color(171, 173, 179)), new EmptyBorder(5, 10, 5, 5)));
+		getContentPane().add(tF_Team);
+		tP_Team = new TextPrompt("Your team name", tF_Team);
+		tP_Team.setFont(new Font("Flexo-Regular", WIDTH, 15));
+		tP_Team.setHorizontalAlignment(SwingConstants.LEADING);
+		tP_Team.changeAlpha(0.75f);
+		tP_Team.setForeground(new Color(150, 0, 0, 180));
+		tP_Team.changeStyle(Font.ITALIC);
 		// BUTTONS -----------------------------------------------------------------------
 		// Register
 		jB_Register = new JButton("SIGN UP");
@@ -242,22 +265,19 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 
 		} else if (e.getSource() == jB_Register) {
 			
-			if (tF_Username.getText().isBlank() || String.valueOf(pF_Password.getPassword()).isBlank())
+			if (tF_Username.getText().isBlank() || String.valueOf(pF_Password.getPassword()).isBlank() || tF_Team.getText().isBlank())
 				JOptionPane.showMessageDialog(null, "Please, dont leave empty fields.", getTitle(),	JOptionPane.INFORMATION_MESSAGE);
-			
 			else if (!String.valueOf(pF_Password.getPassword()).equals(String.valueOf(pF_PasswordConfirm.getPassword())))
 				JOptionPane.showMessageDialog(null, "Passwords must match.", getTitle(), JOptionPane.INFORMATION_MESSAGE);
-			
-			else if (sd.registerNewUser(tF_Username.getText(), String.valueOf(pF_Password.getPassword())) != 0) {
-				
+			else if (signDAO.checkUsername(tF_Username.getText())) {
+				JOptionPane.showMessageDialog(null, "That username is taken. Try another.", getTitle(), JOptionPane.WARNING_MESSAGE);
+			} else if (teamDAO.checkTeamName(tF_Team.getText())) {
+				JOptionPane.showMessageDialog(null, "That team name is taken. Try another.", getTitle(), JOptionPane.WARNING_MESSAGE);
+			} else if (signDAO.registerNewUser(tF_Username.getText(), String.valueOf(pF_Password.getPassword())) != 0) {
+				teamDAO.createTeamForUser(loginDAO.getUserId(tF_Username.getText()), tF_Team.getText()); // create team for user
 				JOptionPane.showMessageDialog(null, "Succesful sign-up, try to log-in!.", getTitle(), JOptionPane.INFORMATION_MESSAGE);
 				parent.setVisible(true);
 				dispose();
-				
-			} else {
-				
-				JOptionPane.showMessageDialog(null, "That username is taken. Try another.", getTitle(), JOptionPane.WARNING_MESSAGE);
-				
 			}
 
 		} else if (e.getSource() == timer) { // Clear fields with 0,2 delay
@@ -277,7 +297,6 @@ public class SignupView extends JFrame implements ActionListener, MouseListener 
 				pF_PasswordConfirm.setText(aux);
 			} else
 				timer.stop();
-
 		} else if (e.getSource() == jB_Back) {
 			parent.setVisible(true);
 			dispose();

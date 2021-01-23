@@ -40,11 +40,11 @@ public abstract class AbstractDAO {
 	 * @returns false If given user-name doesn't exist in PokeDB.
 	 */
 	public boolean checkUsername(String username) {
-
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM pokedb.user WHERE username = '" + username + "'");
-			return rs.next();
+			boolean returned = rs.next();
+			return returned;
 		} catch (SQLException ex) {
 			System.err.println(ex.getMessage());
 			ex.fillInStackTrace();

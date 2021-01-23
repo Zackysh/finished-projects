@@ -20,7 +20,7 @@ public class DAO_SignUp extends AbstractDAO {
 	 * @returns 0 If is not possible to affect a row. It may be due the username already exists.
 	 */
 	public int registerNewUser(String username, String password) {
-
+		
 		try {
 			
 			PreparedStatement stmt = conn.prepareStatement("INSERT INTO pokedb.user (Username, Password) VALUES (?, ?)");

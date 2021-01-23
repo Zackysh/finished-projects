@@ -200,7 +200,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private Timer soundTimer;
 
 	public static void main(String[] args) {
-		new PokedexView("Zackysh", 3);
+		new PokedexView("Pipo", 1);
 	}
 
 	/**
@@ -437,6 +437,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	public void showSearchResult(ArrayList<Pokemon> result) {
 		isSearchOn = true;
 		mNew_new.setEnabled(false);
+		mTeam_Show.setEnabled(false);
 		search.setText("Close search");
 		backupPokeList = pokeList;
 		pokeList = new ArrayList<>();
@@ -680,7 +681,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			mTeam_Release.setEnabled(true);
 		} else {
 			mTeam_Caught.setEnabled(true);
-			mTeam_Show.setEnabled(true);
+			if (!isSearchOn)
+				mTeam_Show.setEnabled(true);
 			mTeam_Release.setEnabled(false);
 		}
 		menu_edit.setEnabled(true);
@@ -1321,6 +1323,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			else { // turn off search
 					isSearchOn = false;
 					mNew_new.setEnabled(true);
+					mTeam_Show.setEnabled(true);
 					search.setText("Search pokemon");
 					searchLbl.setVisible(false);
 					searchIcon.setVisible(false);
@@ -1349,15 +1352,12 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			boolean isUnique = true;
 			if (!cpokeList.isEmpty())
 				do { // avoid repeated nicknames (when same Pokemon is caught more than 1 time)
-					for (CPokemon cpokemon : cpokeList) {
-						if (cpokemon.getNickName().equals(nickname)) {
-							nickname = pokeName + cont;
-							cont++;
-							isUnique = false;
-							break;
-						} else {
-							isUnique = true;
-						}
+					if (teamDAO.checkNickname(nickname)) {
+						nickname = pokeName + cont;
+						cont++;
+						isUnique = false;
+					} else {
+						isUnique = true;
 					}
 				} while (!isUnique);
 			if (cpokeList.size() <= 5) {
@@ -1395,11 +1395,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private void displayTeam() {
 		isTeamOn = !isTeamOn;
 		if(isTeamOn) {
-			mTeam_Show.setText("Close team view");
 			if(cpokeList.isEmpty()) {
 				JOptionPane.showMessageDialog(null, "You must caught at least one Pokemon :(", "Warning", JOptionPane.WARNING_MESSAGE);
 				isTeamOn = false;
 			} else {
+				mTeam_Show.setText("Close team view");
 				listController = 0;
 				setReadyToShow();
 				mTeam_Caught.setEnabled(false);

@@ -3,7 +3,7 @@ package models;
 import java.awt.Color;
 
 /**
- * Method that simulate a Pokemon Type. It has a color attached.
+ * Method that simulate a Pokemon Type. It has a color attached, a name and a id.
  * 
  * @author AdriGB
  *
@@ -15,13 +15,20 @@ public class PokeType implements Comparable<PokeType> {
 	private String name;
 	private Color color;
 	
+	/**
+	 * Constructor that receives main attributes.
+	 * 
+	 * @param idT
+	 * @param nombre
+	 * @param color This color will define how this type will be shown in this application
+	 */
 	public PokeType (int idT, String nombre, Color color) {
 		this.idT = idT;
 		this.name = nombre;
 		this.color = color;
 	}
 	
-	// GETTERS AND SETTERS
+	/** GETTERS AND SETTERS */
 	public Color getColor() {
 		return color;
 	}
