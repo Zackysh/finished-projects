@@ -33,7 +33,8 @@ public class DAO_Type extends AbstractDAO {
 			return rs;
 
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.err.println(ex.getMessage());
+			ex.fillInStackTrace();
 		}
 
 		return null;
@@ -58,7 +59,8 @@ public class DAO_Type extends AbstractDAO {
 			return rs;
 			
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.err.println(ex.getMessage());
+			ex.fillInStackTrace();
 		}
 		
 		return null;

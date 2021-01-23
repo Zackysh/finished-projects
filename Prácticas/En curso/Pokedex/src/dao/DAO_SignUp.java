@@ -31,7 +31,8 @@ public class DAO_SignUp extends AbstractDAO {
 					
 			return affectedRows;
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.err.println(ex.getMessage());
+			ex.fillInStackTrace();
 		}
 		return 0; // It returns 0 if the statement or connection fail,
 	}

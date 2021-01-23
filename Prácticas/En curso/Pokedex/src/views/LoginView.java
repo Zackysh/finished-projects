@@ -57,14 +57,14 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 	private TextPrompt tP_Password;
 	private JButton jB_Register;
 	private JButton jB_Login;
-	private DAO_Login ld;
+	private DAO_Login loginDAO;
 
 	/**
 	 * Constructor of this view, it just call initialize().
 	 */
 	public LoginView() {
-		ld = new DAO_Login();
-		if(ld.checkConnection()) {
+		loginDAO = new DAO_Login();
+		if(loginDAO.checkConnection()) {
 			initialize();
 			setVisible(true);
 		} else
@@ -199,18 +199,19 @@ public class LoginView extends JFrame implements ActionListener, MouseListener {
 		if(e.getSource() == jB_Login) {			
 			if(tF_Username.getText().isBlank() || String.valueOf(pF_Password.getPassword()).isBlank())				
 				JOptionPane.showMessageDialog(null, "Please, dont leave empty fields.", getTitle(), JOptionPane.INFORMATION_MESSAGE);			
-			else if(ld.login(tF_Username.getText(), String.valueOf(pF_Password.getPassword()))) { // If successful login				
+			else if(loginDAO.login(tF_Username.getText(), String.valueOf(pF_Password.getPassword()))) { // If successful login				
 				JOptionPane.showMessageDialog(null, "Succesful login.", getTitle(), JOptionPane.INFORMATION_MESSAGE);
-				this.setVisible(false);
-				new PokedexView(StringUtils.normalizarString(this.tF_Username.getText()));
+				setVisible(false);
+				new PokedexView(StringUtils.normalizarString(tF_Username.getText()), loginDAO.getUserId(tF_Username.getText()));
+				dispose();
 			} else {
-				if(!ld.checkUsername(tF_Username.getText()))
+				if(!loginDAO.checkUsername(tF_Username.getText()))
 					JOptionPane.showMessageDialog(null, "Couldn't find your Pokedex Account :(", getTitle(), JOptionPane.WARNING_MESSAGE);
 				else
 					JOptionPane.showMessageDialog(null, "Wrong password.", getTitle(), JOptionPane.WARNING_MESSAGE);
 			}
 		} else if(e.getSource() == jB_Register) {
-			this.setVisible(false);
+			setVisible(false);
 			new SignupView(this);
 		}
 	}

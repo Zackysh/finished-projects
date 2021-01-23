@@ -24,21 +24,14 @@ public class DAO_Pokemon extends AbstractDAO {
 	 * @return rs Result set with desired list.
 	 */
 	public ResultSet getPokemons() {
-
 		try {
-
 			String sql = "SELECT * FROM pokedb.pokemon";
-
 			PreparedStatement stmt = conn.prepareStatement(sql);
-
 			ResultSet rs = stmt.executeQuery();
-
 			return rs;
-
 		} catch (SQLException ex) {
-			System.err.println(ex.getMessage());
+			ex.fillInStackTrace();
 		}
-
 		return null;
 	}
 	
@@ -92,7 +85,6 @@ public class DAO_Pokemon extends AbstractDAO {
 		String sql3;
 		for (PokeType type : types) {
 			sql3 = "INSERT INTO `pokedb`.`poketype` (`idpoke`,`idtype`) VALUES (" + idP + ", " + type.getIdT() + ");";
-			System.out.println("Inserted: (" + idP + ", " + type.getIdT() + ")");
 			try {
 				stmt = conn.prepareStatement(sql3);
 				stmt.executeUpdate();

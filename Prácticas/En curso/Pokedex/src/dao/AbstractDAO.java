@@ -27,7 +27,8 @@ public abstract class AbstractDAO {
 					"jdbc:mysql://localhost/pokedb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
 					"admin", "admin");
 		} catch (SQLException sqle) {
-			System.out.println(sqle.fillInStackTrace());
+			System.err.println(sqle.fillInStackTrace());
+			sqle.fillInStackTrace();
 		}
 	}
 
@@ -45,7 +46,8 @@ public abstract class AbstractDAO {
 			ResultSet rs = stmt.executeQuery("SELECT * FROM pokedb.user WHERE username = '" + username + "'");
 			return rs.next();
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.err.println(ex.getMessage());
+			ex.fillInStackTrace();
 		}
 		return false;
 	}

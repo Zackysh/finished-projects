@@ -61,26 +61,6 @@ public class SearchView extends JFrame implements MouseListener, ActionListener 
 	private JLabel changeTypes;
 	private JLabel background;
 
-	public static void main(String[] args) {
-		ArrayList<Pokemon> pokeList = new ArrayList<>();
-		ArrayList<PokeType> typeList = new ArrayList<>();
-		typeList.add(new PokeType(1, "Fuego", Color.red));
-		typeList.add(new PokeType(2, "Agua", Color.blue));
-		typeList.add(new PokeType(3, "Bicho", Color.green));
-		typeList.add(new PokeType(4, "Dark", Color.black));
-		ArrayList<PokeType> typeList1 = new ArrayList<>();
-		typeList1.add(typeList.get(1));
-		typeList1.add(typeList.get(2));
-		ArrayList<PokeType> typeList2 = new ArrayList<>();
-		typeList2.add(typeList.get(0));
-		typeList2.add(typeList.get(3));
-		typeList2.add(typeList.get(1));
-		int[] baseAtt = { 2, 3, 5, 6, 7, 8 };
-		pokeList.add(new Pokemon(1, "asd", 32, "dsa", "dsad", "asds", 32, 322, "dsa", typeList1, baseAtt));
-		pokeList.add(new Pokemon(2, "dsadsa", 2, "sdsad", "dsda", "dsadas", 32, 322, "Male", typeList2, baseAtt));
-		new SearchView(new PokedexView("Pipo"), pokeList, typeList);
-	}
-
 	/**
 	 * Constructor which receives pokeList, typeList and his PokedexView parent.
 	 * 
@@ -309,21 +289,18 @@ public class SearchView extends JFrame implements MouseListener, ActionListener 
 						nameOk = true;
 					else
 						nameOk = false;
-				if (byType)
-					System.out.println("Selected Types");
-					System.out.println(selectedTypes.size());
-					System.out.println();
+				if (byType) {
 					int coincidences = 0;
 					for (PokeType lookForType : selectedTypes) {
 						for (PokeType type : pokemon.getTypes()) 
 							if (lookForType.getName().equals(type.getName()))
 								coincidences++;
-						System.out.println("Coin: " + coincidences);
 						if (coincidences == selectedTypes.size())
 							typeOk = true;
 						else
 							typeOk = false;
 					}
+				}
 				if (byId)
 					if (pokemon.getIdP() == Integer.parseInt((String) cb_ById.getSelectedItem()))
 						idOk = true;

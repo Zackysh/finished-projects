@@ -30,9 +30,23 @@ public class DAO_Login extends AbstractDAO {
 
 			return rs.next();
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.err.println(ex.getMessage());
+			ex.fillInStackTrace();
 		}
 		return false;
+	}
+	
+	public int getUserId(String userName) {
+		try {
+			String sql = "SELECT idUser FROM pokedb.user WHERE userName like '" + userName + "'";
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+			rs.next();
+			return rs.getInt("idUser");
+		} catch (SQLException ex) {
+			ex.fillInStackTrace();
+		}
+		return 0;
 	}
 
 }

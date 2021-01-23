@@ -50,7 +50,9 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalButtonUI;
 
 import dao.DAO_Pokemon;
+import dao.DAO_Team;
 import dao.DAO_Type;
+import models.CPokemon;
 import models.PokeType;
 import models.Pokemon;
 import utils.FancyProgressBar;
@@ -96,11 +98,14 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JMenu menu_edit;
 	private JMenuItem mEdit_on, mEdit_save, mEdit_Remove;
 	private JButton search;
+	private JMenu menu_team;
+	private JMenuItem mTeam_Show, mTeam_Caught, mTeam_Release;
 	// WELCOME-ANIMATION components ----------
 	private JButton welcomeMessage;
 	private Timer welcomeTimer;
 	private Timer welcomeTimerTwo;
 	private String userName;
+	private int idUser;
 	// LABEL_BUTTONS -------------------------
 	private JLabel lbl_buttonRight;
 	private JLabel rightButtonFormer1;
@@ -109,6 +114,9 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private JLabel leftButtonFormer1;
 	private JLabel leftButtonFormer2;
 	// TOP ---------------------------
+	private JCheckBox useNickName;
+	private JLabel lvlT;
+	private JLabel lvlV;
 	private JLabel searchIcon;
 	private JLabel searchLbl;
 	private JLabel modeLbl;
@@ -125,6 +133,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private String pokeImageDefaultSource;
 	private JLabel speakerIcon;
 	private JLabel restoreIcon;
+	private JLabel plusIcon;
+	private JLabel subtractIcon;
 	// BLUE-BOX (T: Title, V: Value) --------
 	private JLabel prop_skillT;
 	private JTextField prop_skillV;
@@ -165,13 +175,15 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	// DAOs
 	private DAO_Pokemon pokeDAO;
 	private DAO_Type typeDAO;
+	private DAO_Team teamDAO;
 	// Lists
-	private ArrayList<Pokemon> pokeList = new ArrayList<>();
-	private ArrayList<Pokemon> backupPokeList = new ArrayList<>();
-	private ArrayList<PokeType> typeList = new ArrayList<>();
-	private ArrayList<PokeType> backupTypeList = new ArrayList<>();
+	private ArrayList<CPokemon> cpokeList;
+	private ArrayList<Pokemon> pokeList;
+	private ArrayList<Pokemon> backupPokeList;
+	private ArrayList<PokeType> typeList;
+	private ArrayList<PokeType> backupTypeList;
 	private int listController = 0;
-	// Add/Edit/Search control
+	// Add/Edit/Search/Team control
 	private Pokemon newPokemon;
 	private List<JTextField> readyFields;
 	private List<JTextField> strFields;
@@ -181,12 +193,14 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	private boolean isPokeImageEdited;
 	private boolean isSearchOn;
 	private boolean isEditOn;
+	private boolean isTeamOn;
+	private boolean isNicknameOn = false;
 	// Sound Control
 	private boolean isSoundEnable = true;
 	private Timer soundTimer;
 
 	public static void main(String[] args) {
-		new PokedexView("Pipo");
+		new PokedexView("Zackysh", 3);
 	}
 
 	/**
@@ -195,11 +209,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * 
 	 * Then set visible this frame.
 	 */
-	public PokedexView(String userName) {
+	public PokedexView(String userName, int idUser) {
 		this.userName = userName;
+		this.idUser = idUser;
 		initialize();
 		insertTypes();
 		insertPokemons();
+		insertCPokemons();
 		initializeUIComponentes();
 		setReadyToShow();
 		setVisible(true);
@@ -220,14 +236,20 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		// Initialize DAO objects
 		pokeDAO = new DAO_Pokemon();
 		typeDAO = new DAO_Type();
+		teamDAO = new DAO_Team();
 		// Pane initialization
 		contentPane = new JPanel();
 		contentPane.setLayout(null);
 		// Lists
-		readyFields = new ArrayList<JTextField>();
-		strFields = new ArrayList<JTextField>();
-		attIntputList = new ArrayList<JTextField>();
-		doubleFields = new ArrayList<JTextField>();
+		cpokeList = new ArrayList<>();
+		pokeList = new ArrayList<>();
+		backupPokeList = new ArrayList<>();
+		typeList = new ArrayList<>();
+		backupTypeList = new ArrayList<>();
+		readyFields = new ArrayList<>();
+		strFields = new ArrayList<>();
+		attIntputList = new ArrayList<>();
+		doubleFields = new ArrayList<>();
 		// Frame initialization
 		setTitle("Pokedex");
 		setIconImage(Toolkit.getDefaultToolkit().getImage("images\\Other\\icon.png"));
@@ -301,6 +323,31 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	/**
+	 * Method that insert into cpokeList Pokemons from
+	 * current user team (if exist).
+	 */
+	private void insertCPokemons() {
+		ResultSet rs = teamDAO.getCPokemons(idUser);
+		try {
+			while (rs.next()) {
+				int idCPoke = rs.getInt("idCPoke");
+				String nickName = rs.getString("nickName");
+				int level = rs.getInt("level");
+				int idPoke = rs.getInt("idPoke");
+				Pokemon pokemon = null;
+				for (Pokemon pokemonTo : pokeList) {
+					if (pokemonTo.getIdP() == idPoke)
+						pokemon = pokemonTo;
+				}
+				CPokemon caughtPoke = new CPokemon(idCPoke, pokemon, level, nickName);
+				cpokeList.add(caughtPoke);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * Method that animates Welcome message at the beginning. From left to center
 	 * animOne(). From center to right animTwo().
 	 */
@@ -364,6 +411,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		if (!pokeList.isEmpty()) {
 			Pokemon current = pokeList.get(listController);
 			showHeadder(current);
+			if (isTeamOn)
+				lvlV.setText(Integer.toString(cpokeList.get(listController).getLevel()));
 			description.setText(pokeList.get(listController).getDescription());
 			showBlueBox(current);
 			showGrayBox(current);
@@ -372,6 +421,8 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			pokeImageDefaultSource = "images\\Pokemons_restore_default\\" + pokeList.get(listController).getName()
 					+ ".png";
 			showPokeImage();
+		} else if (isSearchOn) {
+			actionPerformed(new ActionEvent(search, 1, ""));
 		} else
 			actionPerformed(new ActionEvent(mNew_new, 1, ""));
 	}
@@ -383,12 +434,12 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * 
 	 * @param result Pokemons to be displayed.
 	 */
-	@SuppressWarnings("unchecked")
 	public void showSearchResult(ArrayList<Pokemon> result) {
 		isSearchOn = true;
 		mNew_new.setEnabled(false);
 		search.setText("Close search");
-		backupPokeList = (ArrayList<Pokemon>) pokeList.clone();
+		backupPokeList = pokeList;
+		pokeList = new ArrayList<>();
 		pokeList = result;
 		listController = 0;
 		searchLbl.setVisible(true);
@@ -469,7 +520,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	private void showHeadder(Pokemon current) {
 		// CURRENT INFO Always initialized int the same way
-		String currName = current.getName();
+		String currName;
+		if (!isTeamOn || !isNicknameOn)
+			currName = current.getName();
+		else
+			currName = cpokeList.get(listController).getNickName();
 		String currNumber = Integer.toString(current.getNumber());
 		// PREVIOUS INFO
 		String prevName;
@@ -483,13 +538,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				prevNumber = Integer.toString(pokeList.get(listController - 1).getNumber());
 
 				previousName.setText(prevName);
-				previousNumber.setText("N.º" + prevNumber);
+				previousNumber.setText("N." + prevNumber);
 			} else {
 				prevName = pokeList.get(pokeList.size() - 1).getName();
 				prevNumber = Integer.toString(pokeList.get(pokeList.size() - 1).getNumber());
 
 				previousName.setText(prevName);
-				previousNumber.setText("N.º" + prevNumber);
+				previousNumber.setText("N." + prevNumber);
 			}
 			// NEXT INFO
 			String nexName;
@@ -499,13 +554,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				nexNumber = Integer.toString(pokeList.get(listController + 1).getNumber());
 
 				nextName.setText(nexName);
-				nextNumber.setText("N.º" + nexNumber);
+				nextNumber.setText("N." + nexNumber);
 			} else {
 				nexName = pokeList.get(0).getName();
 				nexNumber = Integer.toString(pokeList.get(0).getNumber());
 
 				nextName.setText(nexName);
-				nextNumber.setText("N.º" + nexNumber);
+				nextNumber.setText("N." + nexNumber);
 			}
 		} else {
 			previousName.setText("");
@@ -524,13 +579,24 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	private void setReadyToEdit() {
 		// Setting JMenuBar
+		if (isTeamOn) {
+			useNickName.setText("Edit nickname");
+			plusIcon.setVisible(true);
+			subtractIcon.setVisible(true);
+			if (isNicknameOn)
+				currentName.setEditable(true);
+			else
+				currentName.setEditable(false);
+		} else {
+			currentName.setEditable(true);
+			mEdit_Remove.setEnabled(true);
+		}
+		menu_team.setEnabled(false);
+		menu_new.setEnabled(false);
 		search.setEnabled(false);
-		mNew_new.setEnabled(false);
-		mNew_discard.setEnabled(false);
-		mNew_save.setEnabled(false);
+		searchIcon.setVisible(false);
 		mEdit_on.setText("Discard changes");
 		mEdit_save.setEnabled(true);
-		mEdit_Remove.setEnabled(true);
 		// Setting TOP-COMPONENTS
 		rightButtonFormer1.setVisible(false);
 		rightButtonFormer2.setVisible(false);
@@ -542,32 +608,34 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		previousNumber.setVisible(false);
 		nextName.setVisible(false);
 		nextNumber.setVisible(false);
-		description.setEditable(true);
-		restoreIcon.setVisible(true);
+
 		// Setting BLUE-BOX
-		prop_categoryV.setEditable(true);
-		prop_heightV.setEditable(true);
-		doubleFields.add(prop_heightV);
-		prop_sexV.setEditable(true);
-		prop_skillV.setEditable(true);
-		prop_weightV.setEditable(true);
-		doubleFields.add(prop_weightV);
-		currentName.setEditable(true);
-		currentNumber.setEditable(true);
-		changeTypes.setVisible(true);
-		// Setting GRAY-BOX
-		psI.setVisible(true);
-		psI.setText(Integer.toString(ps.getValue()));
-		attI.setVisible(true);
-		attI.setText(Integer.toString(att.getValue()));
-		defI.setVisible(true);
-		defI.setText(Integer.toString(def.getValue()));
-		sattI.setVisible(true);
-		sattI.setText(Integer.toString(satt.getValue()));
-		sdefI.setVisible(true);
-		sdefI.setText(Integer.toString(sdef.getValue()));
-		speedI.setVisible(true);
-		speedI.setText(Integer.toString(speed.getValue()));
+		if (!isTeamOn) {
+			restoreIcon.setVisible(true);
+			description.setEditable(true);
+			prop_categoryV.setEditable(true);
+			prop_heightV.setEditable(true);
+			doubleFields.add(prop_heightV);
+			prop_sexV.setEditable(true);
+			prop_skillV.setEditable(true);
+			prop_weightV.setEditable(true);
+			doubleFields.add(prop_weightV);
+			currentNumber.setEditable(true);
+			changeTypes.setVisible(true);
+			// Setting GRAY-BOX
+			psI.setVisible(true);
+			psI.setText(Integer.toString(ps.getValue()));
+			attI.setVisible(true);
+			attI.setText(Integer.toString(att.getValue()));
+			defI.setVisible(true);
+			defI.setText(Integer.toString(def.getValue()));
+			sattI.setVisible(true);
+			sattI.setText(Integer.toString(satt.getValue()));
+			sdefI.setVisible(true);
+			sdefI.setText(Integer.toString(sdef.getValue()));
+			speedI.setVisible(true);
+			speedI.setText(Integer.toString(speed.getValue()));
+		}
 		isEditOn = true;
 		/*
 		 * Set all components into ready state, as current fields will contain
@@ -597,15 +665,35 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	private void setReadyToShow() {
 		// Setting JMenuBar
-		search.setEnabled(true);
+		if (isTeamOn)
+			useNickName.setText("Use nickname");
+		else {
+			menu_new.setEnabled(true);
+			search.setEnabled(true);
+		}
+		plusIcon.setVisible(false);
+		subtractIcon.setVisible(false);
+		menu_team.setEnabled(true);
+		if (isTeamOn) {
+			mTeam_Caught.setEnabled(false);
+			mTeam_Show.setEnabled(true);
+			mTeam_Release.setEnabled(true);
+		} else {
+			mTeam_Caught.setEnabled(true);
+			mTeam_Show.setEnabled(true);
+			mTeam_Release.setEnabled(false);
+		}
+		menu_edit.setEnabled(true);
 		mEdit_on.setEnabled(true);
 		mEdit_on.setText("Enable edit mode");
 		mEdit_save.setEnabled(false);
 		mEdit_Remove.setEnabled(false);
 		mNew_save.setEnabled(false);
 		mNew_discard.setEnabled(false);
-		if (!isSearchOn)
+		if (!isSearchOn) {
 			mNew_new.setEnabled(true);
+		} else
+			searchIcon.setVisible(true);
 		modeLbl.setVisible(false);
 		// Setting TOP-COMPONENTS
 		rightButtonFormer1.setVisible(true);
@@ -923,14 +1011,13 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 				showPokemon();
 			}
 		} else if (e.getSource() == speakerIcon) {
-			if(isEditOn) {
+			if(isEditOn && !isTeamOn) {
 				changePokeSound();
 			} else if (isSoundEnable)
 				playSound("Sounds\\" + pokeList.get(listController).getName().toLowerCase() + ".wav");
 		} else if (e.getSource() == exit)
 			this.dispose(); // exitButton
-		else if (e.getSource() == pokeImage && isEditOn) {
-			System.out.println("Algo mal");
+		else if (e.getSource() == pokeImage && isEditOn && !isTeamOn) {
 			String msg = "You are about to change " + pokeList.get(listController).getName() + "s image.";
 			int n = JOptionPane.showConfirmDialog(null, msg, "Pokemon image selector", JOptionPane.OK_CANCEL_OPTION);
 			if (n == 0) {
@@ -991,6 +1078,12 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			 */
 			backupTypeList = (ArrayList<PokeType>) pokeList.get(listController).getTypes().clone();
 			new SelectTypes(typeList, pokeList.get(listController).getTypes(), this);
+		} else if (e.getSource() == plusIcon) {
+			if (Integer.parseInt(lvlV.getText()) < 100)
+				lvlV.setText(Integer.toString(Integer.parseInt(lvlV.getText()) + 1));
+		} else if (e.getSource() == subtractIcon) {
+			if (Integer.parseInt(lvlV.getText()) > 1)
+				lvlV.setText(Integer.toString(Integer.parseInt(lvlV.getText()) - 1));
 		}
 	}
 
@@ -1016,7 +1109,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		} else if (e.getSource() == changeTypes) {
 			changeTypes
 					.setIcon(MediaFormer.getImageIconFitLabel(changeTypes, "images\\Buttons\\changeButtonIcon2.png"));
-		}
+		} else if (e.getSource() == plusIcon)
+			plusIcon.setBounds(732, 198, 55, 55);
+		else if (e.getSource() == subtractIcon)
+			subtractIcon.setBounds(793, 198, 55, 55);
 	}
 
 	/**
@@ -1040,6 +1136,10 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			source.setBackground(new Color(51, 51, 51));
 		} else if (e.getSource() == changeTypes)
 			changeTypes.setIcon(MediaFormer.getImageIconFitLabel(changeTypes, "images\\Buttons\\changeButtonIcon.png"));
+		else if (e.getSource() == plusIcon)
+			plusIcon.setBounds(740, 207, 40, 40);
+		else if (e.getSource() == subtractIcon)
+			subtractIcon.setBounds(785, 207, 40, 40);
 	}
 
 	/**
@@ -1064,11 +1164,11 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			emptyFields();
 			modeLbl.setText("ADD MODE ON");
 			setReadyToEdit();
+			menu_new.setEnabled(true);
 			search.setEnabled(false);
-			mEdit_on.setEnabled(false);
+			menu_edit.setEnabled(false);
 			mEdit_on.setText("Enable edit mode.");
-			mEdit_save.setEnabled(false);
-			mEdit_Remove.setEnabled(false);
+			mNew_new.setEnabled(false);
 			mNew_save.setEnabled(true);
 			mNew_discard.setEnabled(true);
 			restoreIcon.setVisible(false);
@@ -1130,6 +1230,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		} else if (e.getSource() == mNew_discard) { // New -> discard
 			listController--;
 			pokeList.remove(newPokemon);
+			menu_edit.setEnabled(true);
 			setReadyToShow();
 			File toDelete = new File("images\\Pokemons\\NewPokemon.png");
 			toDelete.delete();
@@ -1152,48 +1253,185 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 			else {
 				if(checkName() && checkId()) {
 					updatePokemon();
-					pokeDAO.updatePokemon(pokeList.get(listController));
-					JOptionPane.showMessageDialog(null, "Successful edition!.", "Info message",
-							JOptionPane.INFORMATION_MESSAGE);
+					if (!isTeamOn)
+						pokeDAO.updatePokemon(pokeList.get(listController));
+					else {
+						if (checkNickname())
+							teamDAO.updateCPokemon(cpokeList.get(listController));
+						else
+							JOptionPane.showMessageDialog(null, "This nickname is not available, try another.",
+									"Info message", JOptionPane.WARNING_MESSAGE);
+					}
+					if (!isTeamOn)
+						JOptionPane.showMessageDialog(null, "Successful edition!.", "Info message",
+								JOptionPane.INFORMATION_MESSAGE);
 					setReadyToShow();
 				} else if (!checkName())
-					JOptionPane.showMessageDialog(null, "This name is not available, try another.", "Info message",
+					JOptionPane.showMessageDialog(null,
+							"This name is not available, try another.", "Info message",
 							JOptionPane.WARNING_MESSAGE);
 				else
 					JOptionPane.showMessageDialog(null, "This number is not available, try another.", "Info message",
 							JOptionPane.WARNING_MESSAGE);
 			}
 		} else if (e.getSource() == mEdit_Remove) { // Edit -> remove
-			String msg = "You are about to delete current Pokemon! Do you want to continue?.";
-			Object[] msgContent = {msg};
-			int n = JOptionPane.showConfirmDialog(null, msgContent, "Deletion", JOptionPane.OK_CANCEL_OPTION);
-			if (n == 0) {
-				pokeDAO.deletePokemon(pokeList.get(listController));
-				File toDelete = getCurrentImage();
-				toDelete.delete();
-				toDelete = getDefaultImage();
-				toDelete.delete();
-				toDelete = new File("Sounds\\" + pokeList.get(listController).getName() + ".wav");
-				toDelete.delete();
-				pokeList.remove(pokeList.get(listController));
-				listController = 0;
-				setReadyToShow();
-				JOptionPane.showMessageDialog(null, "Pokemon removed successfully");
-			}
+			String msg = "You are about to delete current Pokemon! Do you want to continue?\n"
+					+ "Please enter his name to confirm.";
+			Object[] msgContent = { msg };
+			if (!teamDAO.checkPokemon(pokeList.get(listController))) {
+				String n = JOptionPane.showInputDialog(null, msgContent, "Deletion", JOptionPane.OK_CANCEL_OPTION);
+				if (n == null)
+					JOptionPane.showMessageDialog(null, "Operation cancelled", "Warning", JOptionPane.WARNING_MESSAGE);
+				else {
+					if (n.equals(pokeList.get(listController).getName())) {
+						pokeDAO.deletePokemon(pokeList.get(listController));
+						File toDelete = getCurrentImage();
+						toDelete.delete();
+						toDelete = getDefaultImage();
+						toDelete.delete();
+						toDelete = new File("Sounds\\" + pokeList.get(listController).getName() + ".wav");
+						toDelete.delete();
+						if (isSearchOn || isTeamOn) {
+							for (Pokemon pokemon : backupPokeList) {
+								if (pokemon.getIdP() == pokeList.get(listController).getIdP()) {
+									backupPokeList.remove(pokemon);
+									break;
+								}
+							}
+						}
+						pokeList.remove(pokeList.get(listController));
+						listController = 0;
+						if (isSearchOn) {
+							actionPerformed(new ActionEvent(search, 1, ""));
+						}
+						setReadyToShow();
+						JOptionPane.showMessageDialog(null, "Pokemon removed successfully");
+					} else
+						JOptionPane.showMessageDialog(null, "Name mismatch, operation cancelled.", "Warning",
+								JOptionPane.WARNING_MESSAGE);
+
+				}
+			} else
+				JOptionPane.showMessageDialog(null,
+						"Some teams use this pokemon, you cannot remove it\nbefore releasing it from each team..",
+						"Warning", JOptionPane.WARNING_MESSAGE);
 		} else if (e.getSource() == search) { // search Pokemon
-			System.out.println(isSearchOn);
 			if (!isSearchOn) // turn on search
 				new SearchView(this, pokeList, typeList);
 			else { // turn off search
-				isSearchOn = false;
-				mNew_new.setEnabled(true);
-				search.setText("Search pokemon");
-				searchLbl.setVisible(false);
-				searchIcon.setVisible(false);
-				pokeList = backupPokeList;
+					isSearchOn = false;
+					mNew_new.setEnabled(true);
+					search.setText("Search pokemon");
+					searchLbl.setVisible(false);
+					searchIcon.setVisible(false);
+					pokeList = backupPokeList;
+					listController = 0;
+					showPokemon();
+			}
+		} else if (e.getSource() == mTeam_Show) { // displayTeam
+			displayTeam();
+		} else if (e.getSource() == useNickName) { // se nickname as currentName
+			if (useNickName.isSelected()) {
+				isNicknameOn = true;
+				currentName.setText(cpokeList.get(listController).getNickName());
+				if (isEditOn) {
+					currentName.setEditable(true);
+				}
+			} else {
+				isNicknameOn = false;
+				currentName.setText(pokeList.get(listController).getName());
+				currentName.setEditable(false);
+			}
+		} else if (e.getSource() == mTeam_Caught) { // caught current pokemon for current team
+			String pokeName = pokeList.get(listController).getName();
+			String nickname = pokeList.get(listController).getName();
+			int cont = 1;
+			boolean isUnique = true;
+			if (!cpokeList.isEmpty())
+				do { // avoid repeated nicknames (when same Pokemon is caught more than 1 time)
+					for (CPokemon cpokemon : cpokeList) {
+						if (cpokemon.getNickName().equals(nickname)) {
+							nickname = pokeName + cont;
+							cont++;
+							isUnique = false;
+							break;
+						} else {
+							isUnique = true;
+						}
+					}
+				} while (!isUnique);
+			if (cpokeList.size() <= 5) {
+				int idCPoke;
+				if (cpokeList.isEmpty())
+					idCPoke = 1;
+				else
+					idCPoke = cpokeList.get(cpokeList.size() - 1).getIdCPoke() + 1;
+				CPokemon newCPokemon = new CPokemon(idCPoke,
+						pokeList.get(listController), 1, nickname);
+				cpokeList.add(newCPokemon);
+				teamDAO.caughtPokemon(newCPokemon, idUser);
+			} else {
+				JOptionPane.showMessageDialog(null, "You can't caught more than 6 pokemons!", "Warning", JOptionPane.WARNING_MESSAGE);
+			}
+		} else if (e.getSource() == mTeam_Release) { // release current caught Pokemon
+			if (cpokeList.size() > 1) {
+				CPokemon toDelete = cpokeList.get(listController);
+				if (toDelete != null) {
+					cpokeList.remove(toDelete);
+					pokeList.remove(toDelete.getPokemon());
+					teamDAO.releasePokemon(toDelete);
+					listController = 0;
+					showPokemon();
+				}
+			} else
+				JOptionPane.showMessageDialog(null, "You can't release all of them! :(", "Warning", JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
+	/**
+	 * Method that control how components must change when team is displayed.
+	 * At this point is not possible to simplify, but i did my best (in a short time).
+	 */
+	private void displayTeam() {
+		isTeamOn = !isTeamOn;
+		if(isTeamOn) {
+			mTeam_Show.setText("Close team view");
+			if(cpokeList.isEmpty()) {
+				JOptionPane.showMessageDialog(null, "You must caught at least one Pokemon :(", "Warning", JOptionPane.WARNING_MESSAGE);
+				isTeamOn = false;
+			} else {
 				listController = 0;
+				setReadyToShow();
+				mTeam_Caught.setEnabled(false);
+				mTeam_Release.setEnabled(true);
+				useNickName.setVisible(true);
+				lvlT.setVisible(true);
+				lvlV.setVisible(true);
+				menu_new.setEnabled(false);
+				search.setEnabled(false);
+				backupPokeList = pokeList;
+				pokeList = new ArrayList<>();
+				for (CPokemon cpokemon : cpokeList) {
+					pokeList.add(cpokemon.getPokemon());
+				}
 				showPokemon();
 			}
+		} else {
+			mTeam_Show.setText("Show Team");
+			if (isNicknameOn) {
+				actionPerformed(new ActionEvent(useNickName, 1, ""));
+				useNickName.setSelected(false);
+			}
+			useNickName.setVisible(false);
+			mTeam_Caught.setEnabled(true);
+			mTeam_Release.setEnabled(false);
+			lvlT.setVisible(false);
+			lvlV.setVisible(false);
+			pokeList = new ArrayList<>();
+			pokeList = backupPokeList;
+			menu_new.setEnabled(true);
+			search.setEnabled(true);
+			showPokemon();
 		}
 	}
 
@@ -1207,6 +1445,20 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		for (Pokemon pokemon : pokeList)
 			if(pokemon != pokeList.get(listController))
 				if(currentName.getText().equals(pokemon.getName()))
+					return false;
+		return true;
+	}
+
+	/**
+	 * This method verify if current Pokemon name is available in pokeDB.
+	 * 
+	 * @returns false If name is not available
+	 * @returns true If name is available
+	 */
+	private boolean checkNickname() {
+		for (CPokemon cpokemon : cpokeList)
+			if(cpokemon != cpokeList.get(listController))
+				if(currentName.getText().equals(cpokemon.getNickName()))
 					return false;
 		return true;
 	}
@@ -1231,22 +1483,31 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 */
 	private void updatePokemon() {
 		Pokemon current = pokeList.get(listController);
-		if (!current.getName().equals(currentName.getText())) {
-			updatePokemonMedia(current.getName(), StringUtils.normalizarString(currentName.getText()));
-			current.setName(currentName.getText());
+		if (!isTeamOn) {
+			if (!current.getName().equals(currentName.getText())) {
+				updatePokemonMedia(current.getName(), StringUtils.normalizarString(currentName.getText()));
+				current.setName(currentName.getText());
+			}
+			current.setNumber(Integer.parseInt(currentNumber.getText()));
+			current.setDescription(description.getText());
+			current.setSkill(prop_skillV.getText());
+			current.setCategory(prop_categoryV.getText());
+			current.setHeight(Double.parseDouble(prop_heightV.getText()));
+			current.setWeight(Double.parseDouble(prop_weightV.getText()));
+			current.setSex(prop_sexV.getText());
+			int[] baseAtt = new int[6];
+			for (int i = 0; i < baseAtt.length; i++)
+				baseAtt[i] = Integer.parseInt(attIntputList.get(i).getText());
+			current.setBaseAtt(baseAtt);
+			backupTypeList = current.getTypes();
+		} else {
+			if (isNicknameOn)
+				if (checkNickname())
+					cpokeList.get(listController).setNickName(currentName.getText());
+			if (cpokeList.get(listController).getLevel() != Integer.parseInt(lvlV.getText())) {
+				cpokeList.get(listController).setLevel(Integer.parseInt(lvlV.getText()));
+			}
 		}
-		current.setNumber(Integer.parseInt(currentNumber.getText()));
-		current.setDescription(description.getText());
-		current.setSkill(prop_skillV.getText());
-		current.setCategory(prop_categoryV.getText());
-		current.setHeight(Double.parseDouble(prop_heightV.getText()));
-		current.setWeight(Double.parseDouble(prop_weightV.getText()));
-		current.setSex(prop_sexV.getText());
-		int[] baseAtt = new int[6];
-		for (int i = 0; i < baseAtt.length; i++)
-			baseAtt[i] = Integer.parseInt(attIntputList.get(i).getText());
-		current.setBaseAtt(baseAtt);
-		backupTypeList = current.getTypes();
 	}
 
 	/**
@@ -1263,7 +1524,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	}
 
 	/**
-	 * KeyRealeased controls field verification.
+	 * KeyReleased controls field verification.
 	 * 
 	 * @param e Event which contains source.
 	 */
@@ -1293,22 +1554,24 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 	 * @returns false If any field is not stored in readyFields
 	 */
 	public boolean verifyAllFields() {
-		verifyAttFields();
 		verifyCurrentName();
-		verifyCurrentNumber();
-		verifyStrFields();
 		if (!readyFields.contains(currentName))
 			return false;
-		if (!readyFields.contains(currentNumber))
-			return false;
-		if (!readyFields.containsAll(attIntputList))
-			return false;
-		if (!readyFields.containsAll(strFields))
-			return false;
-		if (!readyFields.containsAll(doubleFields))
-			return false;
-		if (!isDescriptionReady)
-			return false;
+		if (!isTeamOn) {
+			verifyAttFields();
+			verifyCurrentNumber();
+			verifyStrFields();
+			if (!readyFields.contains(currentNumber))
+				return false;
+			if (!readyFields.containsAll(attIntputList))
+				return false;
+			if (!readyFields.containsAll(strFields))
+				return false;
+			if (!readyFields.containsAll(doubleFields))
+				return false;
+			if (!isDescriptionReady)
+				return false;
+		}
 		return true;
 	}
 
@@ -1536,12 +1799,19 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		menu_edit.setForeground(Color.white);
 		menuIList = new ArrayList<JMenuItem>();
 		// SEARCH Menu_Button
-		search = new JButton("Search pokemon");
+		search = new JButton("   Search pokemon   ");
 		search.setBackground(new Color(51, 51, 51));
 		search.setForeground(Color.white);
 		search.setBorder(null);
 		search.addActionListener(this);
 		menuBar.add(search);
+		// TEAM Menu_Button
+		menu_team = new JMenu("   My Team   ");
+		menu_team.setBackground(new Color(51, 51, 51));
+		menu_team.setForeground(Color.white);
+		menu_team.setBorder(null);
+		menu_team.addActionListener(this);
+		menuBar.add(menu_team);
 		// "NEW" Menu
 		// mNew New
 		mNew_new = new JMenuItem("Add new Pokemon.") { // 1
@@ -1616,6 +1886,42 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		mEdit_Remove.addMouseListener(this);
 		mEdit_Remove.addActionListener(this);
 		menuIList.add(mEdit_Remove);
+		// mTeam Shwow
+		mTeam_Show = new JMenuItem("Show Team") { // 2
+			private static final long serialVersionUID = 4L;
+
+			public void setArmed(boolean b) {
+			}
+		};;
+		mTeam_Show.setBackground(new Color(51, 51, 51));
+		mTeam_Show.setForeground(Color.white);          
+		mTeam_Show.addMouseListener(this);              
+		mTeam_Show.addActionListener(this);         
+		menuIList.add(mTeam_Show);
+		// mTeam Caught
+		mTeam_Caught = new JMenuItem("Caught current Pokemon") { // 2
+			private static final long serialVersionUID = 4L;
+
+			public void setArmed(boolean b) {
+			}
+		};;
+		mTeam_Caught.setBackground(new Color(51, 51, 51));
+		mTeam_Caught.setForeground(Color.white);          
+		mTeam_Caught.addMouseListener(this);              
+		mTeam_Caught.addActionListener(this);             
+		menuIList.add(mTeam_Caught);
+		// mTeam Release
+		mTeam_Release = new JMenuItem("Release current Pokemon") { // 2
+			private static final long serialVersionUID = 4L;
+
+			public void setArmed(boolean b) {
+			}
+		};;
+		mTeam_Release.setBackground(new Color(51, 51, 51));
+		mTeam_Release.setForeground(Color.white);          
+		mTeam_Release.addMouseListener(this);              
+		mTeam_Release.addActionListener(this);             
+		menuIList.add(mTeam_Release);
 		// Menu connections
 		menuBar.add(menu_new);
 		menuBar.add(menu_edit);
@@ -1629,8 +1935,30 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		menu_edit.add(mEdit_save);
 		menu_edit.add(new JSeparator(SwingConstants.HORIZONTAL));
 		menu_edit.add(mEdit_Remove);
+		menu_team.add(mTeam_Show);
+		menu_team.add(mTeam_Caught);
+		menu_team.add(mTeam_Release);
 		setJMenuBar(menuBar);
 		// TOP ---------------------------------------------------------
+		// useNick jcheckbox
+		useNickName = new JCheckBox("Use nickname");
+		useNickName.setBounds(420, 215, 140, 30);
+		useNickName.setFont(new Font("Flexo-Regular", NORMAL, 16));
+		useNickName.setForeground(new Color(45, 45, 45));
+		useNickName.setBackground(Color.white);
+		useNickName.addActionListener(this);
+		useNickName.setVisible(false);
+		// level lbl_Title 
+		lvlT = new JLabel("Level: ");
+		lvlT.setBounds(637, 220, 50, 20);
+		lvlT.setFont(new Font("Flexo-Light", Font.BOLD, 16));
+		lvlT.setVisible(false);
+		// level lbl_Value
+		lvlV = new JLabel();
+		lvlV.setBounds(690, 220, 50, 20);
+		lvlV.setFont(new Font("Flexo-Light", Font.BOLD, 16));
+		lvlV.setVisible(false);
+		// Search
 		searchIcon = new JLabel();
 		searchIcon.setBounds(466, 5, 34, 34);
 		searchIcon.setIcon(MediaFormer.getImageIconFitLabel(searchIcon, "images\\Other\\searchIcon.png"));
@@ -1678,7 +2006,7 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		currentName.setEditable(false);
 		currentName.addKeyListener(this);
 		// NumberSign
-		numberSign = new JLabel("Nº.");
+		numberSign = new JLabel("N.");
 		numberSign.setBounds(500, 55, 50, 50);
 		numberSign.setFont(new Font("Flexo-Regular", WIDTH, 26));
 		numberSign.setForeground(new Color(103, 107, 107));
@@ -1692,12 +2020,24 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		currentNumber.addKeyListener(this);
 		// Description
 		description = new JTextArea();
-		description.setBounds(430, 135, 390, 100);
+		description.setBounds(430, 135, 390, 75);
 		description.setFont(new Font("Flexo-Regular", NORMAL, 15));
 		description.setLineWrap(true);
 		description.setWrapStyleWord(true);
 		description.setEditable(false);
 		description.addKeyListener(this);
+		// Plus Icon
+		plusIcon = new JLabel();
+		plusIcon.setBounds(740, 207, 40, 40);
+		plusIcon.setIcon(MediaFormer.getImageIconFitLabel(plusIcon, "images\\Other\\plus.png"));
+		plusIcon.addMouseListener(this);
+		plusIcon.setVisible(false);
+		// Subtract Icon
+		subtractIcon = new JLabel();
+		subtractIcon.setBounds(785, 207, 40, 40);
+		subtractIcon.setIcon(MediaFormer.getImageIconFitLabel(subtractIcon, "images\\Other\\subtract.png"));
+		subtractIcon.addMouseListener(this);
+		subtractIcon.setVisible(false);
 		// Description rules
 		descriptionRules = new JLabel("Description must be at least 30 characters length :)");
 		descriptionRules.setBounds(430, 115, 387, 20);
@@ -2009,11 +2349,16 @@ public class PokedexView extends JFrame implements ActionListener, MouseListener
 		contentPane.add(nextNumber);
 		contentPane.add(currentName);
 		contentPane.add(currentNumber);
+		contentPane.add(lvlT);
+		contentPane.add(lvlV);
+		contentPane.add(plusIcon);
+		contentPane.add(subtractIcon);
 		contentPane.add(description);
 		contentPane.add(descriptionRules);
 		contentPane.add(speakerIcon);
 		contentPane.add(restoreIcon);
 		contentPane.add(pokeImage);
+		contentPane.add(useNickName);
 		contentPane.add(lbl_buttonLeft);
 		contentPane.add(leftButtonFormer1);
 		contentPane.add(leftButtonFormer2);
