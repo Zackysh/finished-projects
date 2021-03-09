@@ -52,10 +52,10 @@ public class Cuadrado {
 			if (posY > 0)
 				posY -= lado; // 1 es arriba
 			else
-				posY = heightTablero - 20;
+				posY = heightTablero - 90;
 			break;
 		case Cuadrado.ABAJO:
-			if (posY < heightTablero - 20)
+			if (posY < heightTablero - 90)
 				posY += lado; // 2 es abajo
 			else
 				posY = 0;

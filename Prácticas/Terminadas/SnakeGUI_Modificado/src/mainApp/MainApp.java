@@ -20,7 +20,6 @@ import views.TableroJuego;
 public class MainApp {
 
 	public static void main(String[] args) throws InterruptedException {
-		// TODO code application logic here
 
 		int contador;
 		final int MODO_IMPOSIBLE = 0;
@@ -73,6 +72,7 @@ public class MainApp {
 		// la X de cerrar la ventana
 		frame.setSize(height, weight);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
 
 		// 3. Ahora creamos los componentes y los ponemos en la frame (ventana).
 
