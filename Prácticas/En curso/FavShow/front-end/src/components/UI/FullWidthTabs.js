@@ -26,7 +26,7 @@ function TabPanel(props) {
     >
       {value === index && (
         <Box p={3}>
-          <Typography>{children}</Typography>
+          {children}
         </Box>
       )}
     </div>
@@ -52,18 +52,32 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function FullWidthTabs({ filter, setFilter, setFav }) {
-  // style ...
+export default function FullWidthTabs({ filter, setFilter, setFav, fav }) {
+
   const classes = useStyles();
   const theme = useTheme();
-  // hooks :)
+
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => { // 0 -> shows 1 -> favs
-    console.log('change', newValue);
     setFav(newValue === 1)
     setValue(newValue);
   };
+
+  const SearchBox = ({ filter, setFilter }) => {
+    return (
+      <div className="container text-center" id="searchBox">
+        <h1 style={fav ? { color: '#98FB98' } : {}}>NETFLIX Browser</h1>
+        <SearchBar
+          value={filter}
+          onChange={event => setFilter(event.target.value)}
+          style={fav ? { border: '3px solid #98FB98' } : {}}
+        />
+        <br />
+        <h2 style={fav ? { color: '#98FB98' } : {}}>Enter title, director, actor ...</h2>
+      </div>
+    )
+  }
 
   const handleChangeIndex = (index) => {
     setValue(index);
@@ -94,8 +108,6 @@ export default function FullWidthTabs({ filter, setFilter, setFav }) {
         index={value}
         onChangeIndex={handleChangeIndex}
       >
-        {/* it throws warnings, but they are not relevant
-            its not allowed to put */}
         <TabPanel value={value} index={0} dir={theme.direction}>
           <div className="container text-center" id="searchBox">
             <h1>NETFLIX Browser</h1>
@@ -104,7 +116,7 @@ export default function FullWidthTabs({ filter, setFilter, setFav }) {
             <h2>Enter title, director, actor ...</h2>
           </div>
         </TabPanel>
-
+        {/* duplicate code here, if SearchBox is used, react re-render all, unresolved bug :( */}
         <TabPanel value={value} index={1} dir={theme.direction}>
           <div className="container text-center" id="searchBox">
             <h1 style={{ color: '#98FB98' }}>FAV Broser</h1>
@@ -115,7 +127,6 @@ export default function FullWidthTabs({ filter, setFilter, setFav }) {
             <h2 style={{ color: '#98FB98' }}>Enter title, director, actor ...</h2>
           </div>
         </TabPanel>
-
       </SwipeableViews>
     </div>
   );

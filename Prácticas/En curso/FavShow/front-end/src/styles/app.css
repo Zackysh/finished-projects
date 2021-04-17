@@ -3,3 +3,7 @@ container {
   letter-spacing: 2px;
   min-height: 101vh;
 }
+
+footer {
+  padding-top: 2vh;
+}
