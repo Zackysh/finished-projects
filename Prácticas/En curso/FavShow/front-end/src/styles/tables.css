@@ -1,0 +1,40 @@
+tr {
+  color: white; 
+}
+
+th, h3 {
+  font-family: 'Arvo', sans-serif;
+  color:#E35865;
+}
+
+h3 {
+  
+  font-size: 20px;
+}
+
+div.col {
+  align-items: flex-end;
+}
+
+path {
+  color: white;
+}
+
+.btn-outline-success {
+  color: #000000;
+  border-color: #000000;
+}
+
+.btn-outline-success :hover {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+.btn-floating :hover {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+.btn-outline-success :hover {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+

@@ -1,30 +1,19 @@
-package main;
+package com.fav.shows.api.util;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import models.Show;
+import org.springframework.core.io.ResourceLoader;
 
-public class MainApp {
+import com.fav.shows.api.entity.Show;
 
-	private final String SOURCE_CSV_LOC = "Assets/netflix_titles.csv";
-	private final String DUMP_LOC = "Assets/userFavs.txt";
+public class CSVMocker {
 
-	private BufferedReader br;
-	private FileWriter fw;
-
-	private String dumpLocation;
-	private ArrayList<Show> favs;
-	private ArrayList<Show> dumped;
-
-	public MainApp() {
-		favs = new ArrayList<Show>();
-		dumped = new ArrayList<Show>();
-	}
+	private static BufferedReader br;
+	static ResourceLoader resourceLoader;
 
 	/**
 	 * Remove dangerous characters from given String[]. Format (add line braks for
@@ -67,14 +56,18 @@ public class MainApp {
 	/**
 	 * Method that read CSV fields and mock it to an Show ArrayList.
 	 * 
-	 * @param src Path of CSV
+	 * @param src     Path of CSV
 	 * @param headers Number of CSV headers
-	 * @param regex Regular expression to extract info from CSV
+	 * @param regex   Regular expression to extract info from CSV
 	 */
-	public void mockShowsCSV(String src, int headers, String regex) {
+	public ArrayList<Show> mockShowsCSV(String src, int headers, String regex) {
+
+		File file = new File(src);
+		System.out.println(file.getName());
+
 		ArrayList<Show> showsFromCSV = new ArrayList<Show>(); // our Show List
 		try {
-			br = new BufferedReader(new FileReader("src"));
+			br = getBReaderResource(src);
 			// read header
 			for (int i = 0; i < headers; i++) {
 				br.readLine();
@@ -89,7 +82,7 @@ public class MainApp {
 					mock[i] = fields[i];
 				mock = formatLineToPrint(mock);
 //				System.out.println(mock);
-				mock = formatLineToMock(mock);				
+				mock = formatLineToMock(mock);
 				// Add to ArrayList
 				showsFromCSV.add(new Show(mock[0] != null ? mock[0] : null, mock[1] != null ? mock[1] : null,
 						mock[2] != null ? mock[2] : null, mock[3] != null ? mock[3] : null,
@@ -99,8 +92,10 @@ public class MainApp {
 						mock[10] != null ? mock[10] : null, mock[11] != null ? mock[11] : null));
 				line = br.readLine();
 			}
+			return showsFromCSV;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		} finally { // close flow
 			if (br != null) {
 				try {
@@ -111,4 +106,9 @@ public class MainApp {
 			}
 		}
 	}
+
+	private BufferedReader getBReaderResource(String src) {
+		return new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(src)));
+	}
+
 }
