@@ -12,10 +12,10 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
 // UI
-import SearchBar from "./SearchBar";
+import SearchBar from "../SearchBar/SearchBar";
 
 // Style
-import "../../styles/searchTabs.css";
+import "./style.css";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SearchTabs({ filter, setFilter, setFav, fav }) {
+export default function SearchTabs({ filter, setFilter, uploadFavs, setFav, favs, fav }) {
   const classes = useStyles();
   const theme = useTheme();
 
@@ -87,6 +87,7 @@ export default function SearchTabs({ filter, setFilter, setFav, fav }) {
           <Col xs={6}>
             <button
               type="button"
+              onClick={() => uploadFavs(favs)}
               className={buttonStyle}
               data-mdb-ripple-color="dark"
             >

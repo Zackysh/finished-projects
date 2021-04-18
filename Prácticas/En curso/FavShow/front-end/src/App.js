@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
 // Model
 import Shows from "./components/Shows";
-
 // UI
-import SearchTabs from "./components/UI/SearchTabs";
-
+import SearchTabs from "./components/UI/SearchTabs/SearchTabs";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-
+import "./app.css";
+// Services
+import favsService from "./services/favsService";
 // Styles
-import "./styles/app.css";
-import "./styles/seachBar.css";
+import "./components/UI/SearchBar/style.css";
 
 const App = () => {
   const [shows, setShows] = useState([]);
   const [filter, setFilter] = useState("");
   const [favs, setFavs] = useState([]);
   const [fav, setFav] = useState(false);
+
   useEffect(() => {
     axios
       .get("http://localhost:8081/api/shows")
@@ -33,52 +32,17 @@ const App = () => {
       });
   }, []);
 
-  const checkDuplicate = (shows) => {
-    let seen = new Set();
-    return shows.some(
-      (currentObject) => seen.size === seen.add(currentObject.show_id).size
-    );
-  };
-
-  const showShows = () =>
-    shows.filter((show) =>
-      JSON.stringify(show).toLowerCase().includes(filter.toLowerCase())
-    );
-  const showFavs = () =>
-    favs.filter((show) =>
-      JSON.stringify(show).toLowerCase().includes(filter.toLowerCase())
-    );
-
-  const clickOnFav = (show) => {
-    console.log(existOnFavs(show));
-    if (existOnFavs(show)) removeFav(show);
-    else addFav(show);
-  };
-
-  const existOnFavs = (show) => {
-    return favs.filter((fav) => show.show_id == fav.show_id).length > 0;
-  };
-
-  const addFav = (show) => {
-    setFavs(favs.concat(show));
-    window.alert(`"${show.title}" has been added to your favorites list!`);
-  };
-
-  const removeFav = (show) => {
-    if (
-      window.confirm(
-        `You are about to delete "${show.title}" from favorites, continue?`
-      )
-    )
-      setFavs(favs.filter((fav) => fav.show_id !== show.show_id));
-  };
+  useEffect(() => {
+    favsService.downloadFavs(setFavs)
+  }, []);
 
   return (
     <div className="application">
       <SearchTabs
-        useState={useState}
         setFav={setFav}
+        uploadFavs={favsService.uploadFavs}
         fav={fav}
+        favs={favs}
         filter={filter}
         setFilter={setFilter}
       />
@@ -87,10 +51,16 @@ const App = () => {
           <Row>
             <Col>
               <Shows
-                clickOnFav={clickOnFav}
+                clickOnFav={favsService.clickOnFav}
+                setFavs={setFavs}
                 fav={fav}
-                shows={fav ? showFavs() : showShows()}
-                existOnFavs={existOnFavs}
+                favs={favs}
+                shows={
+                  fav
+                    ? favsService.showShows(favs, filter)
+                    : favsService.showShows(shows, filter)
+                }
+                existOnFavs={favsService.existOnFavs}
               />
             </Col>
           </Row>
