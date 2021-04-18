@@ -1,6 +1,7 @@
-import React from 'react'
+import React from "react";
 
-const Filter = ({ value, onChange }) =>
-    <input value={value} onChange={onChange} />
+const Filter = ({ value, onChange }) => (
+  <input value={value} onChange={onChange} />
+);
 
-export default Filter
+export default Filter;

@@ -1,14 +1,14 @@
 tr {
-  color: white; 
+  color: white;
 }
 
-th, h3 {
-  font-family: 'Arvo', sans-serif;
-  color:#E35865;
+th,
+h3 {
+  font-family: "Arvo", sans-serif;
+  color: #e35865;
 }
 
 h3 {
-  
   font-size: 20px;
 }
 
@@ -37,4 +37,3 @@ path {
   color: #ffffff;
   border-color: #ffffff;
 }
-

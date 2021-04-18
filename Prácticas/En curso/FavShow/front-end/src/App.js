@@ -1,68 +1,87 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 // Model
-import Shows from './components/Shows'
+import Shows from "./components/Shows";
 
 // UI
-import FullWidthTabs from './components/UI/FullWidthTabs'
+import SearchTabs from "./components/UI/SearchTabs";
 
-import Container from 'react-bootstrap/Container'
-import Col from 'react-bootstrap/Col'
-import Row from 'react-bootstrap/Row'
+import Container from "react-bootstrap/Container";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
 
 // Styles
-import './styles/app.css'
-import './styles/seachBar.css'
+import "./styles/app.css";
+import "./styles/seachBar.css";
 
 const App = () => {
-  const [shows, setShows] = useState([])
-  const [filter, setFilter] = useState('')
-  const [favs, setFavs] = useState([])
-  const [fav, setFav] = useState(false)
+  const [shows, setShows] = useState([]);
+  const [filter, setFilter] = useState("");
+  const [favs, setFavs] = useState([]);
+  const [fav, setFav] = useState(false);
   useEffect(() => {
     axios
-      .get('http://localhost:8081/api/shows')
-      .then(response => {
-        const data = JSON.parse(response.data)
-        if (data) setShows(data)
-      }).catch(error => {
-        console.log(error)
-        throw error
+      .get("http://localhost:8081/api/shows")
+      .then((response) => {
+        const data = JSON.parse(response.data);
+        if (data) setShows(data);
       })
-  }, [])
+      .catch((error) => {
+        console.log(error);
+        throw error;
+      });
+  }, []);
 
   const checkDuplicate = (shows) => {
     let seen = new Set();
-    return shows.some((currentObject) => seen.size === seen.add(currentObject.show_id).size);
-  }
+    return shows.some(
+      (currentObject) => seen.size === seen.add(currentObject.show_id).size
+    );
+  };
 
-  const showShows = () => shows.filter(show => JSON.stringify(show).toLowerCase().includes(filter.toLowerCase()))
-  const showFavs = () => favs.filter(show => JSON.stringify(show).toLowerCase().includes(filter.toLowerCase()))
+  const showShows = () =>
+    shows.filter((show) =>
+      JSON.stringify(show).toLowerCase().includes(filter.toLowerCase())
+    );
+  const showFavs = () =>
+    favs.filter((show) =>
+      JSON.stringify(show).toLowerCase().includes(filter.toLowerCase())
+    );
 
   const clickOnFav = (show) => {
     console.log(existOnFavs(show));
-    if (existOnFavs(show)) removeFav(show)
+    if (existOnFavs(show)) removeFav(show);
     else addFav(show);
-  }
+  };
 
   const existOnFavs = (show) => {
-    return favs.filter(fav => show.show_id == fav.show_id).length > 0
-  }
+    return favs.filter((fav) => show.show_id == fav.show_id).length > 0;
+  };
 
   const addFav = (show) => {
-    setFavs(favs.concat(show))
-    window.alert(`"${show.title}" has been added to your favorites list!`)
-  }
+    setFavs(favs.concat(show));
+    window.alert(`"${show.title}" has been added to your favorites list!`);
+  };
 
   const removeFav = (show) => {
-    if (window.confirm(`You are about to delete "${show.title}" from favorites, continue?`))
-      setFavs(favs.filter(fav => fav.show_id !== show.show_id))
-  }
+    if (
+      window.confirm(
+        `You are about to delete "${show.title}" from favorites, continue?`
+      )
+    )
+      setFavs(favs.filter((fav) => fav.show_id !== show.show_id));
+  };
 
   return (
     <div className="application">
-      <FullWidthTabs useState={useState} setFav={setFav} fav={fav} filter={filter} setFilter={setFilter} />
+      <SearchTabs
+        useState={useState}
+        setFav={setFav}
+        fav={fav}
+        filter={filter}
+        setFilter={setFilter}
+      />
       <footer className="text-center">
         <Container>
           <Row>
@@ -78,7 +97,7 @@ const App = () => {
         </Container>
       </footer>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
