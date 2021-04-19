@@ -1,12 +1,10 @@
 package com.fav.shows.api.util;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import org.springframework.core.io.ResourceLoader;

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fav.shows.api.DemoApplication;
+import com.fav.shows.api.entity.FavoritesJson;
 import com.fav.shows.api.entity.Show;
 import com.fav.shows.api.links.TaskLinks;
 import com.fav.shows.api.service.ShowService;
@@ -58,7 +59,7 @@ public class ShowController {
     String JSONObject = gson.toJson(favoritesList);
     return JSONObject;
   }
-  
+
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping(path = TaskLinks.FAVORITES, consumes = "application/json", produces = "application/json")
   @ResponseBody
@@ -66,7 +67,7 @@ public class ShowController {
     showService.updateFavorites(newFavorites);
     return "All right";
   }
-  
+
   @CrossOrigin(origins = "http://localhost:3000")
   @PostMapping(path = TaskLinks.RESTART)
   @ResponseBody

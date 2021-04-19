@@ -69,8 +69,12 @@ favsService.uploadFavs = (newFavs) => {
 };
 
 favsService.restartAPI = () => {
-  const placeHolder = JSON.parse({ placeholder: "placeholder" });
-  axios.post(`http://localhost:8081/api/favorites`, placeHolder);
+  let placeHolder = [];
+  placeHolder = JSON.stringify(placeHolder)
+  axios.post(`http://localhost:8081/api/restart`, placeHolder, {
+    headers: { "Content-Type": "application/json" },
+  })
+  console.log("restarted")
 };
 
 export default favsService;
