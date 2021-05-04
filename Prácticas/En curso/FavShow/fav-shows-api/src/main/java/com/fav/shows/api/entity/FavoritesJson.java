@@ -1,5 +1,6 @@
 package com.fav.shows.api.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,12 +18,17 @@ public class FavoritesJson {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Integer show_id;
+  private Integer id_favJson;
 
+  @Column(columnDefinition="TEXT")
   private String json;
 
   public FavoritesJson(String json) {
     this.json = json;
+  }
+  
+  public FavoritesJson() {
+    
   }
   
   public String getJson() {
@@ -31,7 +37,7 @@ public class FavoritesJson {
 
   @Override
   public String toString() {
-    return "FavoritesJson [show_id=" + show_id + ", json=" + json + "]";
+    return "FavoritesJson [show_id=" + id_favJson + ", json=" + json + "]";
   }
 
 }

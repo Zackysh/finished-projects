@@ -49,17 +49,23 @@ public class ShowService {
   }
 
   public List<Show> getFavorites() {
-    Iterable<FavoritesJson> it = repository.findAll();
-    FavoritesJson a = it.iterator().next();
-    String json = a.getJson();
-    File tempFile;
-    try {
-      tempFile = writeFileToTemp(json); // Write with java
-      return getFavoritesFromJSON(tempFile); // Read with gson
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+    Optional<FavoritesJson> it = repository.findById(0);
+    if (it.isPresent()) {
+      FavoritesJson a = it.get();
+      String json = a.getJson();
+      System.out.println("Favorites");
+      System.out.println(json);
+      File tempFile;
+      try {
+        tempFile = writeFileToTemp(json); // Write with java
+        return getFavoritesFromJSON(tempFile); // Read with gson
+      } catch (IOException e) {
+        e.printStackTrace();
+        return null;
+      }
     }
+    return null;
+
   }
 
   /**
@@ -73,6 +79,7 @@ public class ShowService {
     Show[] favorites;
     try {
       BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(json)));
+      BufferedReader mine = new BufferedReader(new InputStreamReader(new FileInputStream(json)));
       favorites = gson.fromJson(br, Show[].class); // gson reads from BufferedReader
       if (favorites != null)
         return Arrays.asList(favorites);
