@@ -1,7 +1,6 @@
 package com.fav.shows.api.util;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +10,12 @@ import org.springframework.core.io.ResourceLoader;
 
 import com.fav.shows.api.entity.Show;
 
+/**
+ * This class is intended to provide useful tools to
+ * read and mock CSV files.
+ * 
+ * @author AdriGB
+ */
 public class CSVMocker {
   private static BufferedReader br;
   static ResourceLoader resourceLoader;
@@ -59,22 +64,20 @@ public class CSVMocker {
    * @param regex   Regular expression to extract info from CSV
    */
   public ArrayList<Show> mockShowsCSV(String src, int headers, String regex) {
-    File file = new File(src);
-    System.out.println(file.getName());
-
-    ArrayList<Show> showsFromCSV = new ArrayList<Show>(); // our Show List
+    // Shows will be stored here
+    ArrayList<Show> showsFromCSV = new ArrayList<Show>();
+    
     try {
-      br = getBReaderResource(src);
-      // read header
-      for (int i = 0; i < headers; i++) {
+      br = getBReaderResource(src); // OPEN READER
+      // read header/s
+      for (int i = 0; i < headers; i++)
         br.readLine();
-      }
       // read first record
       String line = br.readLine();
       // for every record ...
       while (line != null) {
         String[] mock = new String[12]; // use to fit Show() constructor
-        String[] fields = line.split(regex, -1); // ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1
+        String[] fields = line.split(regex, -1);
         for (int i = 0; i < fields.length; i++)
           mock[i] = fields[i];
         mock = formatLineToPrint(mock);
@@ -92,14 +95,13 @@ public class CSVMocker {
     } catch (Exception e) {
       e.printStackTrace();
       return null;
-    } finally { // close flow
-      if (br != null) {
+    } finally {
+      if (br != null)
         try {
-          br.close();
+          br.close(); // CLOSE READER
         } catch (IOException e) {
           e.printStackTrace();
         }
-      }
     }
   }
 
@@ -107,7 +109,9 @@ public class CSVMocker {
    * This function looks for any resource given its file name.
    * Then returns a BufferedReader for it.
    * 
-   * @param src
+   * This is an alternative to fit Spring boot weakness (file managing :,D). 
+   * 
+   * @param src File name
    * @return bufferedReader for source
    */
   public BufferedReader getBReaderResource(String src) throws FileNotFoundException {

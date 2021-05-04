@@ -4,6 +4,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { FileInput } from "../FileInput/FileInput";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -52,7 +53,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SearchTabs({ filter, setFilter, uploadFavs, setFav, favs, fav }) {
+export default function SearchTabs({
+  filter,
+  setFilter,
+  uploadFavs,
+  downloadJSONFavs,
+  setFav,
+  setFavs,
+  favs,
+  fav,
+  importFavs,
+}) {
   const classes = useStyles();
   const theme = useTheme();
 
@@ -76,15 +87,9 @@ export default function SearchTabs({ filter, setFilter, uploadFavs, setFav, favs
       <AppBar position="static" color="default">
         <Row>
           <Col>
-            <button
-              type="button"
-              className={buttonStyle}
-              data-mdb-ripple-color="dark"
-            >
-              Import favorites
-            </button>
+            <FileInput setFavs={setFavs} favs={favs} importFavs={importFavs} buttonStyle={buttonStyle} />
           </Col>
-          <Col xs={6}>
+          <Col xs={3}>
             <button
               type="button"
               onClick={() => uploadFavs(favs)}
@@ -97,6 +102,7 @@ export default function SearchTabs({ filter, setFilter, uploadFavs, setFav, favs
           <Col>
             <button
               type="button"
+              onClick={() => downloadJSONFavs(favs)}
               className={buttonStyle}
               data-mdb-ripple-color="dark"
             >

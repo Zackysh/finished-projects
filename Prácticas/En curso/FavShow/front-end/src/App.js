@@ -1,46 +1,36 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
-// Model
-import Shows from "./components/Shows";
-// UI
-import SearchTabs from "./components/UI/SearchTabs/SearchTabs";
-import Container from "react-bootstrap/Container";
+import React, { useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import "./app.css";
-// Services
-import favsService from "./services/favsService";
-// Styles
+import Shows from "./components/Shows";
 import "./components/UI/SearchBar/style.css";
+import SearchTabs from "./components/UI/SearchTabs/SearchTabs";
+import favsService from "./services/favsService";
 
 const App = () => {
-  const [shows, setShows] = useState([]);
-  const [filter, setFilter] = useState("");
-  const [favs, setFavs] = useState([]);
-  const [fav, setFav] = useState(false);
-
+  const [shows, setShows] = useState([]); // show list
+  const [filter, setFilter] = useState(""); // filter text
+  const [favs, setFavs] = useState([]); // fav list
+  const [fav, setFav] = useState(false); // when fav tab is active or not
+  // fetch shows with axios at first
   useEffect(() => {
-    axios
-      .get("http://localhost:8081/api/shows")
-      .then((response) => {
-        const data = JSON.parse(response.data);
-        if (data) setShows(data);
-      })
-      .catch((error) => {
-        console.log(error);
-        throw error;
-      });
+    favsService.downloadShows(setShows);
   }, []);
-
+  // fetch favorites with axios at second
   useEffect(() => {
-    favsService.downloadFavs(setFavs)
+    favsService.downloadFavs(setFavs);
   }, []);
-
-  return (
+  
+  return ( // render application
     <div className="application">
       <SearchTabs
         setFav={setFav}
+        setFavs={setFavs}
         uploadFavs={favsService.uploadFavs}
+        importFavs={favsService.importFavs}
+        downloadJSONFavs={favsService.downloadJSONFavs}
         fav={fav}
         favs={favs}
         filter={filter}

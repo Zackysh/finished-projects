@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,11 +20,14 @@ import com.fav.shows.api.entity.FavoritesRepository;
 import com.fav.shows.api.entity.Show;
 import com.fav.shows.api.util.CSVMocker;
 import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+  
+/**
+ * This service provide necessary tools to write, read and store JSON files
+ * between remote client, files and data-base.
+ * 
+ * @author AdriGB
+ */
 @Service
 public class ShowService {
 
@@ -33,8 +35,6 @@ public class ShowService {
 
   @Autowired
   private FavoritesRepository repository;
-
-  private final String FAVORITES_PATH = "./src/main/resources/favorites.json";
 
   /**
    * Map CSV Shows and return them as List<Show>.
@@ -48,32 +48,81 @@ public class ShowService {
     return shows;
   }
 
+  /**
+   * Method that fetches favorites JSON from database. - Write fetched JSON in a
+   * temporary JSON (FileWriter).
+   * 
+   * - Read temporary JSON (BufferedReader) to extract favorites.
+   * - Returns favorites as an ArrayList<Show>.
+   * 
+   * @return favorites ArrayList<Show>
+   */
   public List<Show> getFavorites() {
-    Iterable<FavoritesJson> it = repository.findAll();
-    FavoritesJson a = it.iterator().next();
-    String json = a.getJson();
+    // Fetch JSON from database
+    // JSON is stored always on registry with id = 0
+    Optional<FavoritesJson> op = repository.findById(0);
+
+    FavoritesJson favs = null;
+    if (!op.isPresent())
+      return new ArrayList<Show>(); // empty list if there's no JSON
+
+    favs = op.get();
+    String favsJSON = favs.getJson(); // Here we have desired JSON
     File tempFile;
     try {
-      tempFile = writeFileToTemp(json); // Write with java
-      return getFavoritesFromJSON(tempFile); // Read with gson
+      // Write fetched favorites in temporary JSON
+      tempFile = writeJSONToTempFile(favsJSON, "favorites");
+      // Read and return favorites from temporary JSON
+      return readFavoritesFromTemp(tempFile);
     } catch (IOException e) {
       e.printStackTrace();
-      return null;
+      return new ArrayList<Show>(); // empty list JSON couldn't be read
     }
   }
 
   /**
-   * Read favorites.json and return its value as List<Show>.
+   * Method that sets new favorites both in database and temporary JSON file.
+   * Read comments for deeper understanding.
+   * 
+   * @param newFavs List which will be stored
+   * @returns true if favorites were updated
+   * @returns false if favorites weren't updated
+   */
+  public boolean updateFavorites(List<Show> newFavs) {
+    // verify data integrity
+    if (newFavs == null)
+      return false;
+
+    try {
+      // Generate JSON from List
+      Gson gson = new Gson();
+      String newFavsJSON = gson.toJson(newFavs);
+      // Write JSON into temporal file
+      File tempJSON = writeJSONToTempFile(newFavsJSON, "favorites");
+      // Read stored temporary file
+      newFavsJSON = readFavsJSONFromTemp(tempJSON);
+      // Store read JSON on data-base to achieve persistence
+      // because Spring isn't very suitable for file persistence
+      repository.updateFavorites(0, newFavsJSON);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Read given file (that should contain some shows as JSON) and return its
+   * content as List<Show>.
    * 
    * @return favorites As List<Show>
    */
-  private List<Show> getFavoritesFromJSON(File json) {
+  private List<Show> readFavoritesFromTemp(File json) {
     Gson gson = new Gson();
-    c = new CSVMocker();
     Show[] favorites;
     try {
       BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(json)));
-      favorites = gson.fromJson(br, Show[].class); // gson reads from BufferedReader
+      favorites = gson.fromJson(br, Show[].class); // GSON reads from BufferedReader and mock to Show[]
       if (favorites != null)
         return Arrays.asList(favorites);
       return null;
@@ -83,35 +132,42 @@ public class ShowService {
     }
   }
 
-  public boolean updateFavorites(List<Show> newFavorites) {
-    if (newFavorites == null)
-      return false;
-    setNewFavorites(newFavorites);
-    return true;
-  }
-
-  private void setNewFavorites(List<Show> newFavorites) {
-    Gson gson = new Gson();
+  /**
+   * Read given file (that should contain some shows as JSON) and return its
+   * content as String (JSON).
+   * 
+   * @return favorites As String (JSON)
+   */
+  private String readFavsJSONFromTemp(File json) {
+    String favorites = "";
     try {
-      // Generate JSON
-      String strNewFavs = gson.toJson(newFavorites);
-      // Write json into temporal file
-      writeFileToTemp(strNewFavs); // demostrative
-      // Send readed JSON to repository
-      FavoritesJson newFavs = new FavoritesJson(strNewFavs);
-      repository.save(newFavs);
-
-    } catch (JsonIOException e) {
-      e.printStackTrace();
+      BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(json)));
+      String line = br.readLine();
+      while (line != null) {
+        favorites += line;
+        line = br.readLine();
+      }
+      br.close();
+      return favorites;
     } catch (IOException e) {
-      e.printStackTrace();
+      e.fillInStackTrace();
+      return null;
     }
   }
 
-  private File writeFileToTemp(String toWrite) throws IOException {
-    File tmpFile = File.createTempFile("favorites.json", ".tmp");
+  /**
+   * Method which writes given String (JSON) into a new file on client system
+   * default temporary folder.
+   * $TMPDIR on MAC and /TEMP on windows.
+   * 
+   * @param JSONText JSON text to write
+   * @return new/updated temporary file
+   * @throws IOException
+   */
+  private File writeJSONToTempFile(String JSONText, String fileName) throws IOException {
+    File tmpFile = File.createTempFile(fileName, ".json");
     FileWriter writer = new FileWriter(tmpFile);
-    writer.write(toWrite);
+    writer.write(JSONText);
     writer.close();
 
     return tmpFile;

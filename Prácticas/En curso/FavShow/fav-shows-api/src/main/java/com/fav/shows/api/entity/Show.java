@@ -1,29 +1,36 @@
 package com.fav.shows.api.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+/**
+ * The method is a dummy to mock shows from netflix.csv.
+ * 
+ * @author AdriGB
+ */
 public class Show {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  // FIELDS
   private String show_id;
 
   private String type, title, director, cast, country, date_added, release_year, rating, duration, listed_in,
       description;
 
-  public Show(String show_id, String type, String title, String director, String cast, String country, String date_added,
-      String release_year, String rating, String duration, String listed_in, String description) {
+  /**
+   * Constructor.
+   * 
+   * @param show_id
+   * @param type
+   * @param title
+   * @param director
+   * @param cast
+   * @param country
+   * @param date_added
+   * @param release_year
+   * @param rating
+   * @param duration
+   * @param listed_in
+   * @param description
+   */
+  public Show(String show_id, String type, String title, String director, String cast, String country,
+      String date_added, String release_year, String rating, String duration, String listed_in, String description) {
     this.show_id = show_id;
     this.type = type;
     this.title = title;

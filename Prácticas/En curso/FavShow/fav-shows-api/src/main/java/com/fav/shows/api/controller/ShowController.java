@@ -12,27 +12,39 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fav.shows.api.DemoApplication;
-import com.fav.shows.api.entity.FavoritesJson;
 import com.fav.shows.api.entity.Show;
 import com.fav.shows.api.links.TaskLinks;
 import com.fav.shows.api.service.ShowService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-
-@Slf4j
+/**
+ * This class is the main controller of this API.
+ * It contains resources and handlers calls.
+ * 
+ * @author AdriGB
+ *
+ */
+@CrossOrigin(origins = "http://localhost:3000")
 @RepositoryRestController
 @RequestMapping("/api/")
-@RequiredArgsConstructor
 public class ShowController {
+
+  /**
+   * ShowService interacts with netflix.csv and favorites.json (temporal file) to
+   * serve shows and favorites to this controller requests.
+   */
   @Autowired
   private ShowService showService;
 
-  @CrossOrigin(origins = "http://localhost:3000")
+  /**
+   * This GET mapping returns shows extracted from netflix.csv parsed into JSON
+   * format. This process involves reading a CSV with java libraries before serve
+   * its content.
+   * 
+   * @return shows In JSON format (response body)
+   * @throws FileNotFoundException request will fail if netflix.csv doesn't exists
+   */
   @GetMapping(path = TaskLinks.SHOWS, produces = "application/json")
   @ResponseBody
   public String getShows() throws FileNotFoundException {
@@ -41,15 +53,25 @@ public class ShowController {
       GsonBuilder gsonBuilder = new GsonBuilder();
       Gson gson = gsonBuilder.create();
       String JSONObject = gson.toJson(showList);
-      System.out.println(showService.updateFavorites(null));
+      System.out.println("GET request to /shows completed successfully.");
       return JSONObject;
     } catch (Exception e) {
       e.fillInStackTrace();
+      System.out.println("GET request to /shows failed.");
       return null;
     }
   }
 
-  @CrossOrigin(origins = "http://localhost:3000")
+  /**
+   * This GET mapping returns favorites (which are stored both in "data-base" as
+   * "JSON".
+   * 
+   * This process involves "writing" and "reading" those favorites into a
+   * temporary file on system default temporary folder with java libraries
+   * before serve them.
+   * 
+   * @return favorites In JSON format (response body)
+   */
   @GetMapping(path = TaskLinks.FAVORITES, produces = "application/json")
   @ResponseBody
   public String getFavs() {
@@ -57,23 +79,25 @@ public class ShowController {
     GsonBuilder gsonBuilder = new GsonBuilder();
     Gson gson = gsonBuilder.create();
     String JSONObject = gson.toJson(favoritesList);
+    
+    System.out.println("GET request to /favorites completed successfully.");
     return JSONObject;
   }
 
-  @CrossOrigin(origins = "http://localhost:3000")
+  /**
+   * This POST mapping receives new favorites in JSON format. Those new favorites
+   * are directly stored on "data-base" overriding currently stored ones.
+   * 
+   * This process involves "writing" and "reading" those favorites into a
+   * temporary file with java libraries before save them.
+   * 
+   * @param newFavorites JSON with new favorites to be stored
+   */
   @PostMapping(path = TaskLinks.FAVORITES, consumes = "application/json", produces = "application/json")
   @ResponseBody
-  public String updateFavs(@RequestBody List<Show> newFavorites) {
+  public void updateFavs(@RequestBody List<Show> newFavorites) {
     showService.updateFavorites(newFavorites);
-    return "All right";
-  }
-
-  @CrossOrigin(origins = "http://localhost:3000")
-  @PostMapping(path = TaskLinks.RESTART)
-  @ResponseBody
-  public void restart() {
-    System.out.println("RESTARTING......");
-    DemoApplication.restart();
+    System.out.println("POST request to /favorites completed successfully.");
   }
 
 }
