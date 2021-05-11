@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import pk_SuperBuscaMinas.BotonMina.Estado;
@@ -16,6 +17,11 @@ import pk_SuperBuscaMinas.Util.Posicion;
 public class MatrizBotonesTest {
 
   MatrizBotones matriz;
+  
+  @BeforeClass
+  public static void atStart() {
+    System.out.println("sadsad");
+  }
   
   @Before
   public void initialize() {
@@ -61,5 +67,39 @@ public class MatrizBotonesTest {
       assertEquals(Estado.MINA, matriz.getBoton(coordenadas).getEstado());
     }
   }
+  
+  @Test
+  public void recursivoDestapaBotonesAdyacentes() {
+    System.out.println("Estado inicial");
+    matriz.imprimir();
+    
+    matriz.getBoton(2, 0).setValor(Valor.NUMERO);
+//    matriz.getBoton(2, 0).cambiarAspecto(Estado.NUMERO);
+    matriz.recursivoDestapaBotonesAdyacentes(matriz.getBoton(2, 0));
+    
+    System.out.println("Después de destapar numero");
+    matriz.imprimir();
+    
+    matriz.getBoton(3, 2).setValor(Valor.VACIO);
+    matriz.recursivoDestapaBotonesAdyacentes(matriz.getBoton(3, 2));
+    
+    System.out.println("Después de destapar VACIO");
+    matriz.imprimir();
+    
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
 }

@@ -223,12 +223,12 @@ public class MatrizBotones {
 		if (this.hayBoton(boton, posicion)) {
 			BotonMina boton_a_destapar = this.getBotonAdyacente(boton, posicion);
 
-			if (boton_a_destapar.getEstado().equals(Estado.BOTON)) {		
+			if (boton_a_destapar.getEstado().equals(Estado.BOTON)) {
 				// Si es valor NUMERO cambia aspecto a NUMERO
 				if (boton_a_destapar.getValor().equals(Valor.NUMERO)) {
 					boton_a_destapar.cambiarAspecto(Estado.NUMERO);
 					botonesNoMinaSinPulsar--;
-				}  
+				}
 				// Si es valor VACIO cambia aspecto a PULSADO
 				else if (boton_a_destapar.getValor().equals(Valor.VACIO)) {
 					boton_a_destapar.cambiarAspecto(Estado.PULSADO);

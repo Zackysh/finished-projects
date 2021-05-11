@@ -102,7 +102,7 @@ public class Tablero {
 						
 						// Boton Izquierdo
 						if (e.getButton() == MouseEvent.BUTTON1) {				
-							// Si es BOTON 
+							// Si es BOTON
 							if (boton.getEstado().equals(Estado.BOTON)) {
 								// Si debajo hay una mina acaba
 								if (boton.getValor().equals(Valor.MINA)) {
@@ -113,12 +113,11 @@ public class Tablero {
 								// Si debajo no hay nada, limpio de forma recursiva
 								else if (boton.getValor().equals(Valor.VACIO)) {
 									boton.cambiarAspecto(Estado.PULSADO);
-
 									matrizBotones.recursivoDestapaBotonesAdyacentes(boton);
 									isJuegoFinalizado();	
 								}
 								// Si hay número (indicando las minas adyacentes), lo muestro
-								else if (boton.getValor().equals(Valor.NUMERO)) {
+								else if (boton.getValor().equals(Valor.NUMERO)) { // TODO
 									boton.cambiarAspecto(Estado.NUMERO);
 									matrizBotones.decrementaBotonesNoMinasSinPulsar();
 									isJuegoFinalizado();
@@ -138,7 +137,7 @@ public class Tablero {
 								boton.cambiarAspecto(Estado.BANDERA);
 								panelContadorMinas.decrementaNumMinas();
 							}
-						}						
+						}
 					}
 					@Override
 					public void mousePressed(MouseEvent e) {}
