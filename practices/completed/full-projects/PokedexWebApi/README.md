@@ -1,23 +1,21 @@
-### Instrucciones para ejecutar Pokedex Web API
+### Instructions to execute this project
 
-# [ENLACE A DOCUMENTACIÓN](https://www.notion.so/Pokedex-Web-and-API-26bb54dc02164be5bcf3f8461e28a894)
-##### Arrancar API:
+# [DOCUMENTATION](https://www.notion.so/Pokedex-Web-and-API-26bb54dc02164be5bcf3f8461e28a894)
+##### RUN API:
 
-  > Abrir VS y hacer click en "abrir un proyecto o una solución". Seleccionar el archivo `API/Pokedex.sln`
+  > Open VS y click on "open project or solution". Select `API/Pokedex.sln`
 
-- Una vez importado el proyecto, sigue estos pasos:
+- Then follow this steps:
 
-  - Arrancar una base de datos (preferentemente en el puerto 3306).
-  - Ejecutar esta query: [SQL](https://gist.github.com/Zackysh/3802383e4ba18c2e16ce1f9ed12c18cc)
-  - Si no tienes la BDD en el puerto 3306, dentro del proyecto ve a `appsettings.json` y cambia el puerto al que estés utilizando.
-  - Si tienes un usuario `root` sin contraseña, puedes continuar, sino crealo o introduce tus credenciales en `appsettings.json`
+  - Run your sql server de (preferably 3306).
+  - Execute this query: [SQL](https://gist.github.com/Zackysh/3802383e4ba18c2e16ce1f9ed12c18cc)
+  - If your data-base isn't on the port 3306, navigate to `appsettings.json`, then introduce your db port.
+  - If there's `root` user with no password in your db server, continue, otherwise create it or introduce your credentials on `appsettings.json`
 
-##### Arrancar Web:
+##### RUN Web:
 
-- Abre la carpeta `FE` con VS-Code (u otro editor) y ejecuta en la terminal los siguientes comandos:
+- Open `FE` folder with VS-Code (or another editor or terminal) and execute next commands:
   - `npm install`
   - `ng serve`
 
-#### Cosas a tener en cuenta:
-
-Si haces click en el nombre de los pokemons podrás ver sus detalles en una ventana a parte.
+Let me know what do you think about it!
