@@ -1,0 +1,55 @@
+<div class="containerx d-flex align-items-center pb-5">
+  <div class="col-md-5 mx-auto align-middle">
+    <span class="row-5 text">Welcome to Pokedex Web</span>
+    <div class="card card-signin my-3">
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <input
+              type="text"
+              autocomplete="nickname"
+              formControlName="username"
+              placeholder="Username"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f.username.errors }"
+            />
+            <div
+              *ngIf="submitted && f.username.errors"
+              class="invalid-feedback"
+            >
+              <div *ngIf="f.username.errors.required">Username required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              autocomplete="current-password"
+              formControlName="password"
+              placeholder="Password"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f.password.errors }"
+            />
+            <div
+              *ngIf="submitted && f.password.errors"
+              class="invalid-feedback"
+            >
+              <div *ngIf="f.password.errors.required">Password required</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="multi-button">
+              <span
+                *ngIf="loading"
+                class="spinner-border bg-warning spinner-border-sm"
+              ></span>
+              <button [disabled]="loading">Sign in</button>
+              <a routerLink="../register"
+                ><button type="button">Register</button></a
+              >
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

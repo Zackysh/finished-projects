@@ -1,0 +1,23 @@
+.item {
+  width: 30rem;
+  height: 25rem;
+  transition: 0.5s;
+}
+.item:hover {
+  transform: scale(1.07);
+  cursor: pointer;
+}
+.item1 {
+  margin-top: 4rem;
+  margin-bottom: auto;
+  background-image: linear-gradient(
+    -20deg,
+    rgb(41, 59, 56) 50%,
+    rgb(43, 43, 43) 50%
+  );
+}
+.item2 {
+  margin-top: 4rem;
+  margin-bottom: auto;
+  background-image: linear-gradient(-60deg, #6c3 50%, #09f 50%);
+}

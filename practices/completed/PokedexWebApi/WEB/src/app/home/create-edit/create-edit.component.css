@@ -1,0 +1,111 @@
+.get-in-touch {
+  max-width: 800px;
+  margin: 50px auto;
+  position: relative;
+}
+.get-in-touch .title {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 3.2em;
+  line-height: 48px;
+  padding-bottom: 48px;
+  color: #5543ca;
+  background: #5543ca;
+  background: -moz-linear-gradient(left, #500b08 0%, #43b6ca 100%) !important;
+  background: -webkit-linear-gradient(
+    left,
+    #490200 0%,
+    #5543ca 100%
+  ) !important;
+  background: linear-gradient(to right, #000000 0%, #4367ca 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+.contact-form .form-field {
+  position: relative;
+  margin: 32px 0;
+}
+.contact-form .input-text {
+  display: block;
+  width: 100%;
+  height: 36px;
+  border-width: 0 0 2px 0;
+  border-color: #5543ca;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+}
+.contact-form .input-text:focus {
+  outline: none;
+}
+.contact-form .input-text:not(:placeholder-shown) + label {
+  -webkit-transform: translateY(-24px);
+  transform: translateY(-24px);
+}
+.contact-form .input-text:focus + .label,
+.contact-form .input-text.not-empty + .label {
+  -webkit-transform: translateY(-24px);
+  transform: translateY(-24px);
+}
+.contact-form .label {
+  position: absolute;
+  left: 20px;
+  bottom: 11px;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+  color: #5543ca;
+  cursor: text;
+  transition: -webkit-transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;
+}
+.contact-form .submit-btn {
+  background-color: #000;
+  background-image: linear-gradient(125deg, #5f294b, #064497);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 16px;
+  padding: 8px 16px;
+  border: none;
+  width: 160px;
+  cursor: pointer;
+}
+.submit-btn {
+  -webkit-animation: in 400ms;
+}
+.submit-btn:hover {
+  -webkit-animation: out 400ms;
+  transform: scale(1.1);
+}
+@keyframes out {
+  from {
+    -webkit-transform: scale(1);
+  }
+  to {
+    -webkit-transform: scale(1.1);
+  }
+}
+@keyframes in {
+  0% {
+    -webkit-transform: scale(1.1);
+  }
+  100% {
+    -webkit-transform: scale(1);
+  }
+}
+.badgebox {
+  opacity: 0;
+}
+.badgebox + .badge {
+  text-indent: -999999px;
+  width: 27px;
+}
+.badgebox:focus + .badge {
+  box-shadow: inset 0px 0px 5px;
+}
+.badgebox:checked + .badge {
+  text-indent: 0;
+}

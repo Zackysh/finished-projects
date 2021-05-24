@@ -1,0 +1,138 @@
+/* You can add global styles to this file, and also import other style files */
+.bg {
+	position: relative;
+  padding: 0;
+  height: 35%;
+}
+.custom-shape-divider-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+}
+.custom-shape-divider-bottom svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 50px;
+}
+.custom-shape-divider-top {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+}
+.custom-shape-divider-top svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 30px;
+}
+.custom-shape-divider-bottom .shape-fill,
+.custom-shape-divider-top .shape-fill {
+    fill: #FFFFFF;
+}
+
+.card {
+	cursor: pointer;
+}
+
+.bg-Normal {
+	background-color: #A8A77A;
+	color: #fff;
+}
+
+.bg-Fire {
+	background-color: #EE8130;
+	color: #fff;
+}
+
+.bg-Water {
+	background-color: #6390F0;
+	color: #fff;
+}
+
+.bg-Electric {
+	background-color: #F7D02C;
+	color: #fff;
+}
+
+.bg-Grass {
+	background-color: #7AC74C;
+	color: #fff;
+}
+
+.bg-Ice {
+	background-color: #96D9D6;
+	color: #fff;
+}
+
+.bg-Fighter {
+	background-color: #C22E28;
+	color: #fff;
+}
+
+.bg-Poison {
+	background-color: #A33EA1;
+	color: #fff;
+}
+
+.bg-Ground {
+	background-color: #E2BF65;
+	color: #fff;
+}
+
+.bg-Flying {
+	background-color: #A98FF3;
+	color: #fff;
+}
+
+.bg-Psychic {
+	background-color: #F95587;
+	color: #fff;
+}
+
+.bg-Bug {
+	background-color: #A6B91A;
+	color: #fff;
+}
+
+.bg-Rock {
+	background-color: #B6A136;
+	color: #fff;
+}
+
+.bg-Ghost, .bg-shadow {
+	background-color: #735797;
+	color: #fff;
+}
+
+.bg-Dragon {
+	background-color: #6F35FC;
+	color: #fff;
+}
+
+.bg-Dark {
+	background-color: #705746;
+	color: #fff;
+}
+
+.bg-Steel {
+	background-color: #B7B7CE;
+	color: #fff;
+}
+
+.bg-Fairy {
+	background-color: #D685AD;
+	color: #fff;
+}
+
+.bg-Unknown {
+	background-color: #aaa;
+	color: #fff;
+}

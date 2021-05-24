@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pokedex", "Pokedex\Pokedex.csproj", "{11710D1C-DBA1-4419-B76E-D701CDB2F477}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokedex.DAL", "PokedexDAL\Pokedex.DAL.csproj", "{12A6B43F-C42A-4535-B99A-0C01B2E9FD96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokedex.BLL", "PokedexBLL\Pokedex.BLL.csproj", "{9B8BA609-58FB-426E-97D0-211C09397108}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokedex.Core", "PokedexCore\Pokedex.Core.csproj", "{A0AF02B7-A8C5-4B00-9633-CE58503210E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11710D1C-DBA1-4419-B76E-D701CDB2F477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11710D1C-DBA1-4419-B76E-D701CDB2F477}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11710D1C-DBA1-4419-B76E-D701CDB2F477}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11710D1C-DBA1-4419-B76E-D701CDB2F477}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12A6B43F-C42A-4535-B99A-0C01B2E9FD96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12A6B43F-C42A-4535-B99A-0C01B2E9FD96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12A6B43F-C42A-4535-B99A-0C01B2E9FD96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12A6B43F-C42A-4535-B99A-0C01B2E9FD96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B8BA609-58FB-426E-97D0-211C09397108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B8BA609-58FB-426E-97D0-211C09397108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B8BA609-58FB-426E-97D0-211C09397108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B8BA609-58FB-426E-97D0-211C09397108}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0AF02B7-A8C5-4B00-9633-CE58503210E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0AF02B7-A8C5-4B00-9633-CE58503210E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0AF02B7-A8C5-4B00-9633-CE58503210E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0AF02B7-A8C5-4B00-9633-CE58503210E1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A9D6D23-29FB-4969-BDAF-982B4FF6645F}
+	EndGlobalSection
+EndGlobal

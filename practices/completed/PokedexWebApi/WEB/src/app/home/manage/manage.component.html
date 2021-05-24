@@ -1,0 +1,65 @@
+<div class="d-flex justify-content-center">
+  <div class="search">
+    <div>
+      <input
+        type="text"
+        [(ngModel)]="searchValue"
+        placeholder="Search . . ."
+        (ngModelChange)="filterPokemons()"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="row space-rows pt-4 px-3" style="margin: 0">
+  <div *ngFor="let pokemon of filteredPokemons" class="col-md-4 mb-2">
+    <div class="card cards-shadown cards-hover">
+      <div class="d-flex justify-content-between p-3 text-center bg-dark text-light mb-0" style="font-size: larger;">
+        <button class="btn btn-primary" [state]="{number: pokemon.number}" routerLink="/home/create-edit">
+          <fa-icon [icon]="faEdit"></fa-icon>
+        </button>
+        <a class="btn-link text-light card-link" [state]="{number: pokemon.number}" routerLink="/home/viewport">
+          {{ pokemon.name }} Nº {{pokemon.number}}
+        </a>
+        <button class="btn btn-danger" (click)="remove(pokemon.number)">
+          <fa-icon [icon]="faTrashAlt"></fa-icon>
+        </button>
+      </div>
+      <hr class="bg-secondary m-0" />
+      <div class="d-flex justify-content-center pb-3 bg-dark">
+        <img style="width: auto; height: 240px" [src]="pokemon.image" />
+      </div>
+      <div class="card-body">
+        <div style="overflow-y: auto; overflow-x: hidden; height: 100px">
+          {{ pokemon.description }}<br />
+        </div>
+        <span class="header-text">Skill: </span>{{ pokemon.skill }}<br />
+        <hr class="bg-dark m-0" />
+        <span class="header-text">Category: </span>{{ pokemon.category }}<br />
+        <hr class="bg-dark m-0" />
+        <span class="header-text">Height: </span>{{ pokemon.height }}<br />
+        <hr class="bg-dark m-0" />
+        <span class="header-text">Weight: </span>{{ pokemon.weight }}<br />
+        <hr class="bg-dark m-0" />
+        <span class="header-text">Sex: </span>{{ pokemon.sex }}<br />
+        <hr class="bg-dark m-0" />
+      </div>
+      <div class="card-header bg-dark">
+        <!-- prettier-ignore -->
+        <div class="h-100" style="overflow-y: auto; overflow-x: hidden;">
+          <div class="row h-100">
+            <div
+              *ngFor="let type of pokemon.types"
+              class="card d-flex justify-content-center shadow col-mb-6 col-lg-6 text-center"
+              style="font-family:'Lucida Sans Unicode', Geneva, Verdana;"
+              [ngStyle]="{ 'background-color': type.rgbColor }"
+              id="cardheader-subtext"
+            >
+              <p class="h6 ">{{ type.name }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

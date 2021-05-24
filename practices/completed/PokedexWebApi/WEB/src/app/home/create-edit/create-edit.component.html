@@ -1,0 +1,148 @@
+<div class="col">
+  <section class="get-in-touch pb-5">
+    <h1 *ngIf="isAddMode" class="title">Create Pokemon</h1>
+    <h1 *ngIf="!isAddMode" class="title">Edit Pokemon</h1>
+    <!-- prettier-ignore -->
+    <form class="contact-form row" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-field col-lg-6">
+        <input placeholder=" " class="input-text js-input" type="text" formControlName="name" required />
+        <label class="label">Name</label>
+      </div>
+      <div class="form-field col-lg-6">
+        <input placeholder=" " class="input-text js-input" type="number" nkeydown="if(event.key==='.'){event.preventDefault();}"  oninput="event.target.value = event.target.value.replace(/[^0-9]*/g,'');" formControlName="number" required />
+        <label class="label">Number</label>
+      </div>
+      <div class="form-field col-lg-4">
+        <input placeholder=" " class="input-text js-input" type="text" formControlName="skill" required />
+        <label class="label">Skill</label>
+      </div>
+      <div class="form-field col-lg-4">
+        <input placeholder=" " class="input-text js-input" type="text" formControlName="category" required />
+        <label class="label">Category</label>
+      </div>
+      <div class="form-field col-lg-4">
+        <input placeholder=" " class="input-text js-input" type="number" formControlName="height" required />
+        <label class="label">Height</label>
+      </div>
+      <div class="form-field col-lg-4">
+        <input placeholder=" " class="input-text js-input" type="number" formControlName="weight" required />
+        <label class="label">Weight</label>
+      </div>
+      <div class="form-field col-lg-4">
+        <input placeholder=" " class="input-text js-input" type="text" formControlName="sex" required />
+        <label class="label">Sex</label>
+      </div>
+      <div class="form-field col-lg-4">
+        <input placeholder=" " class="input-text js-input" type="url" formControlName="image" required />
+        <label class="label">Image URL</label>
+      </div>
+      <div class="form-field col-lg-12">
+        <textarea style="resize: none" placeholder=" " class="input-text js-input" type="text" formControlName="description" required ></textarea>
+        <label class="label">Description</label>
+      </div>
+      <div class="form-field col-lg-12 bg-dark p-4 center text-light h4">
+        Check desired types<br/><br/>
+        <label *ngFor="let type of types" [ngStyle]="{ 'background-color': type.rgbColor }"class="btn">
+          {{type.name}} <input type="checkbox" [checked]="isTypeSelected(type.idType)" (change)="onCheck($event, type)" id="{{type.name}}" class="badgebox"><span class="badge">&#x2713;</span>
+        </label>
+      </div>
+      <div class="form-field col-lg-6">
+        <button class="submit-btn">Submit</button>
+      </div>
+      <div class="form-field col-lg-3"></div>
+      <div class="form-field col-lg-3">
+        <button class="submit-btn" routerLink="/home/manage">Cancel</button>
+      </div>
+    </form>
+    <!-- ======================================================================================================================== -->
+    <!-- =========== name errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+    *ngIf="submitted && f.name.errors"
+    class="d-flex font-weight-bolder align-items-center card text-light bg-dark px-3"
+    style="width: fit-content; box-shadow: 5px 5px #d9534f;"
+    >
+      <div *ngIf="f.name.errors?.required">Name field is required</div>
+      <div *ngIf="f.name.errors?.maxlength">Name max length is 45 characters</div>
+    </div>
+    <!-- =========== number errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+      *ngIf="submitted && f.number.errors"
+      class="d-flex font-weight-bolder align-items-center card text-light bg-dark px-3"
+      style="width: fit-content; box-shadow: 5px 5px #d9534f;"
+    >
+      <div *ngIf="f.number.errors?.required">Number field is required</div>
+    </div>
+    <!-- =========== skill errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+      *ngIf="submitted && f.skill.errors"
+      class="d-flex font-weight-bolder align-items-center card text-light bg-dark px-3"
+      style="width: fit-content; box-shadow: 5px 5px #d9534f"
+    >
+      <div *ngIf="f.skill.errors?.required">Skill field is required</div>
+      <div *ngIf="f.skill.errors?.maxlength">Skill max length is 50 characters</div>
+    </div>
+    <!-- =========== category errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+      *ngIf="submitted && f.category.errors"
+      class="d-flex font-weight-bolder align-items-center card text-light bg-dark px-3"
+      style="width: fit-content; box-shadow: 5px 5px #d9534f"
+    >
+      <div *ngIf="f.category.errors?.required">Category field is required</div>
+      <div *ngIf="f.category.errors?.maxlength">Category max length is 45 characters</div>
+    </div>
+    <!-- =========== height errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+      *ngIf="submitted && f.height.errors"
+      class=" d-flex font-weight-bolder align-items-center card text-light bg-dark px-3"
+      style="width: fit-content; box-shadow: 5px 5px #d9534f"
+    >
+      <div *ngIf="f.height.errors?.required">Height field is required</div>
+      <div *ngIf="f.height.errors?.maxlength">Height max length is 45 characters</div>
+    </div>
+    <!-- =========== weight errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+      *ngIf="submitted && f.weight.errors"
+      class="d-flex font-weight-bolder align-items-center card  text-light bg-dark px-3"
+      style="width: fit-content; box-shadow: 5px 5px #d9534f"
+    >
+      <div *ngIf="f.weight.errors?.required">Weight field is required</div>
+      <div *ngIf="f.weight.errors?.maxlength">Weight max length is 45 characters</div>
+    </div>
+    <!-- =========== sex errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+      *ngIf="submitted && f.sex.errors"
+      class="d-flex font-weight-bolder align-items-center card  text-light bg-dark px-3"
+      style="width: fit-content; box-shadow: 5px 5px #d9534f"
+    >
+      <div *ngIf="f.sex.errors?.required">Sex field is required</div>
+      <div *ngIf="f.sex.errors?.maxlength">Sex max length is 45 characters</div>
+    </div>
+    <!-- =========== image errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+      *ngIf="submitted && f.image.errors"
+      class="d-flex font-weight-bolder align-items-center card  text-light bg-dark px-3"
+      style="width: fit-content; box-shadow: 5px 5px #d9534f"
+    >
+      <div *ngIf="f.image.errors?.required">Image field is required</div>
+      <div *ngIf="f.image.errors?.maxlength">Image max length is 45 characters</div>
+    </div>
+    <!-- =========== description errors =========== -->
+    <!-- prettier-ignore -->
+    <div
+      *ngIf="submitted && f.description.errors"
+      class="d-flex font-weight-bolder align-items-center card  text-light bg-dark px-3"
+      style="width: fit-content; box-shadow: 5px 5px #d9534f"
+    >
+      <div *ngIf="f.description.errors?.required">Description field is required</div>
+      <div *ngIf="f.description.errors?.maxlength">Description max length is 45 characters</div>
+    </div>
+  </section>
+</div>
