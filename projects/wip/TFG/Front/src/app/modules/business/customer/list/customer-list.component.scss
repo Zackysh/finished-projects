@@ -1,0 +1,30 @@
+.form-field {
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    #drawer {
+        width: 1000px;
+    }
+}
+@media (min-width: 820px) {
+    @media (max-width: 1324px) {
+        #drawer {
+            width: 800px;
+        }
+    }
+    @media (max-width: 1124px) {
+        #drawer {
+            width: 700px;
+        }
+    }
+}
+@media (min-width: 432px) {
+    @media (max-width: 1020 ) {
+        .form-field {
+            width: 33.333333% !important;
+        }
+    }
+}
+
+// 768 432

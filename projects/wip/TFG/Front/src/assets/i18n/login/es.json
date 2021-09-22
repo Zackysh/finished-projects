@@ -1,0 +1,17 @@
+{
+  "title": "Iniciar Sesión",
+  "form": {
+    "username": {
+      "text": "Usuario",
+      "required": "Usuario obligatorio",
+      "valid": "Por favor inserte un usuario válido"
+    },
+    "password": {
+      "text": "Contraseña",
+      "required": "Contraseña obligatoria",
+      "valid": "Por favor inserte una contraseña válida."
+    },
+    "alert": "Error usuario o contraseña.",
+    "submit": "Entrar"
+  }
+}

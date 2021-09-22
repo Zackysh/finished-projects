@@ -1,0 +1,106 @@
+<div class="flex flex-col w-full">
+
+  <!-- View mode -->
+  <ng-container>
+
+    <!-- Header -->
+    <div class="relative w-full h-40 sm:h-48 px-8 sm:px-12 bg-accent-300 dark:bg-accent-700">
+      <!-- Close button -->
+      <div class="flex items-center justify-end w-full max-w-3xl mx-auto pt-6">
+        <button mat-icon-button [matTooltip]="'Close'" [routerLink]="['../']">
+          <mat-icon class="text-black" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+      </div>
+      <!-- Name -->
+      <div class="mt-3 text-4xl font-bold truncate">{{group?.name | spacecamel | titlecase}}</div>
+    </div>
+
+    <!-- Group -->
+    <div class="relative flex flex-col flex-auto items-center p-6 sm:p-12 sm:pt-0">
+      <div class="w-full max-w-3xl">
+        <!-- Actions -->
+        <div *ngIf="!editMode && !createMode" class="flex flex-auto items-end -mt-16">
+          <div class="flex items-center ml-auto mb-1">
+            <button mat-stroked-button (click)="toggleEditMode(true)">
+              <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:pencil-alt'"></mat-icon>
+              <span class="ml-2">Edit</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full max-w-3xl px-6 sm:px-12">
+        <form *ngIf="editMode" @zoomIn [formGroup]="groupForm">
+          <!-- Name -->
+          <div class="mt-8">
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+              <mat-label>New name (optional)</mat-label>
+              <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+              </mat-icon>
+              <input matInput [formControlName]="'name'" [placeholder]="'Name'" [spellcheck]="false">
+            </mat-form-field>
+            <mat-error *ngIf="groupForm.get('name').hasError('maxlength')">
+              Maximun length is 40 characters
+            </mat-error>
+            <mat-error *ngIf="groupForm.get('name').hasError('required')">
+              Name is required
+            </mat-error>
+          </div>
+        </form>
+        <div class="mt-8">
+          <div class="leading-6 text-secondary">Permissions</div>
+          <hr class="text-indigo-700 mt-0">
+        </div>
+        <!-- Permissions -->
+        <div class="grid md:grid-cols-2 w-full">
+          <section *ngFor="let resource of resources; trackBy: trackResourceByFn;"
+            class="border-2 rounded-lg border-gray-400 mx-3 mt-5">
+            <div class="p-3 bg-accent-200 rounded-lg">
+              <div>
+                <mat-checkbox class="text-lg" [disabled]="!editMode" color="warn" [(ngModel)]="resource.checked"
+                  [checked]="resource.checked" [indeterminate]="someComplete(resource)"
+                  (change)="setAll(resource, $event.checked)">
+                  {{resource.name | spacecamel | titlecase}}
+                </mat-checkbox>
+              </div>
+            </div>
+            <div class="p-3">
+              <div>
+                <ul *ngIf="!visible" class="list-none grid grid-cols-2 mt-2 pl-4">
+                  <div *ngFor="let permission of resource.permissions; trackBy: trackPermissionByFn;">
+                    <mat-checkbox @zoomIn class="flex flex-col inline" [disabled]="!editMode" color="primary"
+                      [(ngModel)]="permission.checked" (ngModelChange)="updateAllComplete(resource)" ngDefaultControl>
+                      {{permission.name | titlecase}}
+                    </mat-checkbox>
+                  </div>
+                </ul>
+              </div>
+            </div>
+          </section>
+        </div>
+        <!-- Actions -->
+        <div *ngIf="editMode" class="flex items-center mt-7 -mx-6 sm:-mx-12 py-4 pr-4 pl-1 sm:pr-12 sm:pl-7 border-t">
+          <!-- Delete -->
+          <button *ngIf="!createMode" mat-button [color]="'warn'" [matTooltip]="'Delete'" (click)="deleteGroup()">
+            Delete
+          </button>
+          <!-- Cancel -->
+          <button class="ml-auto" mat-button [matTooltip]="'Cancel'" [routerLink]="['../']"
+            (click)="toggleEditMode(false)">
+            Cancel
+          </button>
+          <!-- Save -->
+          <button *ngIf="!createMode" class="ml-2" mat-flat-button [color]="'primary'" [disabled]="groupForm.invalid"
+            [matTooltip]="'Save'" (click)="updateGroup()">
+            Save
+          </button>
+          <button *ngIf="createMode" class="ml-2" mat-flat-button [color]="'primary'" [disabled]="groupForm.invalid"
+            [matTooltip]="'Save'" (click)="createGroup()">
+            Create
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+</div>

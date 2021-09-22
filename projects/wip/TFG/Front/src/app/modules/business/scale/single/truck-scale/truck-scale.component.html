@@ -1,0 +1,230 @@
+<div *ngIf="!scale" class="w-full flex justify-center">
+	<p class="w-full mt-10 text-center text-gray-900 text-6xl">Scale not found!</p>
+</div>
+<form *ngIf="scale" class="flex flex-col flex-auto rounded shadow-lg h-full border-2 border-gray-700 border-opacity-38"
+	[formGroup]="scaleForm">
+	<div class="flex flex-wrap p-1 md:p-8">
+		<p class="w-full text-center text-6xl">{{ scale?.name | titlecase }}</p>
+		<div class="flex flex-wrap pt-4 md:pl-3 md:pr-5 lg:w-1/2">
+
+			<div class="flex flex-wrap w-full mb-4">
+				<div class="flex flex-wrap w-1/2 md:pr-3">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Weight num.
+					</div>
+					<mat-form-field class="h-12 flex-grow">
+						<input matInput disabled>
+					</mat-form-field>
+				</div>
+				<div class="flex flex-wrap w-1/2">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Type
+					</div>
+					<mat-form-field class="h-12 flex-grow">
+						<mat-select [formControlName]="'type'">
+							<mat-option value="-1" disabled selected>Select type...</mat-option>
+							<mat-option value="0">LOAD</mat-option>
+							<mat-option value="1">UNLOAD</mat-option>
+						</mat-select>
+						<mat-error *ngIf="scaleForm.get('type').hasError('required') || scaleForm.get('type').hasError('min')">
+							Type is required
+						</mat-error>
+					</mat-form-field>
+				</div>
+			</div>
+
+			<div class="flex flex-wrap w-full mb-4">
+				<div class="flex items-center justify-center w-full h-8 md:w-auto md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+					Product
+				</div>
+				<mat-form-field class="md:w-3/4 h-12 flex-grow">
+					<mat-select [formControlName]="'product'">
+						<mat-option value="-1" disabled selected>Select product...</mat-option>
+						<mat-option *ngFor="let product of products" [value]="product">
+							{{ product.name }}
+						</mat-option>
+					</mat-select>
+					<mat-error *ngIf="scaleForm.get('product').hasError('required') || scaleForm.get('product').hasError('min')">
+						Product is required
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<!-- Customer -->
+			<div *ngIf="productType() === 0" class="flex flex-wrap w-full mb-4">
+				<!-- Label -->
+				<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+					Customer
+				</div>
+				<!-- Select + Search -->
+				<mat-form-field class="md:w-3/4 h-12 flex-grow">
+					<input matInput placeholder="Search customer..." [matAutocomplete]="auto" [value]="customer?.corporateName"
+						[formControlName]="'customer'">
+				</mat-form-field>
+				<mat-error *ngIf="!_isCustomerValid()" class="flex">
+					Customer is required
+				</mat-error>
+				<mat-autocomplete #auto="matAutocomplete" (optionSelected)='selectCustomer($event.option.value)'
+					[displayWith]="displayFn">
+					<mat-option *ngFor="let customer of customers" [value]="customer">
+						<span>{{ customer.corporateName }}</span>
+						<small> | ID: {{ customer.idCustomer }}</small>
+					</mat-option>
+				</mat-autocomplete>
+			</div>
+			<!-- Supplier -->
+			<div *ngIf="productType() === 1" class="flex flex-wrap w-full mb-4">
+				<!-- Label -->
+				<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+					Supplier
+				</div>
+				<!-- Select + Search -->
+				<mat-form-field class="md:w-3/4 h-12 flex-grow">
+					<input matInput placeholder="Search supplier..." [matAutocomplete]="auto" [value]="supplier?.corporateName"
+						[formControlName]="'supplier'">
+				</mat-form-field>
+				<mat-error *ngIf="!_isSupplierValid()" class="flex">
+					Supplier is required
+				</mat-error>
+				<mat-autocomplete #auto="matAutocomplete" (optionSelected)='selectSupplier($event.option.value)'
+					[displayWith]="displayFn">
+					<mat-option *ngFor="let supplier of suppliers" [value]="supplier">
+						<span>{{ supplier.corporateName }}</span>
+						<small> | ID: {{ supplier.idSupplier }}</small>
+					</mat-option>
+				</mat-autocomplete>
+			</div>
+
+			<!-- Big box -->
+			<div class="flex flex-wrap w-full mb-4 pt-3 px-2 md:p-5 shadow-md border-2 border-gray-700 border-opacity-25">
+				<div class="flex flex-wrap w-full mb-4">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						NIF
+					</div>
+					<mat-form-field class="md:w-3/4 h-12 flex-grow">
+						<input matInput disabled [value]="productType() === 0 ? customer$?.vat  ?? '' : supplier$?.vat  ?? ''">
+					</mat-form-field>
+				</div>
+				<div class="flex flex-wrap w-full mb-4">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Address
+					</div>
+					<mat-form-field class="md:w-3/4 h-12 flex-grow">
+						<input matInput disabled [value]="productType() === 0 ? customer$?.address  ?? '' : supplier$?.address  ?? ''">
+					</mat-form-field>
+				</div>
+				<div class="flex flex-wrap w-full mb-4">
+					<div class="flex flex-wrap w-full mb-4 lg:mb-0 lg:w-1/2">
+						<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+							Poblacion
+						</div>
+						<mat-form-field class="h-12 flex-grow">
+							<input matInput disabled [value]="poblacion?.poblacion">
+						</mat-form-field>
+					</div>
+					<div class="flex flex-wrap w-full lg:w-1/2">
+						<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+							Postal Code
+						</div>
+						<mat-form-field class="h-12 flex-grow">
+							<input matInput disabled
+								[value]="productType() === 0 ? customer$?.postalCode  ?? '' : supplier$?.postalCode  ?? ''">
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="flex flex-wrap w-full mb-4">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Phone
+					</div>
+					<mat-form-field class="md:w-3/4 h-12 flex-grow">
+						<input matInput disabled [value]="productType() === 0 ? customer$?.phone1  ?? '' : supplier$?.phone1  ?? ''">
+					</mat-form-field>
+				</div>
+			</div>
+
+			<div class="flex flex-wrap w-full md:w-1/2 mb-4 pr-1">
+				<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+					Registration plate
+				</div>
+				<mat-form-field class="h-12 flex-grow">
+					<input matInput [formControlName]="'registrationPlate'">
+				</mat-form-field>
+			</div>
+
+			<div class="flex flex-wrap w-full md:w-1/2 mb-4 pl-1">
+				<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+					Trailer
+				</div>
+				<mat-form-field class="h-12 flex-grow">
+					<input matInput [formControlName]="'trailer'">
+				</mat-form-field>
+			</div>
+		</div>
+		<div class="pt-4 md:pl-3 md:pr-5 w-full lg:w-1/2 rounded">
+			<!-- input -->
+			<div class="flex flex-wrap w-full mb-4">
+				<div class="flex flex-wrap w-1/2 md:pr-1">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Input weight
+					</div>
+					<mat-form-field class="h-12 flex-grow">
+						<input matInput disabled>
+					</mat-form-field>
+				</div>
+				<div class="flex flex-wrap w-1/2 pl-1">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Input date
+					</div>
+					<mat-form-field class="h-12 flex-grow">
+						<input matInput disabled>
+					</mat-form-field>
+				</div>
+			</div>
+			<!-- output -->
+			<div class="flex flex-wrap w-full mb-4">
+				<div class="flex flex-wrap w-1/2 md:pr-1">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Output weight
+					</div>
+					<mat-form-field class="h-12 flex-grow">
+						<input matInput disabled>
+					</mat-form-field>
+				</div>
+				<div class="flex flex-wrap w-1/2 pl-1">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Output date
+					</div>
+					<mat-form-field class="h-12 flex-grow">
+						<input matInput disabled>
+					</mat-form-field>
+				</div>
+			</div>
+			<!-- bottom -->
+			<div class="flex flex-wrap w-full mb-4">
+				<div class="flex flex-wrap w-full md:w-1/2 md:pr-1">
+					<div class="flex items-center justify-center w-full md:w-auto h-8 md:px-4 md:h-12 text-gray-700 bg-gray-400 rounded">
+						Net weight
+					</div>
+					<mat-form-field class="h-12 flex-grow">
+						<input matInput disabled>
+					</mat-form-field>
+				</div>
+			</div>
+			<p class="text-xl">Bench weight</p>
+			<!-- weight -->
+			<div class="flex flex-wrap w-full mb-4 border-2 border-gray-700 border-opacity-30">
+				<input disabled [formControlName]="'weight'" class="w-full text-center bg-white sm:h-15 md:h-24 text-8xl">
+			</div>
+			<div class="flex flex-wrap w-full h-24 mb-4">
+				<button mat-button (click)="getWeight()"
+					[disabled]="scaleForm.invalid || !_isCustomerValid || !_isSupplierValid || (!isSupplierSelected() && !isCustomerSelected())"
+					class="w-full text-3xl text-white max-h-none h-14 bg-green-400">
+					Weigh
+				</button>
+				<button mat-button (click)="clog()" class="w-full text-3xl text-white max-h-none h-14 bg-green-400 mt-4">
+					Log
+				</button>
+			</div>
+		</div>
+	</div>
+
+</form>

@@ -1,0 +1,231 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+
+  <!-- Header -->
+  <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+    <!-- Loader -->
+    <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
+      <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+    </div>
+    <!-- Title -->
+    <div class="text-4xl font-extrabold tracking-tight">User list</div>
+    <!-- Actions -->
+    <div class="flex flex-shrink-0 items-center mt-0 md:mt-6 sm:ml-4">
+      <!-- Search -->
+      <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-50">
+        <mat-icon matPrefix [svgIcon]="'heroicons_outline:search'"></mat-icon>
+        <input matInput [readonly]="createMode" [formControl]="searchInputControl" [autocomplete]="'off'"
+          [placeholder]="'Search users'">
+      </mat-form-field>
+      <!-- Add user button -->
+      <button class="ml-4" [ngClass]="{ 'hover:bg-red-100 bg-red-100': createMode }" mat-flat-button [color]="'primary'"
+        (click)="unshiftNewUser()">
+        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+        <span class="ml-2 mr-1">Add</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="flex flex-auto overflow-hidden">
+
+    <!-- Users list -->
+    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+
+      <ng-container *ngIf="displayedUsers && displayedUsers.length > 0; else noUsers">
+
+        <div class="grid">
+          <!-- Header -->
+          <div
+            class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+            matSort matSortDisableClear>
+            <div class="hidden md:block" [mat-sort-header]="'idUser'">
+              ID
+            </div>
+            <div [mat-sort-header]="'name'">Name</div>
+            <div class="hidden sm:block" [mat-sort-header]="'username'">
+              Username
+            </div>
+            <div class="hidden sm:block" [mat-sort-header]="'group'">
+              Group
+            </div>
+            <div class="hidden lg:block" [mat-sort-header]="'company'">
+              Company
+            </div>
+          </div>
+          <!-- Rows -->
+
+          <ng-container *ngFor="let user of displayedUsers;">
+            <div class="inventory-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b"
+              [ngClass]="{ 'bg-indigo-100 hover:bg-indigo-200 duration-150' : user?.idUser === BLANK_USER_ID }">
+              <!-- ID -->
+              <div class="hidden md:block truncate">
+                {{user?.idUser}}
+              </div>
+              <!-- Name -->
+              <div class="truncate">
+                {{user?.name}}
+              </div>
+              <!-- Username -->
+              <div class="hidden sm:block">
+                {{user?.username}}
+              </div>
+              <!-- Group -->
+              <div class="hidden sm:flex items-center">
+                <div class="min-w-4">{{getUserGroup(user.idGroup)?.name | titlecase}}</div>
+              </div>
+              <!-- Company -->
+              <div class="hidden lg:flex items-center">
+                <div class="min-w-4">{{getUserCompany(user.idCompany)?.businessName | titlecase}}</div>
+              </div>
+              <!-- Details button -->
+              <div class="grid w-full">
+                <button class="min-w-10 min-h-7 h-7 px-2 place-self-end" *ngIf="user && user.idUser !== BLANK_USER_ID"
+                  [ngClass]="{'hover:bg-gray-80 bg-gray-100':(user?.idUser !== BLANK_USER_ID) && createMode}"
+                  mat-stroked-button (click)="toggleDetails(user.idUser)">
+                  <mat-icon class="icon-size-5"
+                    [svgIcon]="selectedUser?.idUser === user.idUser ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="grid">
+              <ng-container *ngIf="selectedUser?.idUser === user.idUser">
+                <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: user}"></ng-container>
+              </ng-container>
+            </div>
+          </ng-container>
+
+        </div>
+
+        <!-- <mat-paginator class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                       [ngClass]="{'pointer-events-none': isLoading}"
+                       [length]="pagination.length"
+                       [pageIndex]="pagination.page"
+                       [pageSize]="pagination.size"
+                       [pageSizeOptions]="[5, 10, 25, 100]"
+                       [showFirstLastButtons]="true"></mat-paginator> -->
+
+
+      </ng-container>
+
+      <ng-template #rowDetailsTemplate let-user>
+        <div class="shadow-lg overflow-hidden">
+          <div class="flex border-b">
+            <!-- Icon -->
+            <form class="flex flex-col w-full md:px-0 px-2" [formGroup]="selectedUserForm">
+
+              <div class="flex flex-wrap sm:flex justify-center sm:p-0 md:p-8">
+                <!-- Name -->
+                <mat-form-field class="w-full md:mr-4 md:w-1/2 lg:w-1/4">
+                  <mat-label>Name</mat-label>
+                  <input matInput [formControlName]="'name'">
+                  <mat-error *ngIf="selectedUserForm.get('name').hasError('required')">
+                    Name is required
+                  </mat-error>
+                  <mat-error *ngIf="selectedUserForm.get('name').hasError('maxlength')">
+                    Maximun length is 40 characters
+                  </mat-error>
+                </mat-form-field>
+                <!-- Username -->
+                <mat-form-field class="w-full md:mr-4 md:w-1/2 lg:w-1/4">
+                  <mat-label>Username</mat-label>
+                  <input matInput autocomplete="username" [formControlName]="'username'">
+                  <mat-error *ngIf="selectedUserForm.get('username').hasError('required')">
+                    Username is required
+                  </mat-error>
+                  <mat-error *ngIf="selectedUserForm.get('username').hasError('maxlength')">
+                    Maximun length is 25 characters
+                  </mat-error>
+                </mat-form-field>
+                <!-- Password -->
+                <mat-form-field class="w-full md:mr-4 md:w-1/2 lg:w-1/4">
+                  <mat-label>Passowrd</mat-label>
+                  <input id="password" autocomplete="current-password" matInput type="password" [formControlName]="'password'" #passwordField>
+                  <button mat-icon-button type="button"
+                    (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                    matSuffix>
+                    <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'password'"
+                      [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                    <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'text'"
+                      [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                  </button>
+                  <mat-error *ngIf="selectedUserForm.get('password').hasError('required')">
+                    Password is required
+                  </mat-error>
+                  <mat-error *ngIf="selectedUserForm.get('password').hasError('maxlength')">
+                    Maximun length is 32 characters
+                  </mat-error>
+                  <mat-error *ngIf="selectedUserForm.get('password').hasError('minlength')">
+                    Minimun length is 6 characters
+                  </mat-error>
+                </mat-form-field>
+                <!-- Group -->
+                <mat-form-field class="w-full md:mr-4 md:w-1/2 lg:w-1/4">
+                  <mat-label>Group</mat-label>
+                  <mat-select [formControlName]="'idGroup'">
+                    <ng-container *ngFor="let group of groups">
+                      <mat-option [value]="group.idGroup">
+                        {{group.name | titlecase}}
+                      </mat-option>
+                    </ng-container>
+                  </mat-select>
+                </mat-form-field>
+                <!-- Company -->
+                <mat-form-field class="w-full md:mr-4 md:w-1/2 lg:w-1/4">
+                  <mat-label>Company</mat-label>
+                  <mat-select [formControlName]="'idCompany'">
+                    <ng-container *ngFor="let company of companies">
+                      <mat-option [value]="company.idCompany">
+                        {{company.businessName | titlecase}}
+                      </mat-option>
+                    </ng-container>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+
+              <div class="flex items-center justify-between w-full border-t px-8 py-4">
+                <button class="-ml-4" *ngIf="user.idUser !== BLANK_USER_ID" mat-button [color]="'warn'"
+                  (click)="deleteSelectedUser()">
+                  Delete
+                </button>
+                <button class="-ml-4" *ngIf="user.idUser === BLANK_USER_ID" mat-button [color]="'warn'"
+                  (click)="shiftBlankUser()">
+                  Cancel
+                </button>
+                <div class="flex items-center">
+                  <div class="flex items-center mr-4" *ngIf="flashMessage">
+                    <ng-container *ngIf="flashMessage === 'success'">
+                      <mat-icon class="text-green-500" [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                      <span class="ml-2">Product updated</span>
+                    </ng-container>
+                    <ng-container *ngIf="flashMessage === 'error'">
+                      <mat-icon class="text-red-500" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                      <span class="ml-2">An error occurred, try again!</span>
+                    </ng-container>
+                  </div>
+                  <button *ngIf="user.idUser !== BLANK_USER_ID" mat-flat-button
+                    [disabled]="!this.selectedUserForm.valid" [color]="'primary'" (click)="updateSelectedUser()">
+                    Update
+                  </button>
+                  <button *ngIf="user.idUser === BLANK_USER_ID" mat-flat-button
+                    [disabled]="!this.selectedUserForm.valid" [color]="'primary'" (click)="createUser()">
+                    Create
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #noUsers>
+        <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no users!</div>
+      </ng-template>
+
+    </div>
+
+  </div>
+
+</div>

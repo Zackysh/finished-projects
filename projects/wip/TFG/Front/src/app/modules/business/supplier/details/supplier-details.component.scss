@@ -1,0 +1,60 @@
+input[disalbed] {
+    color: red;
+}
+
+.toDisable:disabled {
+    color: red;
+}
+
+fieldset {
+    div mat-form-field input {
+        color: red;
+    }
+    color: red;
+}
+
+// .mat-radio-group.ng-tns-c222-8.ng-untouched.ng-pristine {
+//     color: red;
+// }
+
+// Overriding disabled styles ...
+
+body.light .mat-radio-button.mat-radio-disabled .mat-radio-label-content,
+body .light .mat-radio-button.mat-radio-disabled .mat-radio-label-content {
+    color: #404a59;
+}
+
+body.light
+    .mat-radio-button.mat-radio-disabled.mat-radio-checked
+    .mat-radio-outer-circle,
+body.light .mat-radio-button.mat-radio-disabled .mat-radio-outer-circle,
+body
+    .light
+    .mat-radio-button.mat-radio-disabled.mat-radio-checked
+    .mat-radio-outer-circle,
+body .light .mat-radio-button.mat-radio-disabled .mat-radio-outer-circle {
+    border-color: var(--fuse-primary);
+}
+
+body.light
+    .mat-radio-button.mat-radio-disabled
+    .mat-radio-ripple
+    .mat-ripple-element,
+body.light .mat-radio-button.mat-radio-disabled .mat-radio-inner-circle,
+body
+    .light
+    .mat-radio-button.mat-radio-disabled
+    .mat-radio-ripple
+    .mat-ripple-element,
+body .light .mat-radio-button.mat-radio-disabled .mat-radio-inner-circle {
+    background-color: var(--fuse-primary) !important;
+}
+
+body.light .mat-select-disabled .mat-select-value,
+body .light .mat-select-disabled .mat-select-value {
+  color: #404a59;
+}
+
+body.light .mat-checkbox-disabled .mat-checkbox-label, body .light .mat-checkbox-disabled .mat-checkbox-label {
+  color: #404a59;
+}

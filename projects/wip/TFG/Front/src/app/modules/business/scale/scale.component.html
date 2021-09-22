@@ -1,0 +1,11 @@
+<div *ngIf="!isLoading">
+	<bw-scale *ngIf="type.name === 'BW'"></bw-scale>
+	<bench-scale *ngIf="type.name === 'BENCH'"></bench-scale>
+	<truck-scale *ngIf="type.name === 'TRUCK'"></truck-scale>
+	<div *ngIf="!type" class="w-full flex justify-center">
+		<p class="w-full mt-10 text-center text-gray-900 text-6xl">Scale not found!</p>
+	</div>
+</div>
+<!-- <button mat-mini-fab color="accent" (click)="logs()" class="ml-3">
+	<mat-icon>add</mat-icon>
+</button> -->

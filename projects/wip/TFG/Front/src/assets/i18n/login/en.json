@@ -1,0 +1,17 @@
+{
+  "title": "Sign in",
+  "form": {
+    "username": {
+      "text": "Username",
+      "required": "Username is required",
+      "valid": "Please enter a valid username"
+    },
+    "password": {
+      "text": "Password",
+      "required": "Password is required",
+      "valid": "Please enter a valid password"
+    },
+    "alert": "Wrong username or password",
+    "submit": "Sign in"
+  }
+}

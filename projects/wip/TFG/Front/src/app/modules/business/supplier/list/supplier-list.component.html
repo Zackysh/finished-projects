@@ -1,0 +1,103 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden">
+
+	<mat-drawer-container class="flex-auto h-full bg-card dark:bg-transparent" (backdropClick)="onBackdropClicked()">
+
+		<!-- Drawer -->
+		<mat-drawer id="drawer" class="dark:bg-gray-900" [mode]="drawerMode" [opened]="false" [position]="'end'"
+			[disableClose]="true" #matDrawer>
+			<router-outlet></router-outlet>
+		</mat-drawer>
+
+		<mat-drawer-content class="flex flex-col">
+
+			<!-- Main -->
+			<div class="flex-auto overflow-y-auto">
+
+				<!-- Header -->
+				<div class="flex flex-col sm:flex-row flex-auto justify-between py-8 px-6 md:px-8 border-b">
+					<!-- Title -->
+					<div>
+						<div class="text-4xl font-extrabold tracking-tight leading-none">Suppliers</div>
+						<div class="ml-0.5 font-medium text-secondary">
+							<ng-container *ngIf="supplierCount > 0">
+								{{supplierCount}}
+							</ng-container>
+							{{supplierCount | i18nPlural: {
+							'=0' : 'No suppliers',
+							'=1' : 'supplier',
+							'other': 'suppliers'
+							} }}
+						</div>
+					</div>
+
+					<!-- Main actions -->
+					<div class="flex flex-col items-center md:w-full mt-4 sm:mt-0 md:mt-4">
+						<form [formGroup]="searchForm">
+							<!-- Search -->
+							<mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full min-w-50">
+								<mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:search'"></mat-icon>
+								<input matInput [formControlName]="'searchInput'" [placeholder]="'Search suppliers'">
+							</mat-form-field>
+							<mat-checkbox color="primary" [formControlName]="'searchByID'">
+								Search by Spanish ID
+							</mat-checkbox>
+							<mat-error *ngIf="searchForm.get('searchInput').hasError('required')">
+								Search query date is required
+							</mat-error>
+							<mat-error *ngIf="searchForm.get('searchInput').hasError('invalidnif')">
+								Invalid NIF
+							</mat-error>
+						</form>
+
+						<!-- Add supplier button -->
+						<div class="w-full mt-4 text-center">
+							<button class="w-28 ml-4 " mat-flat-button [color]="'primary'" (click)="tlog()">
+								<mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+								<span class="ml-2 mr-1">Log</span>
+							</button>
+							<button class="w-28 ml-4 sm: mt-4" mat-flat-button [color]="'primary'" (click)="createSupplier()">
+								<mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+								<span class="ml-2 mr-1">Add</span>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Suppliers list -->
+				<div class="relative">
+					<ng-container *ngFor="let supplier of suppliers; let i = index;">
+						<!-- Supplier -->
+						<a class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
+							[ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !(selectedSupplier | async) || (selectedSupplier | async).idSupplier !== supplier.idSupplier,
+                                          'bg-primary-50 dark:bg-hover': (selectedSupplier | async) && (selectedSupplier | async).idSupplier === supplier.idSupplier}"
+							[routerLink]="['./', supplier.idInternal]" [state]="{id: supplier?.idInternal}">
+							<div class="min-w-0 ml-4">
+								<div class="font-medium leading-5 truncate">{{supplier.corporateName | titlecase}} - {{supplier.vat}}
+								</div>
+							</div>
+						</a>
+					</ng-container>
+
+
+
+					<!-- No suppliers -->
+					<ng-template #noSuppliers>
+						<div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+							There are no suppliers!
+						</div>
+					</ng-template>
+				</div>
+			</div>
+
+
+			<mat-paginator
+				class="sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+				[ngClass]="{'pointer-events-none': isLoading}" [length]="pagination?.searchCount ?? pagination?.count"
+				[pageIndex]="pagination?.page" [pageSize]="pagination?.size" [pageSizeOptions]="[5, 10, 15, 25, 100]"
+				[showFirstLastButtons]="true">
+			</mat-paginator>
+		</mat-drawer-content>
+
+	</mat-drawer-container>
+
+</div>

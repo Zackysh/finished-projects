@@ -1,0 +1,336 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+
+	<!-- Header -->
+	<div class="flex flex-col sm:flex-row sm:products-center sm:justify-between py-8 px-6 md:px-8 border-b">
+		<!-- Loader -->
+		<div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
+			<mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+		</div>
+		<!-- Title -->
+		<div class="text-4xl font-extrabold tracking-tight">Product list</div>
+		<!-- Actions -->
+		<div class="flex flex-shrink-0 products-center mt-0 md:mt-6 sm:ml-4">
+			<!-- Search -->
+			<mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-50">
+				<mat-icon matPrefix [svgIcon]="'heroicons_outline:search'"></mat-icon>
+				<input matInput [readonly]="createMode" [formControl]="searchControl" [autocomplete]="'off'"
+					[placeholder]="'Search products'">
+			</mat-form-field>
+			<!-- Add product button -->
+			<button class="ml-4" [ngClass]="{ 'hover:bg-red-100 bg-red-100': createMode }" mat-flat-button [color]="'primary'"
+				(click)="unshiftNewProduct()">
+				<mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+				<span class="ml-2 mr-1">Add</span>
+			</button>
+			<!-- Log button -->
+			<button class="ml-4" mat-flat-button [color]="'primary'" (click)="logres()">
+				<mat-icon [svgIcon]="'heroicons_outline:bell'"></mat-icon>
+				<span class="ml-2 mr-1">Log</span>
+			</button>
+		</div>
+	</div>
+
+	<!-- Main -->
+	<div class="flex flex-auto overflow-hidden">
+
+		<!-- Products list -->
+		<div class="flex flex-col flex-auto overflow-hidden overflow-y-auto">
+			<ng-container *ngIf="products && products.length > 0; else noProducts">
+
+				<div class="grid">
+					<!-- Header -->
+					<div
+						class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+						matSort matSortDisableClear>
+						<div [mat-sort-header]="'idProduct'">
+							ID
+						</div>
+						<div class="hidden sm:block" [mat-sort-header]="'reference'">
+							Reference
+						</div>
+						<div [mat-sort-header]="'name'" class="sm:bg-blue-300 md:bg-green-500 lg:bg-red-600">
+							Name
+						</div>
+						<div class="hidden md:block" [mat-sort-header]="'idProductType'">
+							Type
+						</div>
+						<div class="hidden sm:block" [mat-sort-header]="'description'">
+							Description
+						</div>
+						<div class="hidden lg:block" [mat-sort-header]="'active'">
+							Active
+						</div>
+						<div class="hidden lg:block" [mat-sort-header]="'onSale'">
+							On sale
+						</div>
+						<div class="hidden lg:block" [mat-sort-header]="'quantity'">
+							Quantity
+						</div>
+					</div>
+
+					<!-- Rows -->
+					<div class="relative">
+						<ng-container *ngFor="let product of products;">
+							<div class="inventory-grid grid products-center gap-4 py-3 px-6 md:px-8 border-b"
+								[ngClass]="{ 'bg-indigo-100 hover:bg-indigo-200 duration-150' : product?.idProduct === BLANK_TEMPLATE_ID }">
+								<!-- ID -->
+								<div class="">
+									{{product?.idProduct}}
+								</div>
+								<!-- Reference -->
+								<div class="hidden sm:block">
+									{{product?.reference}}
+								</div>
+								<!-- Name -->
+								<div>
+									{{product?.name}}
+								</div>
+								<!-- ProductType -->
+								<div class="hidden md:block">
+									{{getProductType(product.idProductType)?.name ?? 'No type' | titlecase}}
+								</div>
+								<!-- Description -->
+								<p class="hidden sm:block truncate" [matTooltip]="product.description">
+									{{product?.description}}
+								</p>
+								<!-- Active -->
+								<div class="hidden lg:flex">
+									<mat-checkbox class="justify-center text-lg" disabled color="warn" [checked]="product?.active">
+									</mat-checkbox>
+								</div>
+								<!-- On sale -->
+								<div class="hidden lg:flex">
+									<mat-checkbox class="text-lg" disabled color="warn" [checked]="product?.onSale">
+									</mat-checkbox>
+								</div>
+								<!-- Quantity -->
+								<div class="hidden lg:flex items-center">
+									{{product?.quantity}}
+								</div>
+								<!-- Details button -->
+								<div class="grid w-full">
+									<button class="min-w-10 min-h-7 h-7 px-2 place-self-end"
+										*ngIf="product && product.idProduct !== BLANK_TEMPLATE_ID"
+										[ngClass]="{'hover:bg-gray-80 bg-gray-100':(product?.idProduct !== BLANK_TEMPLATE_ID) && createMode}"
+										mat-stroked-button (click)="toggleDetails(product.idProduct)">
+										<mat-icon class="icon-size-5"
+											[svgIcon]="selectedProduct?.idProduct === product.idProduct ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+										</mat-icon>
+									</button>
+								</div>
+							</div>
+							<div class="grid">
+								<ng-container *ngIf="selectedProduct?.idProduct === product.idProduct">
+									<ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: product}">
+									</ng-container>
+								</ng-container>
+							</div>
+						</ng-container>
+					</div>
+				</div>
+			</ng-container>
+
+			<ng-template #rowDetailsTemplate let-product>
+				<div class="shadow-lg overflow-hidden">
+					<div class="flex border-b">
+						<!-- Icon -->
+						<form class="px-2 pt-4 flex flex-col md:px-0" [formGroup]="productForm">
+
+							<div class="flex flex-wrap sm:flex justify-center sm:p-0 md:p-8">
+								<!-- Name -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/2 md:w-1/3 lg:pr-5 lg:w-1/4">
+									<mat-label>Name</mat-label>
+									<input matInput [formControlName]="'name'">
+									<mat-error *ngIf="productForm.get('name').hasError('required')">
+										Name is required
+									</mat-error>
+									<mat-error *ngIf="productForm.get('name').hasError('maxlength')">
+										Maximun length is 40 characters
+									</mat-error>
+								</mat-form-field>
+								<!-- productType -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/2 md:w-1/3 lg:pr-5 lg:w-1/4">
+									<mat-label>Type</mat-label>
+									<mat-select [formControlName]="'idProductType'">
+										<ng-container *ngFor="let type of productTypes">
+											<mat-option [value]="type.idProductType">
+												{{type.name | titlecase}}
+											</mat-option>
+										</ng-container>
+									</mat-select>
+								</mat-form-field>
+								<!-- Description -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/2 md:w-1/3 lg:pr-5 lg:w-1/4" appearance="fill">
+									<mat-label>Description</mat-label>
+									<textarea matInput style="resize: none" [formControlName]="'description'"></textarea>
+									<mat-error *ngIf="productForm.get('description').hasError('maxlength')">
+										Maximun length is 75 characters
+									</mat-error>
+								</mat-form-field>
+								<!-- Description short -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/2 md:w-1/3 lg:pr-5 lg:w-1/4" appearance="fill">
+									<mat-label>Short description</mat-label>
+									<textarea matInput style="resize: none" [formControlName]="'descriptionShort'"></textarea>
+									<mat-error *ngIf="productForm.get('descriptionShort').hasError('maxlength')">
+										Maximun length is 75 characters
+									</mat-error>
+								</mat-form-field>
+								<!-- Reference -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/3 md:w-1/3 lg:pr-5 lg:w-1/4">
+									<mat-label>Reference</mat-label>
+									<input matInput [formControlName]="'reference'">
+									<mat-error *ngIf="productForm.get('reference').hasError('required')">
+										Reference is required
+									</mat-error>
+									<mat-error *ngIf="productForm.get('reference').hasError('maxlength')">
+										Maximun length is 30 characters
+									</mat-error>
+								</mat-form-field>
+								<!-- Alternative reference -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/3 md:w-1/3 lg:pr-5 lg:w-1/4">
+									<mat-label>Alternative reference</mat-label>
+									<input matInput [formControlName]="'alternativeReference'">
+									<mat-error *ngIf="productForm.get('alternativeReference').hasError('required')">
+										Alternative reference is required
+									</mat-error>
+									<mat-error *ngIf="productForm.get('alternativeReference').hasError('maxlength')">
+										Maximun length is 30 characters
+									</mat-error>
+								</mat-form-field>
+								<!-- EAN13 -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/3 md:w-1/3 lg:pr-5 lg:w-1/4">
+									<mat-label>EAN13</mat-label>
+									<input type="number" matInput [formControlName]="'ean13'">
+									<mat-error *ngIf="productForm.get('ean13').hasError('required')">
+										EAN13 is required
+									</mat-error>
+									<mat-error *ngIf="productForm.get('ean13').hasError('pattern')" class="mb-1">
+										EAN13 must be a string of 13 numbers from 0 to 9
+									</mat-error>
+								</mat-form-field>
+								<!-- Note -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/2 md:w-1/3 lg:pr-5 lg:w-1/4">
+									<mat-label>Note</mat-label>
+									<input matInput [formControlName]="'note'">
+									<mat-error *ngIf="productForm.get('note').hasError('required')">
+										Note is required
+									</mat-error>
+									<mat-error *ngIf="productForm.get('note').hasError('maxlength')">
+										Maximun length is 45 characters
+									</mat-error>
+								</mat-form-field>
+								<hr class=" lg:visible">
+								<!-- Stock -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/2 md:w-1/3 lg:pr-5 lg:w-1/5">
+									<mat-label>Stock</mat-label>
+									<input type="number" matInput [formControlName]="'quantity'">
+									<mat-error *ngIf="productForm.get('quantity').hasError('required')">
+										Stock is required
+									</mat-error>
+								</mat-form-field>
+								<!-- Out Of Stock -->
+								<mat-form-field class="w-full sm:pr-1 sm:w-1/2 md:w-1/4 lg:pr-5 lg:w-1/5">
+									<mat-label>Out of stock</mat-label>
+									<mat-select [formControlName]="'outOfStock'">
+										<mat-option [value]="0">
+											Op. 1
+										</mat-option>
+										<mat-option [value]="1">
+											Op. 2
+										</mat-option>
+										<mat-option [value]="2">
+											Op. 3
+										</mat-option>
+									</mat-select>
+								</mat-form-field>
+								<!-- Create Date -->
+								<mat-form-field *ngIf="!createMode" class="w-full sm:pr-1 sm:w-1/2 md:w-1/4 lg:pr-5 lg:w-1/5"
+									appearance="fill">
+									<mat-label>Creation date</mat-label>
+									<input matInput disabled [matDatepicker]="createDate" [formControlName]="'createDate'">
+									<mat-datepicker-toggle matSuffix [for]="createDate"></mat-datepicker-toggle>
+									<mat-datepicker #createDate></mat-datepicker>
+									<mat-error *ngIf="productForm.get('createDate').errors">
+										Creation date is required
+									</mat-error>
+								</mat-form-field>
+								<!-- Update Date -->
+								<mat-form-field *ngIf="!createMode" class="w-full sm:pr-1 sm:w-1/2 md:w-1/4 lg:pr-5 lg:w-1/5"
+									appearance="fill">
+									<mat-label>Modification date</mat-label>
+									<input matInput disabled [matDatepicker]="updateDate" [formControlName]="'updateDate'">
+									<mat-datepicker-toggle matSuffix [for]="updateDate"></mat-datepicker-toggle>
+									<mat-datepicker #updateDate></mat-datepicker>
+									<mat-error *ngIf="productForm.get('updateDate').errors">
+										Modification date is required
+									</mat-error>
+								</mat-form-field>
+								<!-- Checkboxes -->
+								<div class="flex flex-col justify-center sm:pr-1 sm:w-1/2 md:w-1/4 lg:pr-5 lg:w-1/5">
+									<!-- On sale -->
+									<div class="w-full">
+										<mat-checkbox color="primary" [formControlName]="'onSale'" ngDefaultControl>
+											On Sale
+										</mat-checkbox>
+									</div>
+									<!-- Active -->
+									<div class="w-full">
+										<mat-checkbox color="primary" [formControlName]="'active'" ngDefaultControl>
+											Active
+										</mat-checkbox>
+									</div>
+								</div>
+							</div>
+
+
+							<div class="border-t px-8 py-4 flex justify-between">
+								<button *ngIf="!createMode" class="-ml-4" mat-button [color]="'warn'" (click)="deleteSelectedProduct()">
+									Delete
+								</button>
+								<button class="-ml-4" *ngIf="createMode" mat-button [color]="'warn'" (click)="shiftBlankProduct()">
+									Cancel
+								</button>
+								<div class="flex products-center">
+									<div class="flex products-center mr-4" *ngIf="flashMessage">
+										<ng-container *ngIf="flashMessage === 'success'">
+											<mat-icon class="text-green-500" [svgIcon]="'heroicons_outline:check'">
+											</mat-icon>
+											<span class="ml-2">Product updated</span>
+										</ng-container>
+										<ng-container *ngIf="flashMessage === 'error'">
+											<mat-icon class="text-red-500" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+											<span class="ml-2">An error occurred, try again!</span>
+										</ng-container>
+									</div>
+									<button *ngIf="!createMode" mat-flat-button [disabled]="!this.productForm.valid" [color]="'primary'"
+										(click)="updateProduct()">
+										Update
+									</button>
+									<button *ngIf="createMode" mat-flat-button [disabled]="!this.productForm.valid" [color]="'primary'"
+										(click)="createProduct()">
+										Create
+									</button>
+								</div>
+							</div>
+
+						</form>
+					</div>
+				</div>
+			</ng-template>
+
+			<ng-template #noProducts>
+				<div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no
+					products!</div>
+			</ng-template>
+
+
+		</div>
+	</div>
+
+	<mat-paginator class="sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+		[ngClass]="{'pointer-events-none': isLoading}" [length]="pagination?.searchCount ?? pagination?.count"
+		[pageIndex]="pagination?.page" [pageSize]="pagination?.size" [pageSizeOptions]="[5, 10, 15, 25, 100]"
+		[showFirstLastButtons]="true">
+	</mat-paginator>
+
+</div>

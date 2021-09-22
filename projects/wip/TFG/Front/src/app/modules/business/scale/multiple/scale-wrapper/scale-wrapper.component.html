@@ -1,0 +1,20 @@
+<div class="flex flex-wrap max-w-full max-h-none w-full" *ngIf="scales && scales?.length > 0">
+
+	<div class="flex flex-wrap w-full">
+		<div class="flex items-center w-full h-12">
+			<!-- Sidebar toggle button -->
+			<button mat-icon-button (click)="_multiScaleComponent.drawer.toggle()">
+				<mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+			</button>
+		</div>
+		<div class="flex flex-wrap w-full h-full">
+			<ng-container *ngFor="let scale of scales">
+				<bw-scale [scale]="scale" class=" min-w-1/2" [ngClass]="{'xxl:max-w-1/2': (scales && scales.length > 1)}"></bw-scale>
+			</ng-container>
+		</div>
+	</div>
+
+
+
+
+</div>
