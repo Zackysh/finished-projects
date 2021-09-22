@@ -1,6 +1,6 @@
 # PokedexDesktop App
 
-Difficulty for one dev <image src="[https://progress-bar.dev/](https://progress-bar.dev/)47" />
+Difficulty for one dev ![47%](https://progress-bar.dev/47)
 
 This project displays what could be named a Pokedex. It has been implemented using exclusively Java Swing & MySql.
 
