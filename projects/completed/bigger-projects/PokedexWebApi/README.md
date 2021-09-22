@@ -1,6 +1,12 @@
-### Instructions to execute this project
+## Instructions to execute this project
+
+Difficulty for one dev <image src="[https://progress-bar.dev/](https://progress-bar.dev/)40" />
+
+level of experience (compared to present) that I had with this technologies, which implies room for improvement with my new skills <image src="[https://progress-bar.dev/](https://progress-bar.dev/)35" />
 
 # [DOCUMENTATION](https://www.notion.so/Pokedex-Web-and-API-26bb54dc02164be5bcf3f8461e28a894)
+
+
 ##### RUN API:
 
   > Open VS y click on "open project or solution". Select `API/Pokedex.sln`
