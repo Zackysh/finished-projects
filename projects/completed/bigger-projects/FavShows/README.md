@@ -1,6 +1,6 @@
 # FavShows App
 
-Difficulty for one dev <image src="[https://progress-bar.dev/](https://progress-bar.dev/)20" />
+Difficulty for one dev ![25%](https://progress-bar.dev/25)
 
 This is a simple app aplying React + Spring Boot basics. No css processor or advanced management/interactions has been implemented (poor UX).
 
