@@ -1,7 +1,7 @@
 
 ## This repository 📌
 
-This repository is officially where I save my academic / dummy projects.
+This repository is where I save my academic / dummy projects.
 
 ### Projects
 #### [Pokedex Desktop](https://github.com/Zackysh/programming/tree/main/practices/completed/full-projects/PokedexDesktop) Just Java
